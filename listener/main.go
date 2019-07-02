@@ -31,7 +31,34 @@ func newCR(crAddr common.Address, client *ethclient.Client) (*commitreveal.Commi
 }
 
 var proxyEvent = []string{
-	0: "Grouping",
+	0:  "LogUrl",
+	1:  "LogRequestUserRandom",
+	2:  "LogNonSupportedType",
+	3:  "LogNonContractCall",
+	4:  "LogCallbackTriggeredFor",
+	5:  "LogRequestFromNonExistentUC",
+	6:  "LogUpdateRandom",
+	7:  "LogValidationResult",
+	8:  "LogInsufficientPendingNode",
+	9:  "LogInsufficientWorkingGroup",
+	10: "Grouping",
+	11: "LogPublicKeyAccepted",
+	12: "LogPublicKeySuggested",
+	13: "LogGroupDissolve",
+	14: "LogRegisteredNewPendingNode",
+	15: "LogGroupingInitiated",
+	16: "LogNoPendingGroup",
+	17: "LogPendingGroupRemoved",
+	18: "LogError",
+	19: "UpdateGroupToPick",
+	20: "UpdateGroupSize",
+	21: "UpdateGroupingThreshold",
+	22: "UpdateGroupMaturityPeriod",
+	23: "UpdateBootstrapCommitDuration",
+	24: "UpdateBootstrapRevealDuration",
+	25: "UpdatebootstrapStartThreshold",
+	26: "UpdatePendingGroupMaxLife",
+	27: "GuardianReward",
 }
 
 func main() {

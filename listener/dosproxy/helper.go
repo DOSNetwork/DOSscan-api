@@ -15,6 +15,76 @@ var FetchTable = []func(ctx context.Context, lastBlkc chan uint64, filter *Dospr
 		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
+		}()
+		return out, errc
+	},
+	1: func(ctx context.Context, lastBlkc chan uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+		}()
+		return out, errc
+	},
+	2: func(ctx context.Context, lastBlkc chan uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+		}()
+		return out, errc
+	},
+	3: func(ctx context.Context, lastBlkc chan uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+		}()
+		return out, errc
+	},
+	4: func(ctx context.Context, lastBlkc chan uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+		}()
+		return out, errc
+	},
+	5: func(ctx context.Context, lastBlkc chan uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+		}()
+		return out, errc
+	},
+	6: func(ctx context.Context, lastBlkc chan uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+		}()
+		return out, errc
+	},
+	7: func(ctx context.Context, lastBlkc chan uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+		}()
+		return out, errc
+	},
+	8: func(ctx context.Context, lastBlkc chan uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+		}()
+		return out, errc
+	},
+	9: func(ctx context.Context, lastBlkc chan uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+		}()
+		return out, errc
+	},
+	10: func(ctx context.Context, lastBlkc chan uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
 			var blkNum uint64
 			select {
 			case <-ctx.Done():
@@ -59,6 +129,125 @@ var FetchTable = []func(ctx context.Context, lastBlkc chan uint64, filter *Dospr
 					}
 				}
 			}
+		}()
+		return out, errc
+	},
+	11: func(ctx context.Context, lastBlkc chan uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+		}()
+		return out, errc
+	},
+	12: func(ctx context.Context, lastBlkc chan uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+		}()
+		return out, errc
+	},
+	13: func(ctx context.Context, lastBlkc chan uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+		}()
+		return out, errc
+	},
+	14: func(ctx context.Context, lastBlkc chan uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+		}()
+		return out, errc
+	},
+	15: func(ctx context.Context, lastBlkc chan uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+		}()
+		return out, errc
+	},
+	16: func(ctx context.Context, lastBlkc chan uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+		}()
+		return out, errc
+	},
+	17: func(ctx context.Context, lastBlkc chan uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+		}()
+		return out, errc
+	},
+	18: func(ctx context.Context, lastBlkc chan uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+		}()
+		return out, errc
+	},
+	19: func(ctx context.Context, lastBlkc chan uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+		}()
+		return out, errc
+	},
+	20: func(ctx context.Context, lastBlkc chan uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+		}()
+		return out, errc
+	},
+	21: func(ctx context.Context, lastBlkc chan uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+		}()
+		return out, errc
+	},
+	22: func(ctx context.Context, lastBlkc chan uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+		}()
+		return out, errc
+	},
+	23: func(ctx context.Context, lastBlkc chan uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+		}()
+		return out, errc
+	},
+	24: func(ctx context.Context, lastBlkc chan uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+		}()
+		return out, errc
+	},
+	25: func(ctx context.Context, lastBlkc chan uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+		}()
+		return out, errc
+	},
+	26: func(ctx context.Context, lastBlkc chan uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+		}()
+		return out, errc
+	},
+	27: func(ctx context.Context, lastBlkc chan uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
 		}()
 		return out, errc
 	},

@@ -44,6 +44,66 @@ var ProxyTable = []func(ctx context.Context, eventc chan interface{}, db *sql.DB
 	0: func(ctx context.Context, eventc chan interface{}, db *sql.DB) chan error {
 		errc := make(chan error)
 		go func() {
+		}()
+		return errc
+	},
+	1: func(ctx context.Context, eventc chan interface{}, db *sql.DB) chan error {
+		errc := make(chan error)
+		go func() {
+		}()
+		return errc
+	},
+	2: func(ctx context.Context, eventc chan interface{}, db *sql.DB) chan error {
+		errc := make(chan error)
+		go func() {
+		}()
+		return errc
+	},
+	3: func(ctx context.Context, eventc chan interface{}, db *sql.DB) chan error {
+		errc := make(chan error)
+		go func() {
+		}()
+		return errc
+	},
+	4: func(ctx context.Context, eventc chan interface{}, db *sql.DB) chan error {
+		errc := make(chan error)
+		go func() {
+		}()
+		return errc
+	},
+	5: func(ctx context.Context, eventc chan interface{}, db *sql.DB) chan error {
+		errc := make(chan error)
+		go func() {
+		}()
+		return errc
+	},
+	6: func(ctx context.Context, eventc chan interface{}, db *sql.DB) chan error {
+		errc := make(chan error)
+		go func() {
+		}()
+		return errc
+	},
+	7: func(ctx context.Context, eventc chan interface{}, db *sql.DB) chan error {
+		errc := make(chan error)
+		go func() {
+		}()
+		return errc
+	},
+	8: func(ctx context.Context, eventc chan interface{}, db *sql.DB) chan error {
+		errc := make(chan error)
+		go func() {
+		}()
+		return errc
+	},
+	9: func(ctx context.Context, eventc chan interface{}, db *sql.DB) chan error {
+		errc := make(chan error)
+		go func() {
+		}()
+		return errc
+	},
+	10: func(ctx context.Context, eventc chan interface{}, db *sql.DB) chan error {
+		errc := make(chan error)
+		go func() {
 			for {
 				select {
 				case <-ctx.Done():
@@ -69,6 +129,108 @@ var ProxyTable = []func(ctx context.Context, eventc chan interface{}, db *sql.DB
 					}
 				}
 			}
+		}()
+		return errc
+	},
+	11: func(ctx context.Context, eventc chan interface{}, db *sql.DB) chan error {
+		errc := make(chan error)
+		go func() {
+		}()
+		return errc
+	},
+	12: func(ctx context.Context, eventc chan interface{}, db *sql.DB) chan error {
+		errc := make(chan error)
+		go func() {
+		}()
+		return errc
+	},
+	13: func(ctx context.Context, eventc chan interface{}, db *sql.DB) chan error {
+		errc := make(chan error)
+		go func() {
+		}()
+		return errc
+	},
+	14: func(ctx context.Context, eventc chan interface{}, db *sql.DB) chan error {
+		errc := make(chan error)
+		go func() {
+		}()
+		return errc
+	},
+	15: func(ctx context.Context, eventc chan interface{}, db *sql.DB) chan error {
+		errc := make(chan error)
+		go func() {
+		}()
+		return errc
+	},
+	16: func(ctx context.Context, eventc chan interface{}, db *sql.DB) chan error {
+		errc := make(chan error)
+		go func() {
+		}()
+		return errc
+	},
+	17: func(ctx context.Context, eventc chan interface{}, db *sql.DB) chan error {
+		errc := make(chan error)
+		go func() {
+		}()
+		return errc
+	},
+	18: func(ctx context.Context, eventc chan interface{}, db *sql.DB) chan error {
+		errc := make(chan error)
+		go func() {
+		}()
+		return errc
+	},
+	19: func(ctx context.Context, eventc chan interface{}, db *sql.DB) chan error {
+		errc := make(chan error)
+		go func() {
+		}()
+		return errc
+	},
+	20: func(ctx context.Context, eventc chan interface{}, db *sql.DB) chan error {
+		errc := make(chan error)
+		go func() {
+		}()
+		return errc
+	},
+	21: func(ctx context.Context, eventc chan interface{}, db *sql.DB) chan error {
+		errc := make(chan error)
+		go func() {
+		}()
+		return errc
+	},
+	22: func(ctx context.Context, eventc chan interface{}, db *sql.DB) chan error {
+		errc := make(chan error)
+		go func() {
+		}()
+		return errc
+	},
+	23: func(ctx context.Context, eventc chan interface{}, db *sql.DB) chan error {
+		errc := make(chan error)
+		go func() {
+		}()
+		return errc
+	},
+	24: func(ctx context.Context, eventc chan interface{}, db *sql.DB) chan error {
+		errc := make(chan error)
+		go func() {
+		}()
+		return errc
+	},
+	25: func(ctx context.Context, eventc chan interface{}, db *sql.DB) chan error {
+		errc := make(chan error)
+		go func() {
+		}()
+		return errc
+	},
+	26: func(ctx context.Context, eventc chan interface{}, db *sql.DB) chan error {
+		errc := make(chan error)
+		go func() {
+		}()
+		return errc
+	},
+	27: func(ctx context.Context, eventc chan interface{}, db *sql.DB) chan error {
+		errc := make(chan error)
+		go func() {
 		}()
 		return errc
 	},
