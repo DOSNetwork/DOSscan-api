@@ -2,24 +2,18 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"sync"
 
-	"github.com/DOSNetwork/explorer-Api/listener/commitreveal"
-	"github.com/DOSNetwork/explorer-Api/listener/db"
-	"github.com/DOSNetwork/explorer-Api/listener/dosbridge"
-	"github.com/DOSNetwork/explorer-Api/listener/dosproxy"
+	"github.com/DOSNetwork/explorer-Api/models"
+	"github.com/DOSNetwork/explorer-Api/subscriber/commitreveal"
+	"github.com/DOSNetwork/explorer-Api/subscriber/dosbridge"
+	"github.com/DOSNetwork/explorer-Api/subscriber/dosproxy"
+
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	//	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
-)
-
-const (
-	DB_USER     = "postgres"
-	DB_PASSWORD = "postgres"
-	DB_NAME     = "postgres"
 )
 
 func newCR(crAddr common.Address, client *ethclient.Client) (*commitreveal.CommitrevealSession, error) {
@@ -31,47 +25,39 @@ func newCR(crAddr common.Address, client *ethclient.Client) (*commitreveal.Commi
 }
 
 var proxyEvent = []string{
-	0:  "LogUrl",
-	1:  "LogRequestUserRandom",
-	2:  "LogNonSupportedType",
-	3:  "LogNonContractCall",
-	4:  "LogCallbackTriggeredFor",
-	5:  "LogRequestFromNonExistentUC",
-	6:  "LogUpdateRandom",
-	7:  "LogValidationResult",
-	8:  "LogInsufficientPendingNode",
-	9:  "LogInsufficientWorkingGroup",
-	10: "Grouping",
-	11: "LogPublicKeyAccepted",
-	12: "LogPublicKeySuggested",
-	13: "LogGroupDissolve",
-	14: "LogRegisteredNewPendingNode",
-	15: "LogGroupingInitiated",
-	16: "LogNoPendingGroup",
-	17: "LogPendingGroupRemoved",
-	18: "LogError",
-	19: "UpdateGroupToPick",
-	20: "UpdateGroupSize",
-	21: "UpdateGroupingThreshold",
-	22: "UpdateGroupMaturityPeriod",
-	23: "UpdateBootstrapCommitDuration",
-	24: "UpdateBootstrapRevealDuration",
-	25: "UpdatebootstrapStartThreshold",
-	26: "UpdatePendingGroupMaxLife",
-	27: "GuardianReward",
+	0:  "logurl",
+	1:  "logrequestuserrandom",
+	2:  "lognonsupportedtype",
+	3:  "lognoncontractcall",
+	4:  "logcallbacktriggeredfor",
+	5:  "logrequestfromnonexistentuc",
+	6:  "logupdaterandom",
+	7:  "logvalidationresult",
+	8:  "loginsufficientpendingnode",
+	9:  "loginsufficientworkinggroup",
+	10: "loggrouping",
+	11: "logpublickeyaccepted",
+	12: "logpublickeySuggested",
+	13: "loggroupdissolve",
+	14: "logregisterednewpendingnode",
+	15: "loggroupinginitiated",
+	16: "lognopendinggroup",
+	17: "logpendinggroupremoved",
+	18: "logerror",
+	19: "updategrouptopick",
+	20: "updategroupsize",
+	21: "updategroupingthreshold",
+	22: "updategroupmaturityperiod",
+	23: "updatebootstrapcommitduration",
+	24: "updatebootstraprevealduration",
+	25: "updatebootstrapstartthreshold",
+	26: "updatependinggroupmaxLife",
+	27: "guardianreward",
 }
 
 func main() {
 	ctx := context.Background()
-
-	dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable",
-		DB_USER, DB_PASSWORD, DB_NAME)
-	dbConn, err := sql.Open("postgres", dbinfo)
-	if err != nil {
-		fmt.Println(":DialToEth err ", err)
-		return
-	}
-	defer dbConn.Close()
+	db := models.Connect()
 
 	client, err := ethclient.Dial("wss://rinkeby.infura.io/ws/v3/db19cf9028054762865cb9ce883c6ab8")
 	if err != nil {
@@ -97,15 +83,18 @@ RECONNECT:
 		fmt.Println("newProxy err ", err)
 		return
 	}
-
+	lastBlk, err := getLatestBlock(client)
+	if err != nil {
+		fmt.Println("GetLatestBlock err ", err)
+		return
+	}
 	var errcList []chan error
 	for idx, event := range proxyEvent {
-		fromBc, errc := db.FromBlockNumber(ctx, event, dbConn)
+		fromBc, errc := dosproxy.FromBlockNumber(ctx, event, db)
 		errcList = append(errcList, errc)
-		out, errc := dosproxy.FetchTable[idx](ctx, fromBc, &proxy.Contract.DosproxyFilterer)
+		outc, errc := dosproxy.FetchTable[idx](ctx, fromBc, lastBlk, &proxy.Contract.DosproxyFilterer)
 		errcList = append(errcList, errc)
-		//errcList = append(errcList, db.ProxyTable[idx](ctx, out, dbConn))
-
+		dosproxy.ModelsTable[idx](ctx, db, outc)
 	}
 	//TODO Add CommitReveal Event
 	//TODO Add Stacking Event
@@ -131,6 +120,15 @@ L:
 		return
 	}
 	goto RECONNECT
+}
+
+func getLatestBlock(client *ethclient.Client) (blknum uint64, err error) {
+	var header *types.Header
+	header, err = client.HeaderByNumber(context.Background(), nil)
+	if err == nil {
+		blknum = header.Number.Uint64()
+	}
+	return
 }
 
 func mergeErrors(ctx context.Context, cs ...chan error) chan error {
