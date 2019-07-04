@@ -2,9 +2,9 @@
 package main
 
 import (
-	"github.com/DOSNetwork/explorer-Api/models"
-	"github.com/DOSNetwork/explorer-Api/server/api"
-	"github.com/DOSNetwork/explorer-Api/server/middleware"
+	"github.com/DOSNetwork/DOSscan-api/models"
+	"github.com/DOSNetwork/DOSscan-api/server/api"
+	"github.com/DOSNetwork/DOSscan-api/server/middleware"
 
 	"github.com/gin-gonic/gin"
 )

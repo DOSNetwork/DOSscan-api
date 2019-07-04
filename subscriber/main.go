@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/DOSNetwork/explorer-Api/models"
-	"github.com/DOSNetwork/explorer-Api/subscriber/commitreveal"
-	"github.com/DOSNetwork/explorer-Api/subscriber/dosbridge"
-	"github.com/DOSNetwork/explorer-Api/subscriber/dosproxy"
+	"github.com/DOSNetwork/DOSscan-api/models"
+	"github.com/DOSNetwork/DOSscan-api/subscriber/commitreveal"
+	"github.com/DOSNetwork/DOSscan-api/subscriber/dosbridge"
+	"github.com/DOSNetwork/DOSscan-api/subscriber/dosproxy"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"

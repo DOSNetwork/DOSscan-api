@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/DOSNetwork/explorer-Api/models"
+	"github.com/DOSNetwork/DOSscan-api/models"
 	"github.com/jinzhu/gorm"
 )
 
