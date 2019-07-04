@@ -511,6 +511,8 @@ func (GuardianReward) TableName() string {
 	return "guardianreward"
 }
 
+var DB *gorm.DB
+
 func Connect() *gorm.DB {
 	postgres_url := fmt.Sprintf("postgres://%s:%s@localhost:5432/%s?sslmode=disable", DB_USER, DB_PASSWORD, DB_NAME)
 	var db *gorm.DB
@@ -527,5 +529,6 @@ func Connect() *gorm.DB {
 
 	// DB.LogMode(true)
 	log.Info("DB Connected")
+	DB = db
 	return db
 }
