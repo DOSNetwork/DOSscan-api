@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	//	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/DOSNetwork/DOSscan-Api/models"
+	"github.com/DOSNetwork/DOSscan-api/models"
 	//	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
