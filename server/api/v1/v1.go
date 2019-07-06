@@ -3,7 +3,7 @@ package apiv1
 import (
 	"fmt"
 
-	"github.com/DOSNetwork/explorer-Api/models"
+	"github.com/DOSNetwork/DOSscan-api/models"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )

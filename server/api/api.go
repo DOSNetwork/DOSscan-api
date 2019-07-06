@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/DOSNetwork/explorer-Api/server/api/v1"
+	"github.com/DOSNetwork/DOSscan-api/server/api/v1"
 	"github.com/gin-gonic/gin"
 )
 
