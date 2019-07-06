@@ -94,8 +94,9 @@ RECONNECT:
 		errcList = append(errcList, errc)
 		outc, errc := dosproxy.FetchTable[idx](ctx, fromBc, lastBlk, &proxy.Contract.DosproxyFilterer)
 		errcList = append(errcList, errc)
-		dosproxy.ModelsTable[idx](ctx, db, outc)
-	}
+		dosproxy.ModelsTable[idx](ctx, db, outc, client)
+
+	} //0x919840ad
 	//TODO Add CommitReveal Event
 	//TODO Add Stacking Event
 	//TODO Add AddressBridge Event

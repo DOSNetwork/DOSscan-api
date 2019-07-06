@@ -199,7 +199,6 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 				}
 				go func(logs *DosproxyLogNonSupportedTypeIterator) {
 					for logs.Next() {
-						fmt.Println("FilterLogUrl form ")
 						select {
 						case <-ctx.Done():
 						case out <- logs.Event:
@@ -271,7 +270,6 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 				}
 				go func(logs *DosproxyLogNonContractCallIterator) {
 					for logs.Next() {
-						fmt.Println("FilterLogUrl form ")
 						select {
 						case <-ctx.Done():
 						case out <- logs.Event:
@@ -343,7 +341,6 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 				}
 				go func(logs *DosproxyLogCallbackTriggeredForIterator) {
 					for logs.Next() {
-						fmt.Println("FilterLogUrl form ")
 						select {
 						case <-ctx.Done():
 						case out <- logs.Event:
@@ -540,14 +537,11 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 				if err != nil {
 					fmt.Println("FilterLogValidationResult err ", err)
 				}
-				fmt.Println("LogValidationResult fromBlock ", fromBlock, " ", toBlock)
 				go func(logs *DosproxyLogValidationResultIterator) {
 					for logs.Next() {
-						fmt.Println("LogValidationResult Next")
 						select {
 						case <-ctx.Done():
 						case out <- logs.Event:
-							fmt.Println("LogValidationResult")
 						}
 					}
 				}(logs)
@@ -564,8 +558,6 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 						select {
 						case <-ctx.Done():
 						case out <- logs.Event:
-							fmt.Println("LogValidationResult ")
-
 						}
 					}
 				}(logs)
@@ -796,7 +788,6 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 					}
 					return
 				case event := <-ch:
-					fmt.Println("fetchTable get event")
 					select {
 					case <-ctx.Done():
 					case out <- event:
@@ -2022,3 +2013,14 @@ func NewProxy(proxyAddr common.Address, client *ethclient.Client) (*DosproxySess
 	}
 	return &DosproxySession{Contract: p, CallOpts: bind.CallOpts{Context: context.Background()}}, nil
 }
+
+/*
+func TopicToSignature(topic []byte) string {
+	hash := crypto.Keccak256Hash(eventSignature)
+}
+
+func SignatureToTopic(string) topic[]byte {
+	map := map[string]string{"getLastHandledGroup": "getLastHandledGroup(uint,uint[4],uint,address[])"}
+	hash := crypto.Keccak256Hash(eventSignature)
+}
+*/

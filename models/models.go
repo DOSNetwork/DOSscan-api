@@ -16,21 +16,71 @@ const (
 	DB_NAME     = "postgres"
 )
 
+type Transaction struct {
+	gorm.Model
+	Hash                          string                          `gorm:"primary_key"`
+	GasPrice                      uint64                          `gorm:"column:gas_price" json:"gasPrice"`
+	Value                         uint64                          `gorm:"column:value" json:"value"`
+	GasLimit                      uint64                          `gorm:"column:gas_limit" json:"gasLimit"`
+	Nonce                         uint64                          `gorm:"column:nonce" json:"nonce"`
+	To                            string                          `gorm:"column:to" json:"to"`
+	Data                          []byte                          `gorm:"column:data;type:bytea" json:"data"`
+	Method                        string                          `gorm:"column:method" json:"method"`
+	LogURL                        []LogURL                        `gorm:"foreignkey:TransactionHash"`
+	LogRequestUserRandom          []LogRequestUserRandom          `gorm:"foreignkey:TransactionHash"`
+	LogNonSupportedType           []LogNonSupportedType           `gorm:"foreignkey:TransactionHash"`
+	LogNonContractCall            []LogNonContractCall            `gorm:"foreignkey:TransactionHash"`
+	LogCallbackTriggeredFor       []LogCallbackTriggeredFor       `gorm:"foreignkey:TransactionHash"`
+	LogRequestFromNonExistentUC   []LogRequestFromNonExistentUC   `gorm:"foreignkey:TransactionHash"`
+	LogUpdateRandom               []LogUpdateRandom               `gorm:"foreignkey:TransactionHash"`
+	LogValidationResult           []LogValidationResult           `gorm:"foreignkey:TransactionHash"`
+	LogInsufficientPendingNode    []LogInsufficientPendingNode    `gorm:"foreignkey:TransactionHash"`
+	LogInsufficientWorkingGroup   []LogInsufficientWorkingGroup   `gorm:"foreignkey:TransactionHash"`
+	LogGrouping                   []LogGrouping                   `gorm:"foreignkey:TransactionHash"`
+	LogPublicKeyAccepted          []LogPublicKeyAccepted          `gorm:"foreignkey:TransactionHash"`
+	LogPublicKeySuggested         []LogPublicKeySuggested         `gorm:"foreignkey:TransactionHash"`
+	LogGroupDissolve              []LogGroupDissolve              `gorm:"foreignkey:TransactionHash"`
+	LogRegisteredNewPendingNode   []LogRegisteredNewPendingNode   `gorm:"foreignkey:TransactionHash"`
+	LogGroupingInitiated          []LogGroupingInitiated          `gorm:"foreignkey:TransactionHash"`
+	LogNoPendingGroup             []LogNoPendingGroup             `gorm:"foreignkey:TransactionHash"`
+	LogPendingGroupRemoved        []LogPendingGroupRemoved        `gorm:"foreignkey:TransactionHash"`
+	LogError                      []LogError                      `gorm:"foreignkey:TransactionHash"`
+	UpdateGroupToPick             []UpdateGroupToPick             `gorm:"foreignkey:TransactionHash"`
+	UpdateGroupSize               []UpdateGroupSize               `gorm:"foreignkey:TransactionHash"`
+	UpdateGroupingThreshold       []UpdateGroupingThreshold       `gorm:"foreignkey:TransactionHash"`
+	UpdateGroupMaturityPeriod     []UpdateGroupMaturityPeriod     `gorm:"foreignkey:TransactionHash"`
+	UpdateBootstrapCommitDuration []UpdateBootstrapCommitDuration `gorm:"foreignkey:TransactionHash"`
+	UpdateBootstrapRevealDuration []UpdateBootstrapRevealDuration `gorm:"foreignkey:TransactionHash"`
+	UpdatebootstrapStartThreshold []UpdatebootstrapStartThreshold `gorm:"foreignkey:TransactionHash"`
+	UpdatePendingGroupMaxLife     []UpdatePendingGroupMaxLife     `gorm:"foreignkey:TransactionHash"`
+	GuardianReward                []GuardianReward                `gorm:"foreignkey:TransactionHash"`
+}
+
+// Set User's table name to be `transaction`
+func (Transaction) TableName() string {
+	return "transaction"
+}
+
+// `LogURL` belongs to `Transaction`, `TransactionID` is the foreign key
 type LogURL struct {
 	gorm.Model
-	BlockNumber       uint64    `gorm:"column:block_number;index;" json:"blockNumber"`
-	BlockHash         string    `gorm:"column:block_hash" json:"blockHash"`
-	TxHash            string    `gorm:"column:transaction_hash" json:"transactionHash"`
-	TxIndex           uint      `gorm:"column:transaction_index" json:"transactionIndex"`
-	LogIndex          uint      `gorm:"column:log_index;" json:"logIndex"`
-	Removed           bool      `gorm:"column:removed;" json:"removed"`
-	Date              time.Time `gorm:"column:date;" json:"date"`
-	QueryId           string    `gorm:"column:query_id" json:"queryId"`
-	Timeout           string    `gorm:"column:time_out" json:"timeOut"`
-	DataSource        string    `gorm:"column:data_source" json:"dataSource"`
-	Selector          string    `gorm:"column:selector" json:"selector"`
-	Randomness        string    `gorm:"column:randomness" json:"randomness"`
-	DispatchedGroupId string    `gorm:"column:dispatched_groupid" json:"dispatchedGroupId"`
+	Transaction     Transaction    `gorm:"association_foreignkey:Hash"`
+	TransactionHash string         `gorm:"column:transaction_hash" json:"transactionHash"`
+	TxIndex         uint           `gorm:"column:transaction_index" json:"transactionIndex"`
+	MethodId        string         `gorm:"column:method_id" json:"methodId"`
+	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"topics"`
+	BlockNumber     uint64         `gorm:"column:block_number" json:"blockNumber"`
+	BlockHash       string         `gorm:"column:block_hash" json:"blockHash"`
+	LogIndex        uint           `gorm:"column:log_index;" json:"logIndex"`
+	Removed         bool           `gorm:"column:removed;" json:"removed"`
+	Date            time.Time      `gorm:"column:date;" json:"date"`
+
+	QueryId           string `gorm:"column:query_id" json:"queryId"`
+	Timeout           string `gorm:"column:time_out" json:"timeOut"`
+	DataSource        string `gorm:"column:data_source" json:"dataSource"`
+	Selector          string `gorm:"column:selector" json:"selector"`
+	Randomness        string `gorm:"column:randomness" json:"randomness"`
+	DispatchedGroupId string `gorm:"column:dispatched_groupid" json:"dispatchedGroupId"`
 }
 
 // Set User's table name to be `logurl`
@@ -40,17 +90,20 @@ func (LogURL) TableName() string {
 
 type LogRequestUserRandom struct {
 	gorm.Model
-	BlockNumber          uint64    `gorm:"column:block_number;" json:"blockNumber"`
-	BlockHash            string    `gorm:"column:block_hash" json:"blockHash"`
-	TxHash               string    `gorm:"column:transaction_hash" json:"transactionHash"`
-	TxIndex              uint      `gorm:"column:transaction_index" json:"transactionIndex"`
-	LogIndex             uint      `gorm:"column:log_index;" json:"logIndex"`
-	Removed              bool      `gorm:"column:removed;" json:"removed"`
-	Date                 time.Time `gorm:"column:date;" json:"date"`
-	RequestId            string    `gorm:"column:request_id" json:"requestId"`
-	LastSystemRandomness string    `gorm:"column:last_system_randomness" json:"lastSystemRandomness"`
-	UserSeed             string    `gorm:"column:user_seed" json:"userSeed"`
-	DispatchedGroupId    string    `gorm:"column:dispatched_groupid" json:"dispatchedGroupId"`
+	MethodId        string         `gorm:"column:method_id" json:"methodId"`
+	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"topics"`
+	BlockNumber     uint64         `gorm:"column:block_number;" json:"blockNumber"`
+	BlockHash       string         `gorm:"column:block_hash" json:"blockHash"`
+	TransactionHash string         `gorm:"column:transaction_hash" json:"transactionHash"`
+	TxIndex         uint           `gorm:"column:transaction_index" json:"transactionIndex"`
+	LogIndex        uint           `gorm:"column:log_index;" json:"logIndex"`
+	Removed         bool           `gorm:"column:removed;" json:"removed"`
+	Date            time.Time      `gorm:"column:date;" json:"date"`
+
+	RequestId            string `gorm:"column:request_id" json:"requestId"`
+	LastSystemRandomness string `gorm:"column:last_system_randomness" json:"lastSystemRandomness"`
+	UserSeed             string `gorm:"column:user_seed" json:"userSeed"`
+	DispatchedGroupId    string `gorm:"column:dispatched_groupid" json:"dispatchedGroupId"`
 }
 
 // Set User's table name to be `profiles`
@@ -60,14 +113,17 @@ func (LogRequestUserRandom) TableName() string {
 
 type LogNonSupportedType struct {
 	gorm.Model
-	BlockNumber     uint64    `gorm:"column:block_number;" json:"blockNumber"`
-	BlockHash       string    `gorm:"column:block_hash" json:"blockHash"`
-	TxHash          string    `gorm:"column:transaction_hash" json:"transactionHash"`
-	TxIndex         uint      `gorm:"column:transaction_index" json:"transactionIndex"`
-	LogIndex        uint      `gorm:"column:log_index;" json:"logIndex"`
-	Removed         bool      `gorm:"column:removed;" json:"removed"`
-	Date            time.Time `gorm:"column:date;" json:"date"`
-	InvalidSelector string    `gorm:"column:invalid_selector" json:"invalidSelector"`
+	MethodId        string         `gorm:"column:method_id" json:"methodId"`
+	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"topics"`
+	BlockNumber     uint64         `gorm:"column:block_number;" json:"blockNumber"`
+	BlockHash       string         `gorm:"column:block_hash" json:"blockHash"`
+	TransactionHash string         `gorm:"column:transaction_hash" json:"transactionHash"`
+	TxIndex         uint           `gorm:"column:transaction_index" json:"transactionIndex"`
+	LogIndex        uint           `gorm:"column:log_index;" json:"logIndex"`
+	Removed         bool           `gorm:"column:removed;" json:"removed"`
+	Date            time.Time      `gorm:"column:date;" json:"date"`
+
+	InvalidSelector string `gorm:"column:invalid_selector" json:"invalidSelector"`
 }
 
 // Set User's table name to be `profiles`
@@ -77,14 +133,16 @@ func (LogNonSupportedType) TableName() string {
 
 type LogNonContractCall struct {
 	gorm.Model
-	BlockNumber uint64    `gorm:"column:block_number;" json:"blockNumber"`
-	BlockHash   string    `gorm:"column:block_hash" json:"blockHash"`
-	TxHash      string    `gorm:"column:transaction_hash" json:"transactionHash"`
-	TxIndex     uint      `gorm:"column:transaction_index" json:"transactionIndex"`
-	LogIndex    uint      `gorm:"column:log_index;" json:"logIndex"`
-	Removed     bool      `gorm:"column:removed;" json:"removed"`
-	Date        time.Time `gorm:"column:date;" json:"date"`
-	From        string    `gorm:"column:from" json:"from"`
+	MethodId        string         `gorm:"column:method_id" json:"methodId"`
+	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"topics"`
+	BlockNumber     uint64         `gorm:"column:block_number;" json:"blockNumber"`
+	BlockHash       string         `gorm:"column:block_hash" json:"blockHash"`
+	TransactionHash string         `gorm:"column:transaction_hash" json:"transactionHash"`
+	TxIndex         uint           `gorm:"column:transaction_index" json:"transactionIndex"`
+	LogIndex        uint           `gorm:"column:log_index;" json:"logIndex"`
+	Removed         bool           `gorm:"column:removed;" json:"removed"`
+	Date            time.Time      `gorm:"column:date;" json:"date"`
+	From            string         `gorm:"column:from" json:"from"`
 }
 
 // Set User's table name to be `profiles`
@@ -94,14 +152,16 @@ func (LogNonContractCall) TableName() string {
 
 type LogCallbackTriggeredFor struct {
 	gorm.Model
-	BlockNumber  uint64    `gorm:"column:block_number;" json:"blockNumber"`
-	BlockHash    string    `gorm:"column:block_hash" json:"blockHash"`
-	TxHash       string    `gorm:"column:transaction_hash" json:"transactionHash"`
-	TxIndex      uint      `gorm:"column:transaction_index" json:"transactionIndex"`
-	LogIndex     uint      `gorm:"column:log_index;" json:"logIndex"`
-	Removed      bool      `gorm:"column:removed;" json:"removed"`
-	Date         time.Time `gorm:"column:date;" json:"date"`
-	CallbackAddr string    `gorm:"column:call_back_addr" json:"callbackAddr"`
+	MethodId        string         `gorm:"column:method_id" json:"methodId"`
+	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"topics"`
+	BlockNumber     uint64         `gorm:"column:block_number;" json:"blockNumber"`
+	BlockHash       string         `gorm:"column:block_hash" json:"blockHash"`
+	TransactionHash string         `gorm:"column:transaction_hash" json:"transactionHash"`
+	TxIndex         uint           `gorm:"column:transaction_index" json:"transactionIndex"`
+	LogIndex        uint           `gorm:"column:log_index;" json:"logIndex"`
+	Removed         bool           `gorm:"column:removed;" json:"removed"`
+	Date            time.Time      `gorm:"column:date;" json:"date"`
+	CallbackAddr    string         `gorm:"column:call_back_addr" json:"callbackAddr"`
 }
 
 // Set User's table name to be `profiles`
@@ -111,13 +171,15 @@ func (LogCallbackTriggeredFor) TableName() string {
 
 type LogRequestFromNonExistentUC struct {
 	gorm.Model
-	BlockNumber uint64    `gorm:"column:block_number;" json:"blockNumber"`
-	BlockHash   string    `gorm:"column:block_hash" json:"blockHash"`
-	TxHash      string    `gorm:"column:transaction_hash" json:"transactionHash"`
-	TxIndex     uint      `gorm:"column:transaction_index" json:"transactionIndex"`
-	LogIndex    uint      `gorm:"column:log_index;" json:"logIndex"`
-	Removed     bool      `gorm:"column:removed;" json:"removed"`
-	Date        time.Time `gorm:"column:date;" json:"date"`
+	MethodId        string         `gorm:"column:method_id" json:"methodId"`
+	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"topics"`
+	BlockNumber     uint64         `gorm:"column:block_number;" json:"blockNumber"`
+	BlockHash       string         `gorm:"column:block_hash" json:"blockHash"`
+	TransactionHash string         `gorm:"column:transaction_hash" json:"transactionHash"`
+	TxIndex         uint           `gorm:"column:transaction_index" json:"transactionIndex"`
+	LogIndex        uint           `gorm:"column:log_index;" json:"logIndex"`
+	Removed         bool           `gorm:"column:removed;" json:"removed"`
+	Date            time.Time      `gorm:"column:date;" json:"date"`
 }
 
 // Set User's table name to be `profiles`
@@ -127,15 +189,17 @@ func (LogRequestFromNonExistentUC) TableName() string {
 
 type LogUpdateRandom struct {
 	gorm.Model
-	BlockNumber       uint64    `gorm:"column:block_number;" json:"blockNumber"`
-	BlockHash         string    `gorm:"column:block_hash" json:"blockHash"`
-	TxHash            string    `gorm:"column:transaction_hash" json:"transactionHash"`
-	TxIndex           uint      `gorm:"column:transaction_index" json:"transactionIndex"`
-	LogIndex          uint      `gorm:"column:log_index;" json:"logIndex"`
-	Removed           bool      `gorm:"column:removed;" json:"removed"`
-	Date              time.Time `gorm:"column:date;" json:"date"`
-	LastRandomness    string    `gorm:"column:last_randomness" json:"lastRandomness"`
-	DispatchedGroupId string    `gorm:"column:dispatched_groupid" json:"dispatchedGroupId"`
+	MethodId          string         `gorm:"column:method_id" json:"methodId"`
+	Topics            pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"topics"`
+	BlockNumber       uint64         `gorm:"column:block_number;" json:"blockNumber"`
+	BlockHash         string         `gorm:"column:block_hash" json:"blockHash"`
+	TransactionHash   string         `gorm:"column:transaction_hash" json:"transactionHash"`
+	TxIndex           uint           `gorm:"column:transaction_index" json:"transactionIndex"`
+	LogIndex          uint           `gorm:"column:log_index;" json:"logIndex"`
+	Removed           bool           `gorm:"column:removed;" json:"removed"`
+	Date              time.Time      `gorm:"column:date;" json:"date"`
+	LastRandomness    string         `gorm:"column:last_randomness" json:"lastRandomness"`
+	DispatchedGroupId string         `gorm:"column:dispatched_groupid" json:"dispatchedGroupId"`
 }
 
 // Set User's table name to be `profiles`
@@ -145,19 +209,21 @@ func (LogUpdateRandom) TableName() string {
 
 type LogValidationResult struct {
 	gorm.Model
-	BlockNumber uint64         `gorm:"column:block_number;" json:"blockNumber"`
-	BlockHash   string         `gorm:"column:block_hash" json:"blockHash"`
-	TxHash      string         `gorm:"column:transaction_hash" json:"transactionHash"`
-	TxIndex     uint           `gorm:"column:transaction_index" json:"transactionIndex"`
-	LogIndex    uint           `gorm:"column:log_index;" json:"logIndex"`
-	Removed     bool           `gorm:"column:removed;" json:"removed"`
-	Date        time.Time      `gorm:"column:date;" json:"date"`
-	TrafficType uint8          `gorm:"column:traffic_type" json:"trafficType"`
-	TrafficId   string         `gorm:"column:traffic_id" json:"trafficId"`
-	Message     []byte         `gorm:"column:message;type:bytea" json:"message"`
-	Signature   pq.StringArray `gorm:"column:signature;type:varchar(100)[]" json:"signature"`
-	PubKey      pq.StringArray `gorm:"column:pub_key;type:varchar(100)[]" json:"pubKey"`
-	Pass        bool           `gorm:"column:pass;" json:"pass"`
+	MethodId        string         `gorm:"column:method_id" json:"methodId"`
+	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"topics"`
+	BlockNumber     uint64         `gorm:"column:block_number;" json:"blockNumber"`
+	BlockHash       string         `gorm:"column:block_hash" json:"blockHash"`
+	TransactionHash string         `gorm:"column:transaction_hash" json:"transactionHash"`
+	TxIndex         uint           `gorm:"column:transaction_index" json:"transactionIndex"`
+	LogIndex        uint           `gorm:"column:log_index;" json:"logIndex"`
+	Removed         bool           `gorm:"column:removed;" json:"removed"`
+	Date            time.Time      `gorm:"column:date;" json:"date"`
+	TrafficType     uint8          `gorm:"column:traffic_type" json:"trafficType"`
+	TrafficId       string         `gorm:"column:traffic_id" json:"trafficId"`
+	Message         []byte         `gorm:"column:message;type:bytea" json:"message"`
+	Signature       pq.StringArray `gorm:"column:signature;type:varchar(100)[]" json:"signature"`
+	PubKey          pq.StringArray `gorm:"column:pub_key;type:varchar(100)[]" json:"pubKey"`
+	Pass            bool           `gorm:"column:pass;" json:"pass"`
 }
 
 // Set User's table name to be `profiles`
@@ -167,14 +233,16 @@ func (LogValidationResult) TableName() string {
 
 type LogInsufficientPendingNode struct {
 	gorm.Model
-	BlockNumber     uint64    `gorm:"column:block_number;" json:"blockNumber"`
-	BlockHash       string    `gorm:"column:block_hash" json:"blockHash"`
-	TxHash          string    `gorm:"column:transaction_hash" json:"transactionHash"`
-	TxIndex         uint      `gorm:"column:transaction_index" json:"transactionIndex"`
-	LogIndex        uint      `gorm:"column:log_index;" json:"logIndex"`
-	Removed         bool      `gorm:"column:removed;" json:"removed"`
-	Date            time.Time `gorm:"column:date;" json:"date"`
-	NumPendingNodes uint64    `gorm:"column:num_pending_nodes" json:"numPendingNodes"`
+	MethodId        string         `gorm:"column:method_id" json:"methodId"`
+	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"topics"`
+	BlockNumber     uint64         `gorm:"column:block_number;" json:"blockNumber"`
+	BlockHash       string         `gorm:"column:block_hash" json:"blockHash"`
+	TransactionHash string         `gorm:"column:transaction_hash" json:"transactionHash"`
+	TxIndex         uint           `gorm:"column:transaction_index" json:"transactionIndex"`
+	LogIndex        uint           `gorm:"column:log_index;" json:"logIndex"`
+	Removed         bool           `gorm:"column:removed;" json:"removed"`
+	Date            time.Time      `gorm:"column:date;" json:"date"`
+	NumPendingNodes uint64         `gorm:"column:num_pending_nodes" json:"numPendingNodes"`
 }
 
 // Set User's table name to be `profiles`
@@ -184,15 +252,17 @@ func (LogInsufficientPendingNode) TableName() string {
 
 type LogInsufficientWorkingGroup struct {
 	gorm.Model
-	BlockNumber      uint64    `gorm:"column:block_number;" json:"blockNumber"`
-	BlockHash        string    `gorm:"column:block_hash" json:"blockHash"`
-	TxHash           string    `gorm:"column:transaction_hash" json:"transactionHash"`
-	TxIndex          uint      `gorm:"column:transaction_index" json:"transactionIndex"`
-	LogIndex         uint      `gorm:"column:log_index;" json:"logIndex"`
-	Removed          bool      `gorm:"column:removed;" json:"removed"`
-	Date             time.Time `gorm:"column:date;" json:"date"`
-	NumWorkingGroups uint64    `gorm:"column:num_working_groups" json:"numWorkingGroups"`
-	NumPendingGroups uint64    `gorm:"column:num_pending_groups" json:"numPendingGroups"`
+	MethodId         string         `gorm:"column:method_id" json:"methodId"`
+	Topics           pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"topics"`
+	BlockNumber      uint64         `gorm:"column:block_number;" json:"blockNumber"`
+	BlockHash        string         `gorm:"column:block_hash" json:"blockHash"`
+	TransactionHash  string         `gorm:"column:transaction_hash" json:"transactionHash"`
+	TxIndex          uint           `gorm:"column:transaction_index" json:"transactionIndex"`
+	LogIndex         uint           `gorm:"column:log_index;" json:"logIndex"`
+	Removed          bool           `gorm:"column:removed;" json:"removed"`
+	Date             time.Time      `gorm:"column:date;" json:"date"`
+	NumWorkingGroups uint64         `gorm:"column:num_working_groups" json:"numWorkingGroups"`
+	NumPendingGroups uint64         `gorm:"column:num_pending_groups" json:"numPendingGroups"`
 }
 
 // Set User's table name to be `profiles`
@@ -202,15 +272,17 @@ func (LogInsufficientWorkingGroup) TableName() string {
 
 type LogGrouping struct {
 	gorm.Model
-	BlockNumber uint64         `gorm:"column:block_number;" json:"blockNumber"`
-	BlockHash   string         `gorm:"column:block_hash" json:"blockHash"`
-	TxHash      string         `gorm:"column:transaction_hash" json:"transactionHash"`
-	TxIndex     uint           `gorm:"column:transaction_index" json:"transactionIndex"`
-	LogIndex    uint           `gorm:"column:log_index;" json:"logIndex"`
-	Removed     bool           `gorm:"column:removed;" json:"removed"`
-	Date        time.Time      `gorm:"column:date;" json:"date"`
-	GroupId     string         `gorm:"column:group_id" json:"groupId"`
-	NodeId      pq.StringArray `gorm:"column:node_id;type:varchar(100)[]" json:"nodeId"`
+	MethodId        string         `gorm:"column:method_id" json:"methodId"`
+	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"topics"`
+	BlockNumber     uint64         `gorm:"column:block_number;" json:"blockNumber"`
+	BlockHash       string         `gorm:"column:block_hash" json:"blockHash"`
+	TransactionHash string         `gorm:"column:transaction_hash" json:"transactionHash"`
+	TxIndex         uint           `gorm:"column:transaction_index" json:"transactionIndex"`
+	LogIndex        uint           `gorm:"column:log_index;" json:"logIndex"`
+	Removed         bool           `gorm:"column:removed;" json:"removed"`
+	Date            time.Time      `gorm:"column:date;" json:"date"`
+	GroupId         string         `gorm:"column:group_id" json:"groupId"`
+	NodeId          pq.StringArray `gorm:"column:node_id;type:varchar(100)[]" json:"nodeId"`
 }
 
 // Set User's table name to be `profiles`
@@ -220,9 +292,11 @@ func (LogGrouping) TableName() string {
 
 type LogPublicKeyAccepted struct {
 	gorm.Model
+	MethodId         string         `gorm:"column:method_id" json:"methodId"`
+	Topics           pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"topics"`
 	BlockNumber      uint64         `gorm:"column:block_number;" json:"blockNumber"`
 	BlockHash        string         `gorm:"column:block_hash" json:"blockHash"`
-	TxHash           string         `gorm:"column:transaction_hash" json:"transactionHash"`
+	TransactionHash  string         `gorm:"column:transaction_hash" json:"transactionHash"`
 	TxIndex          uint           `gorm:"column:transaction_index" json:"transactionIndex"`
 	LogIndex         uint           `gorm:"column:log_index;" json:"logIndex"`
 	Removed          bool           `gorm:"column:removed;" json:"removed"`
@@ -239,15 +313,17 @@ func (LogPublicKeyAccepted) TableName() string {
 
 type LogPublicKeySuggested struct {
 	gorm.Model
-	BlockNumber uint64    `gorm:"column:block_number;" json:"blockNumber"`
-	BlockHash   string    `gorm:"column:block_hash" json:"blockHash"`
-	TxHash      string    `gorm:"column:transaction_hash" json:"transactionHash"`
-	TxIndex     uint      `gorm:"column:transaction_index" json:"transactionIndex"`
-	LogIndex    uint      `gorm:"column:log_index;" json:"logIndex"`
-	Removed     bool      `gorm:"column:removed;" json:"removed"`
-	Date        time.Time `gorm:"column:date;" json:"date"`
-	GroupId     string    `gorm:"column:group_id" json:"groupId"`
-	PubKeyCount uint64    `gorm:"column:pub_key_count" json:"pubKeyCount"`
+	MethodId        string         `gorm:"column:method_id" json:"methodId"`
+	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"topics"`
+	BlockNumber     uint64         `gorm:"column:block_number;" json:"blockNumber"`
+	BlockHash       string         `gorm:"column:block_hash" json:"blockHash"`
+	TransactionHash string         `gorm:"column:transaction_hash" json:"transactionHash"`
+	TxIndex         uint           `gorm:"column:transaction_index" json:"transactionIndex"`
+	LogIndex        uint           `gorm:"column:log_index;" json:"logIndex"`
+	Removed         bool           `gorm:"column:removed;" json:"removed"`
+	Date            time.Time      `gorm:"column:date;" json:"date"`
+	GroupId         string         `gorm:"column:group_id" json:"groupId"`
+	PubKeyCount     uint64         `gorm:"column:pub_key_count" json:"pubKeyCount"`
 }
 
 // Set User's table name to be `profiles`
@@ -257,14 +333,16 @@ func (LogPublicKeySuggested) TableName() string {
 
 type LogGroupDissolve struct {
 	gorm.Model
-	BlockNumber uint64    `gorm:"column:block_number;" json:"blockNumber"`
-	BlockHash   string    `gorm:"column:block_hash" json:"blockHash"`
-	TxHash      string    `gorm:"column:transaction_hash" json:"transactionHash"`
-	TxIndex     uint      `gorm:"column:transaction_index" json:"transactionIndex"`
-	LogIndex    uint      `gorm:"column:log_index;" json:"logIndex"`
-	Removed     bool      `gorm:"column:removed;" json:"removed"`
-	Date        time.Time `gorm:"column:date;" json:"date"`
-	GroupId     string    `gorm:"column:group_id" json:"groupId"`
+	MethodId        string         `gorm:"column:method_id" json:"methodId"`
+	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"topics"`
+	BlockNumber     uint64         `gorm:"column:block_number;" json:"blockNumber"`
+	BlockHash       string         `gorm:"column:block_hash" json:"blockHash"`
+	TransactionHash string         `gorm:"column:transaction_hash" json:"transactionHash"`
+	TxIndex         uint           `gorm:"column:transaction_index" json:"transactionIndex"`
+	LogIndex        uint           `gorm:"column:log_index;" json:"logIndex"`
+	Removed         bool           `gorm:"column:removed;" json:"removed"`
+	Date            time.Time      `gorm:"column:date;" json:"date"`
+	GroupId         string         `gorm:"column:group_id" json:"groupId"`
 }
 
 // Set User's table name to be `profiles`
@@ -274,14 +352,16 @@ func (LogGroupDissolve) TableName() string {
 
 type LogRegisteredNewPendingNode struct {
 	gorm.Model
-	BlockNumber uint64    `gorm:"column:block_number;" json:"blockNumber"`
-	BlockHash   string    `gorm:"column:block_hash" json:"blockHash"`
-	TxHash      string    `gorm:"column:transaction_hash" json:"transactionHash"`
-	TxIndex     uint      `gorm:"column:transaction_index" json:"transactionIndex"`
-	LogIndex    uint      `gorm:"column:log_index;" json:"logIndex"`
-	Removed     bool      `gorm:"column:removed;" json:"removed"`
-	Date        time.Time `gorm:"column:date;" json:"date"`
-	Node        string    `gorm:"column:node" json:"node"`
+	MethodId        string         `gorm:"column:method_id" json:"methodId"`
+	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"topics"`
+	BlockNumber     uint64         `gorm:"column:block_number;" json:"blockNumber"`
+	BlockHash       string         `gorm:"column:block_hash" json:"blockHash"`
+	TransactionHash string         `gorm:"column:transaction_hash" json:"transactionHash"`
+	TxIndex         uint           `gorm:"column:transaction_index" json:"transactionIndex"`
+	LogIndex        uint           `gorm:"column:log_index;" json:"logIndex"`
+	Removed         bool           `gorm:"column:removed;" json:"removed"`
+	Date            time.Time      `gorm:"column:date;" json:"date"`
+	Node            string         `gorm:"column:node" json:"node"`
 }
 
 // Set User's table name to be `profiles`
@@ -291,16 +371,18 @@ func (LogRegisteredNewPendingNode) TableName() string {
 
 type LogGroupingInitiated struct {
 	gorm.Model
-	BlockNumber       uint64    `gorm:"column:block_number;" json:"blockNumber"`
-	BlockHash         string    `gorm:"column:block_hash" json:"blockHash"`
-	TxHash            string    `gorm:"column:transaction_hash" json:"transactionHash"`
-	TxIndex           uint      `gorm:"column:transaction_index" json:"transactionIndex"`
-	LogIndex          uint      `gorm:"column:log_index;" json:"logIndex"`
-	Removed           bool      `gorm:"column:removed;" json:"removed"`
-	Date              time.Time `gorm:"column:date;" json:"date"`
-	PendingNodePool   uint64    `gorm:"column:pending_node_pool" json:"pendingNodePool"`
-	Groupsize         uint64    `gorm:"column:group_size" json:"groupSize"`
-	Groupingthreshold uint64    `gorm:"column:grouping_threshold" json:"groupingThreshold"`
+	MethodId          string         `gorm:"column:method_id" json:"methodId"`
+	Topics            pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"topics"`
+	BlockNumber       uint64         `gorm:"column:block_number;" json:"blockNumber"`
+	BlockHash         string         `gorm:"column:block_hash" json:"blockHash"`
+	TransactionHash   string         `gorm:"column:transaction_hash" json:"transactionHash"`
+	TxIndex           uint           `gorm:"column:transaction_index" json:"transactionIndex"`
+	LogIndex          uint           `gorm:"column:log_index;" json:"logIndex"`
+	Removed           bool           `gorm:"column:removed;" json:"removed"`
+	Date              time.Time      `gorm:"column:date;" json:"date"`
+	PendingNodePool   uint64         `gorm:"column:pending_node_pool" json:"pendingNodePool"`
+	Groupsize         uint64         `gorm:"column:group_size" json:"groupSize"`
+	Groupingthreshold uint64         `gorm:"column:grouping_threshold" json:"groupingThreshold"`
 }
 
 // Set User's table name to be `profiles`
@@ -310,14 +392,16 @@ func (LogGroupingInitiated) TableName() string {
 
 type LogNoPendingGroup struct {
 	gorm.Model
-	BlockNumber uint64    `gorm:"column:block_number;" json:"blockNumber"`
-	BlockHash   string    `gorm:"column:block_hash" json:"blockHash"`
-	TxHash      string    `gorm:"column:transaction_hash" json:"transactionHash"`
-	TxIndex     uint      `gorm:"column:transaction_index" json:"transactionIndex"`
-	LogIndex    uint      `gorm:"column:log_index;" json:"logIndex"`
-	Removed     bool      `gorm:"column:removed;" json:"removed"`
-	Date        time.Time `gorm:"column:date;" json:"date"`
-	GroupId     string    `gorm:"column:group_id" json:"groupId"`
+	MethodId        string         `gorm:"column:method_id" json:"methodId"`
+	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"topics"`
+	BlockNumber     uint64         `gorm:"column:block_number;" json:"blockNumber"`
+	BlockHash       string         `gorm:"column:block_hash" json:"blockHash"`
+	TransactionHash string         `gorm:"column:transaction_hash" json:"transactionHash"`
+	TxIndex         uint           `gorm:"column:transaction_index" json:"transactionIndex"`
+	LogIndex        uint           `gorm:"column:log_index;" json:"logIndex"`
+	Removed         bool           `gorm:"column:removed;" json:"removed"`
+	Date            time.Time      `gorm:"column:date;" json:"date"`
+	GroupId         string         `gorm:"column:group_id" json:"groupId"`
 }
 
 // Set User's table name to be `profiles`
@@ -327,14 +411,16 @@ func (LogNoPendingGroup) TableName() string {
 
 type LogPendingGroupRemoved struct {
 	gorm.Model
-	BlockNumber uint64    `gorm:"column:block_number;" json:"blockNumber"`
-	BlockHash   string    `gorm:"column:block_hash" json:"blockHash"`
-	TxHash      string    `gorm:"column:transaction_hash" json:"transactionHash"`
-	TxIndex     uint      `gorm:"column:transaction_index" json:"transactionIndex"`
-	LogIndex    uint      `gorm:"column:log_index;" json:"logIndex"`
-	Removed     bool      `gorm:"column:removed;" json:"removed"`
-	Date        time.Time `gorm:"column:date;" json:"date"`
-	GroupId     string    `gorm:"column:group_id" json:"groupId"`
+	MethodId        string         `gorm:"column:method_id" json:"methodId"`
+	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"topics"`
+	BlockNumber     uint64         `gorm:"column:block_number;" json:"blockNumber"`
+	BlockHash       string         `gorm:"column:block_hash" json:"blockHash"`
+	TransactionHash string         `gorm:"column:transaction_hash" json:"transactionHash"`
+	TxIndex         uint           `gorm:"column:transaction_index" json:"transactionIndex"`
+	LogIndex        uint           `gorm:"column:log_index;" json:"logIndex"`
+	Removed         bool           `gorm:"column:removed;" json:"removed"`
+	Date            time.Time      `gorm:"column:date;" json:"date"`
+	GroupId         string         `gorm:"column:group_id" json:"groupId"`
 }
 
 // Set User's table name to be `profiles`
@@ -344,14 +430,16 @@ func (LogPendingGroupRemoved) TableName() string {
 
 type LogError struct {
 	gorm.Model
-	BlockNumber uint64    `gorm:"column:block_number;" json:"blockNumber"`
-	BlockHash   string    `gorm:"column:block_hash" json:"blockHash"`
-	TxHash      string    `gorm:"column:transaction_hash" json:"transactionHash"`
-	TxIndex     uint      `gorm:"column:transaction_index" json:"transactionIndex"`
-	LogIndex    uint      `gorm:"column:log_index;" json:"logIndex"`
-	Removed     bool      `gorm:"column:removed;" json:"removed"`
-	Date        time.Time `gorm:"column:date;" json:"date"`
-	Err         string    `gorm:"column:err" json:"err"`
+	MethodId        string         `gorm:"column:method_id" json:"methodId"`
+	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"topics"`
+	BlockNumber     uint64         `gorm:"column:block_number;" json:"blockNumber"`
+	BlockHash       string         `gorm:"column:block_hash" json:"blockHash"`
+	TransactionHash string         `gorm:"column:transaction_hash" json:"transactionHash"`
+	TxIndex         uint           `gorm:"column:transaction_index" json:"transactionIndex"`
+	LogIndex        uint           `gorm:"column:log_index;" json:"logIndex"`
+	Removed         bool           `gorm:"column:removed;" json:"removed"`
+	Date            time.Time      `gorm:"column:date;" json:"date"`
+	Err             string         `gorm:"column:err" json:"err"`
 }
 
 func (LogError) TableName() string {
@@ -360,15 +448,17 @@ func (LogError) TableName() string {
 
 type UpdateGroupToPick struct {
 	gorm.Model
-	BlockNumber uint64    `gorm:"column:block_number;" json:"blockNumber"`
-	BlockHash   string    `gorm:"column:block_hash" json:"blockHash"`
-	TxHash      string    `gorm:"column:transaction_hash" json:"transactionHash"`
-	TxIndex     uint      `gorm:"column:transaction_index" json:"transactionIndex"`
-	LogIndex    uint      `gorm:"column:log_index;" json:"logIndex"`
-	Removed     bool      `gorm:"column:removed;" json:"removed"`
-	Date        time.Time `gorm:"column:date;" json:"date"`
-	OldNum      uint64    `gorm:"column:old_num" json:"oldNum"`
-	NewNum      uint64    `gorm:"column:new_num" json:"newNum"`
+	MethodId        string         `gorm:"column:method_id" json:"methodId"`
+	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"topics"`
+	BlockNumber     uint64         `gorm:"column:block_number;" json:"blockNumber"`
+	BlockHash       string         `gorm:"column:block_hash" json:"blockHash"`
+	TransactionHash string         `gorm:"column:transaction_hash" json:"transactionHash"`
+	TxIndex         uint           `gorm:"column:transaction_index" json:"transactionIndex"`
+	LogIndex        uint           `gorm:"column:log_index;" json:"logIndex"`
+	Removed         bool           `gorm:"column:removed;" json:"removed"`
+	Date            time.Time      `gorm:"column:date;" json:"date"`
+	OldNum          uint64         `gorm:"column:old_num" json:"oldNum"`
+	NewNum          uint64         `gorm:"column:new_num" json:"newNum"`
 }
 
 func (UpdateGroupToPick) TableName() string {
@@ -377,15 +467,17 @@ func (UpdateGroupToPick) TableName() string {
 
 type UpdateGroupSize struct {
 	gorm.Model
-	BlockNumber uint64    `gorm:"column:block_number;" json:"blockNumber"`
-	BlockHash   string    `gorm:"column:block_hash" json:"blockHash"`
-	TxHash      string    `gorm:"column:transaction_hash" json:"transactionHash"`
-	TxIndex     uint      `gorm:"column:transaction_index" json:"transactionIndex"`
-	LogIndex    uint      `gorm:"column:log_index;" json:"logIndex"`
-	Removed     bool      `gorm:"column:removed;" json:"removed"`
-	Date        time.Time `gorm:"column:date;" json:"date"`
-	OldSize     uint64    `gorm:"column:old_size" json:"oldSize"`
-	NewSize     uint64    `gorm:"column:new_size" json:"newSize"`
+	MethodId        string         `gorm:"column:method_id" json:"methodId"`
+	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"topics"`
+	BlockNumber     uint64         `gorm:"column:block_number;" json:"blockNumber"`
+	BlockHash       string         `gorm:"column:block_hash" json:"blockHash"`
+	TransactionHash string         `gorm:"column:transaction_hash" json:"transactionHash"`
+	TxIndex         uint           `gorm:"column:transaction_index" json:"transactionIndex"`
+	LogIndex        uint           `gorm:"column:log_index;" json:"logIndex"`
+	Removed         bool           `gorm:"column:removed;" json:"removed"`
+	Date            time.Time      `gorm:"column:date;" json:"date"`
+	OldSize         uint64         `gorm:"column:old_size" json:"oldSize"`
+	NewSize         uint64         `gorm:"column:new_size" json:"newSize"`
 }
 
 func (UpdateGroupSize) TableName() string {
@@ -394,15 +486,17 @@ func (UpdateGroupSize) TableName() string {
 
 type UpdateGroupingThreshold struct {
 	gorm.Model
-	BlockNumber  uint64    `gorm:"column:block_number;" json:"blockNumber"`
-	BlockHash    string    `gorm:"column:block_hash" json:"blockHash"`
-	TxHash       string    `gorm:"column:transaction_hash" json:"transactionHash"`
-	TxIndex      uint      `gorm:"column:transaction_index" json:"transactionIndex"`
-	LogIndex     uint      `gorm:"column:log_index;" json:"logIndex"`
-	Removed      bool      `gorm:"column:removed;" json:"removed"`
-	Date         time.Time `gorm:"column:date;" json:"date"`
-	OldThreshold uint64    `gorm:"column:old_threshold" json:"oldThreshold"`
-	NewThreshold uint64    `gorm:"column:new_threshold" json:"newThreshold"`
+	MethodId        string         `gorm:"column:method_id" json:"methodId"`
+	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"topics"`
+	BlockNumber     uint64         `gorm:"column:block_number;" json:"blockNumber"`
+	BlockHash       string         `gorm:"column:block_hash" json:"blockHash"`
+	TransactionHash string         `gorm:"column:transaction_hash" json:"transactionHash"`
+	TxIndex         uint           `gorm:"column:transaction_index" json:"transactionIndex"`
+	LogIndex        uint           `gorm:"column:log_index;" json:"logIndex"`
+	Removed         bool           `gorm:"column:removed;" json:"removed"`
+	Date            time.Time      `gorm:"column:date;" json:"date"`
+	OldThreshold    uint64         `gorm:"column:old_threshold" json:"oldThreshold"`
+	NewThreshold    uint64         `gorm:"column:new_threshold" json:"newThreshold"`
 }
 
 func (UpdateGroupingThreshold) TableName() string {
@@ -411,15 +505,17 @@ func (UpdateGroupingThreshold) TableName() string {
 
 type UpdateGroupMaturityPeriod struct {
 	gorm.Model
-	BlockNumber uint64    `gorm:"column:block_number;" json:"blockNumber"`
-	BlockHash   string    `gorm:"column:block_hash" json:"blockHash"`
-	TxHash      string    `gorm:"column:transaction_hash" json:"transactionHash"`
-	TxIndex     uint      `gorm:"column:transaction_index" json:"transactionIndex"`
-	LogIndex    uint      `gorm:"column:log_index;" json:"logIndex"`
-	Removed     bool      `gorm:"column:removed;" json:"removed"`
-	Date        time.Time `gorm:"column:date;" json:"date"`
-	OldPeriod   uint64    `gorm:"column:old_period" json:"oldPeriod"`
-	NewPeriod   uint64    `gorm:"column:new_period" json:"newPeriod"`
+	MethodId        string         `gorm:"column:method_id" json:"methodId"`
+	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"topics"`
+	BlockNumber     uint64         `gorm:"column:block_number;" json:"blockNumber"`
+	BlockHash       string         `gorm:"column:block_hash" json:"blockHash"`
+	TransactionHash string         `gorm:"column:transaction_hash" json:"transactionHash"`
+	TxIndex         uint           `gorm:"column:transaction_index" json:"transactionIndex"`
+	LogIndex        uint           `gorm:"column:log_index;" json:"logIndex"`
+	Removed         bool           `gorm:"column:removed;" json:"removed"`
+	Date            time.Time      `gorm:"column:date;" json:"date"`
+	OldPeriod       uint64         `gorm:"column:old_period" json:"oldPeriod"`
+	NewPeriod       uint64         `gorm:"column:new_period" json:"newPeriod"`
 }
 
 func (UpdateGroupMaturityPeriod) TableName() string {
@@ -428,15 +524,17 @@ func (UpdateGroupMaturityPeriod) TableName() string {
 
 type UpdateBootstrapCommitDuration struct {
 	gorm.Model
-	BlockNumber uint64    `gorm:"column:block_number;" json:"blockNumber"`
-	BlockHash   string    `gorm:"column:block_hash" json:"blockHash"`
-	TxHash      string    `gorm:"column:transaction_hash" json:"transactionHash"`
-	TxIndex     uint      `gorm:"column:transaction_index" json:"transactionIndex"`
-	LogIndex    uint      `gorm:"column:log_index;" json:"logIndex"`
-	Removed     bool      `gorm:"column:removed;" json:"removed"`
-	Date        time.Time `gorm:"column:date;" json:"date"`
-	OldDuration uint64    `gorm:"column:old_duration" json:"oldDuration"`
-	NewDuration uint64    `gorm:"column:new_duration" json:"newDuration"`
+	MethodId        string         `gorm:"column:method_id" json:"methodId"`
+	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"topics"`
+	BlockNumber     uint64         `gorm:"column:block_number;" json:"blockNumber"`
+	BlockHash       string         `gorm:"column:block_hash" json:"blockHash"`
+	TransactionHash string         `gorm:"column:transaction_hash" json:"transactionHash"`
+	TxIndex         uint           `gorm:"column:transaction_index" json:"transactionIndex"`
+	LogIndex        uint           `gorm:"column:log_index;" json:"logIndex"`
+	Removed         bool           `gorm:"column:removed;" json:"removed"`
+	Date            time.Time      `gorm:"column:date;" json:"date"`
+	OldDuration     uint64         `gorm:"column:old_duration" json:"oldDuration"`
+	NewDuration     uint64         `gorm:"column:new_duration" json:"newDuration"`
 }
 
 func (UpdateBootstrapCommitDuration) TableName() string {
@@ -445,15 +543,17 @@ func (UpdateBootstrapCommitDuration) TableName() string {
 
 type UpdateBootstrapRevealDuration struct {
 	gorm.Model
-	BlockNumber uint64    `gorm:"column:block_number;" json:"blockNumber"`
-	BlockHash   string    `gorm:"column:block_hash" json:"blockHash"`
-	TxHash      string    `gorm:"column:transaction_hash" json:"transactionHash"`
-	TxIndex     uint      `gorm:"column:transaction_index" json:"transactionIndex"`
-	LogIndex    uint      `gorm:"column:log_index;" json:"logIndex"`
-	Removed     bool      `gorm:"column:removed;" json:"removed"`
-	Date        time.Time `gorm:"column:date;" json:"date"`
-	OldDuration uint64    `gorm:"column:old_duration" json:"oldDuration"`
-	NewDuration uint64    `gorm:"column:new_duration" json:"newDuration"`
+	MethodId        string         `gorm:"column:method_id" json:"methodId"`
+	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"topics"`
+	BlockNumber     uint64         `gorm:"column:block_number;" json:"blockNumber"`
+	BlockHash       string         `gorm:"column:block_hash" json:"blockHash"`
+	TransactionHash string         `gorm:"column:transaction_hash" json:"transactionHash"`
+	TxIndex         uint           `gorm:"column:transaction_index" json:"transactionIndex"`
+	LogIndex        uint           `gorm:"column:log_index;" json:"logIndex"`
+	Removed         bool           `gorm:"column:removed;" json:"removed"`
+	Date            time.Time      `gorm:"column:date;" json:"date"`
+	OldDuration     uint64         `gorm:"column:old_duration" json:"oldDuration"`
+	NewDuration     uint64         `gorm:"column:new_duration" json:"newDuration"`
 }
 
 func (UpdateBootstrapRevealDuration) TableName() string {
@@ -462,15 +562,17 @@ func (UpdateBootstrapRevealDuration) TableName() string {
 
 type UpdatebootstrapStartThreshold struct {
 	gorm.Model
-	BlockNumber  uint64    `gorm:"column:block_number;" json:"blockNumber"`
-	BlockHash    string    `gorm:"column:block_hash" json:"blockHash"`
-	TxHash       string    `gorm:"column:transaction_hash" json:"transactionHash"`
-	TxIndex      uint      `gorm:"column:transaction_index" json:"transactionIndex"`
-	LogIndex     uint      `gorm:"column:log_index;" json:"logIndex"`
-	Removed      bool      `gorm:"column:removed;" json:"removed"`
-	Date         time.Time `gorm:"column:date;" json:"date"`
-	OldThreshold uint64    `gorm:"column:old_threshold" json:"oldThreshold"`
-	NewThreshold uint64    `gorm:"column:new_threshold" json:"newThreshold"`
+	MethodId        string         `gorm:"column:method_id" json:"methodId"`
+	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"topics"`
+	BlockNumber     uint64         `gorm:"column:block_number;" json:"blockNumber"`
+	BlockHash       string         `gorm:"column:block_hash" json:"blockHash"`
+	TransactionHash string         `gorm:"column:transaction_hash" json:"transactionHash"`
+	TxIndex         uint           `gorm:"column:transaction_index" json:"transactionIndex"`
+	LogIndex        uint           `gorm:"column:log_index;" json:"logIndex"`
+	Removed         bool           `gorm:"column:removed;" json:"removed"`
+	Date            time.Time      `gorm:"column:date;" json:"date"`
+	OldThreshold    uint64         `gorm:"column:old_threshold" json:"oldThreshold"`
+	NewThreshold    uint64         `gorm:"column:new_threshold" json:"newThreshold"`
 }
 
 func (UpdatebootstrapStartThreshold) TableName() string {
@@ -479,15 +581,17 @@ func (UpdatebootstrapStartThreshold) TableName() string {
 
 type UpdatePendingGroupMaxLife struct {
 	gorm.Model
-	BlockNumber   uint64    `gorm:"column:block_number;" json:"blockNumber"`
-	BlockHash     string    `gorm:"column:block_hash" json:"blockHash"`
-	TxHash        string    `gorm:"column:transaction_hash" json:"transactionHash"`
-	TxIndex       uint      `gorm:"column:transaction_index" json:"transactionIndex"`
-	LogIndex      uint      `gorm:"column:log_index;" json:"logIndex"`
-	Removed       bool      `gorm:"column:removed;" json:"removed"`
-	Date          time.Time `gorm:"column:date;" json:"date"`
-	OldLifeBlocks uint64    `gorm:"column:old_life_blocks" json:"oldLifeBlocks"`
-	NewLifeBlocks uint64    `gorm:"column:new_life_blocks" json:"newLifeBlock"`
+	MethodId        string         `gorm:"column:method_id" json:"methodId"`
+	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"topics"`
+	BlockNumber     uint64         `gorm:"column:block_number;" json:"blockNumber"`
+	BlockHash       string         `gorm:"column:block_hash" json:"blockHash"`
+	TransactionHash string         `gorm:"column:transaction_hash" json:"transactionHash"`
+	TxIndex         uint           `gorm:"column:transaction_index" json:"transactionIndex"`
+	LogIndex        uint           `gorm:"column:log_index;" json:"logIndex"`
+	Removed         bool           `gorm:"column:removed;" json:"removed"`
+	Date            time.Time      `gorm:"column:date;" json:"date"`
+	OldLifeBlocks   uint64         `gorm:"column:old_life_blocks" json:"oldLifeBlocks"`
+	NewLifeBlocks   uint64         `gorm:"column:new_life_blocks" json:"newLifeBlock"`
 }
 
 func (UpdatePendingGroupMaxLife) TableName() string {
@@ -496,15 +600,17 @@ func (UpdatePendingGroupMaxLife) TableName() string {
 
 type GuardianReward struct {
 	gorm.Model
-	BlockNumber uint64    `gorm:"column:block_number;" json:"blockNumber"`
-	BlockHash   string    `gorm:"column:block_hash" json:"blockHash"`
-	TxHash      string    `gorm:"column:transaction_hash" json:"transactionHash"`
-	TxIndex     uint      `gorm:"column:transaction_index" json:"transactionIndex"`
-	LogIndex    uint      `gorm:"column:log_index;" json:"logIndex"`
-	Removed     bool      `gorm:"column:removed;" json:"removed"`
-	Date        time.Time `gorm:"column:date;" json:"date"`
-	BlkNum      uint64    `gorm:"column:blk_num" json:"blkNum"`
-	Guardian    string    `gorm:"column:guardian" json:"guardian"`
+	MethodId        string         `gorm:"column:method_id" json:"methodId"`
+	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"topics"`
+	BlockNumber     uint64         `gorm:"column:block_number;" json:"blockNumber"`
+	BlockHash       string         `gorm:"column:block_hash" json:"blockHash"`
+	TransactionHash string         `gorm:"column:transaction_hash" json:"transactionHash"`
+	TxIndex         uint           `gorm:"column:transaction_index" json:"transactionIndex"`
+	LogIndex        uint           `gorm:"column:log_index;" json:"logIndex"`
+	Removed         bool           `gorm:"column:removed;" json:"removed"`
+	Date            time.Time      `gorm:"column:date;" json:"date"`
+	BlkNum          uint64         `gorm:"column:blk_num" json:"blkNum"`
+	Guardian        string         `gorm:"column:guardian" json:"guardian"`
 }
 
 func (GuardianReward) TableName() string {
@@ -524,7 +630,7 @@ func Connect() *gorm.DB {
 
 	// AutoMigrate will ONLY create tables, missing columns and missing indexes,
 	// and WON’T change existing column’s type or delete unused columns to protect your data.
-	db.AutoMigrate(&LogURL{}, &LogRequestUserRandom{}, &LogNonSupportedType{}, &LogNonContractCall{}, &LogCallbackTriggeredFor{}, &LogRequestFromNonExistentUC{}, &LogUpdateRandom{}, &LogValidationResult{}, &LogInsufficientPendingNode{}, &LogInsufficientWorkingGroup{}, &LogGrouping{}, &LogPublicKeyAccepted{}, &LogPublicKeySuggested{}, &LogGroupDissolve{}, &LogRegisteredNewPendingNode{}, &LogGroupingInitiated{}, &LogNoPendingGroup{}, &LogPendingGroupRemoved{}, &LogError{}, &UpdateGroupToPick{}, &UpdateGroupSize{}, &UpdateGroupingThreshold{}, &UpdateGroupMaturityPeriod{}, &UpdateBootstrapCommitDuration{}, &UpdateBootstrapRevealDuration{}, &UpdatebootstrapStartThreshold{}, &UpdatePendingGroupMaxLife{}, &GuardianReward{})
+	db.AutoMigrate(&Transaction{}, &LogURL{}, &LogRequestUserRandom{}, &LogNonSupportedType{}, &LogNonContractCall{}, &LogCallbackTriggeredFor{}, &LogRequestFromNonExistentUC{}, &LogUpdateRandom{}, &LogValidationResult{}, &LogInsufficientPendingNode{}, &LogInsufficientWorkingGroup{}, &LogGrouping{}, &LogPublicKeyAccepted{}, &LogPublicKeySuggested{}, &LogGroupDissolve{}, &LogRegisteredNewPendingNode{}, &LogGroupingInitiated{}, &LogNoPendingGroup{}, &LogPendingGroupRemoved{}, &LogError{}, &UpdateGroupToPick{}, &UpdateGroupSize{}, &UpdateGroupingThreshold{}, &UpdateGroupMaturityPeriod{}, &UpdateBootstrapCommitDuration{}, &UpdateBootstrapRevealDuration{}, &UpdatebootstrapStartThreshold{}, &UpdatePendingGroupMaxLife{}, &GuardianReward{})
 	//db.AutoMigrate(&LogURL{}, &LogRequestUserRandom{}, &LogNonSupportedType{}, &LogNonContractCall{}, &LogCallbackTriggeredFor{}, &LogRequestFromNonExistentUC{}, &LogUpdateRandom{}, &LogValidationResult{}, &LogInsufficientPendingNode{}, &LogInsufficientWorkingGroup{}, &LogGrouping{}, &LogPublicKeyAccepted{}, &LogGroupDissolve{}, &LogRegisteredNewPendingNode{}, &LogGroupingInitiated{}, &LogNoPendingGroup{}, &LogPendingGroupRemoved{}, &LogError{}, &UpdateGroupToPick{}, &UpdateGroupSize{}, &UpdateGroupingThreshold{}, &UpdateGroupMaturityPeriod{}, &UpdateBootstrapCommitDuration{}, &UpdateBootstrapRevealDuration{}, &UpdatebootstrapStartThreshold{}, &UpdatePendingGroupMaxLife{}, &GuardianReward{})
 
 	// DB.LogMode(true)

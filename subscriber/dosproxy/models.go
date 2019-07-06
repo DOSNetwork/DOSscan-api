@@ -3,11 +3,65 @@ package dosproxy
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"strings"
 
+	//	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/DOSNetwork/explorer-Api/models"
+	//	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethclient"
+
 	"github.com/jinzhu/gorm"
 )
 
+var methodMap map[string]string
+var proxyAbi abi.ABI
+
+func init() {
+	jsonFile, err := os.Open("/Users/chenhaonien/go/src/github.com/DOSNetwork/explorer-Api/subscriber/abi/DOSProxy.abi")
+	// if we os.Open returns an error then handle it
+	if err != nil {
+		fmt.Println(err)
+	}
+	abiJsonByte, _ := ioutil.ReadAll(jsonFile)
+	proxyAbi, err = abi.JSON(strings.NewReader(string(abiJsonByte)))
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+func getTx(txHash common.Hash, client *ethclient.Client, db *gorm.DB) *models.Transaction {
+	tx, _, err := client.TransactionByHash(context.Background(), txHash)
+	if err != nil {
+		fmt.Println("TransactionByHash err", err)
+		return nil
+	}
+	methodName := "ExternalCall"
+	if method, err := proxyAbi.MethodById(tx.Data()[:4]); err == nil {
+		methodName = method.Name
+	}
+	mTx := models.Transaction{
+		Hash:     fmt.Sprintf("%x", txHash.Big()),
+		GasPrice: tx.GasPrice().Uint64(),
+		Value:    tx.Value().Uint64(),
+		GasLimit: tx.Gas(),
+		Nonce:    tx.Nonce(),
+		To:       fmt.Sprintf("%x", tx.To().Big()),
+		Data:     tx.Data(),
+		Method:   methodName,
+	}
+	if err := db.Where("Hash = ?", mTx.Hash).First(&mTx).Error; gorm.IsRecordNotFoundError(err) {
+		db.Create(&mTx)
+		fmt.Println("Saved Tx Log: ", mTx.Hash)
+	} else {
+		fmt.Println("duplicate Tx Log: ", mTx.Hash)
+	}
+	return &mTx
+
+}
 func FromBlockNumber(ctx context.Context, event string, db *gorm.DB) (chan uint64, chan error) {
 	out := make(chan uint64)
 	errc := make(chan error)
@@ -36,8 +90,8 @@ func FromBlockNumber(ctx context.Context, event string, db *gorm.DB) (chan uint6
 	return out, errc
 }
 
-var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface{}) chan error{
-	0: func(ctx context.Context, db *gorm.DB, eventc chan interface{}) chan error {
+var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error{
+	0: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
 		errc := make(chan error)
 		go func() {
 			for {
@@ -54,12 +108,19 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					if !ok {
 						continue
 					}
-					fmt.Println("DosproxyLogUrl got event ", log.Raw.BlockNumber)
-
+					var topics []string
+					for i := range log.Raw.Topics {
+						topics = append(topics, fmt.Sprintf("%x", log.Raw.Topics[i].Big()))
+					}
+					tx := getTx(log.Raw.TxHash, client, db)
+					if tx == nil {
+						continue
+					}
 					mLog := models.LogURL{
+						Topics:            topics,
 						BlockNumber:       log.Raw.BlockNumber,
 						BlockHash:         fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
-						TxHash:            fmt.Sprintf("%x", log.Raw.TxHash.Big()),
+						TransactionHash:   fmt.Sprintf("%x", log.Raw.TxHash.Big()),
 						TxIndex:           log.Raw.TxIndex,
 						LogIndex:          log.Raw.Index,
 						Removed:           log.Raw.Removed,
@@ -71,8 +132,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						DispatchedGroupId: fmt.Sprintf("%x", log.DispatchedGroupId),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&mLog)
-						fmt.Println("Saved Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
+						tx.LogURL = append(tx.LogURL, mLog)
+						db.Save(&tx)
 					} else {
 						fmt.Println("duplicate Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
 					}
@@ -81,7 +142,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 		}()
 		return errc
 	},
-	1: func(ctx context.Context, db *gorm.DB, eventc chan interface{}) chan error {
+	1: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
 		errc := make(chan error)
 		go func() {
 			for {
@@ -96,11 +157,19 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					if !ok {
 						continue
 					}
-
+					var topics []string
+					for i := range log.Raw.Topics {
+						topics = append(topics, fmt.Sprintf("%x", log.Raw.Topics[i].Big()))
+					}
+					tx := getTx(log.Raw.TxHash, client, db)
+					if tx == nil {
+						continue
+					}
 					mLog := models.LogRequestUserRandom{
+						Topics:               topics,
 						BlockNumber:          log.Raw.BlockNumber,
 						BlockHash:            fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
-						TxHash:               fmt.Sprintf("%x", log.Raw.TxHash.Big()),
+						TransactionHash:      fmt.Sprintf("%x", log.Raw.TxHash.Big()),
 						TxIndex:              log.Raw.TxIndex,
 						LogIndex:             log.Raw.Index,
 						Removed:              log.Raw.Removed,
@@ -110,7 +179,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						DispatchedGroupId:    fmt.Sprintf("%x", log.DispatchedGroupId),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&mLog)
+						tx.LogRequestUserRandom = append(tx.LogRequestUserRandom, mLog)
+						db.Save(&tx)
 						fmt.Println("Saved Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
 					} else {
 						fmt.Println("duplicate Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
@@ -120,7 +190,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 		}()
 		return errc
 	},
-	2: func(ctx context.Context, db *gorm.DB, eventc chan interface{}) chan error {
+	2: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
 		errc := make(chan error)
 		go func() {
 			for {
@@ -135,18 +205,27 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					if !ok {
 						continue
 					}
-
+					var topics []string
+					for i := range log.Raw.Topics {
+						topics = append(topics, fmt.Sprintf("%x", log.Raw.Topics[i].Big()))
+					}
+					tx := getTx(log.Raw.TxHash, client, db)
+					if tx == nil {
+						continue
+					}
 					mLog := models.LogNonSupportedType{
+						Topics:          topics,
 						BlockNumber:     log.Raw.BlockNumber,
 						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
-						TxHash:          fmt.Sprintf("%x", log.Raw.TxHash.Big()),
+						TransactionHash: fmt.Sprintf("%x", log.Raw.TxHash.Big()),
 						TxIndex:         log.Raw.TxIndex,
 						LogIndex:        log.Raw.Index,
 						Removed:         log.Raw.Removed,
 						InvalidSelector: fmt.Sprintf("%x", log.InvalidSelector),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&mLog)
+						tx.LogNonSupportedType = append(tx.LogNonSupportedType, mLog)
+						db.Save(&tx)
 						fmt.Println("Saved Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
 					} else {
 						fmt.Println("duplicate Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
@@ -156,7 +235,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 		}()
 		return errc
 	},
-	3: func(ctx context.Context, db *gorm.DB, eventc chan interface{}) chan error {
+	3: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
 		errc := make(chan error)
 		go func() {
 			for {
@@ -171,18 +250,27 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					if !ok {
 						continue
 					}
-
+					var topics []string
+					for i := range log.Raw.Topics {
+						topics = append(topics, fmt.Sprintf("%x", log.Raw.Topics[i].Big()))
+					}
+					tx := getTx(log.Raw.TxHash, client, db)
+					if tx == nil {
+						continue
+					}
 					mLog := models.LogNonContractCall{
-						BlockNumber: log.Raw.BlockNumber,
-						BlockHash:   fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
-						TxHash:      fmt.Sprintf("%x", log.Raw.TxHash.Big()),
-						TxIndex:     log.Raw.TxIndex,
-						LogIndex:    log.Raw.Index,
-						Removed:     log.Raw.Removed,
-						From:        fmt.Sprintf("%x", log.From.Big()),
+						Topics:          topics,
+						BlockNumber:     log.Raw.BlockNumber,
+						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
+						TransactionHash: fmt.Sprintf("%x", log.Raw.TxHash.Big()),
+						TxIndex:         log.Raw.TxIndex,
+						LogIndex:        log.Raw.Index,
+						Removed:         log.Raw.Removed,
+						From:            fmt.Sprintf("%x", log.From.Big()),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&mLog)
+						tx.LogNonContractCall = append(tx.LogNonContractCall, mLog)
+						db.Save(&tx)
 						fmt.Println("Saved Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
 					} else {
 						fmt.Println("duplicate Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
@@ -192,7 +280,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 		}()
 		return errc
 	},
-	4: func(ctx context.Context, db *gorm.DB, eventc chan interface{}) chan error {
+	4: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
 		errc := make(chan error)
 		go func() {
 			for {
@@ -207,18 +295,27 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					if !ok {
 						continue
 					}
-
+					var topics []string
+					for i := range log.Raw.Topics {
+						topics = append(topics, fmt.Sprintf("%x", log.Raw.Topics[i].Big()))
+					}
+					tx := getTx(log.Raw.TxHash, client, db)
+					if tx == nil {
+						continue
+					}
 					mLog := models.LogCallbackTriggeredFor{
-						BlockNumber:  log.Raw.BlockNumber,
-						BlockHash:    fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
-						TxHash:       fmt.Sprintf("%x", log.Raw.TxHash.Big()),
-						TxIndex:      log.Raw.TxIndex,
-						LogIndex:     log.Raw.Index,
-						Removed:      log.Raw.Removed,
-						CallbackAddr: fmt.Sprintf("%x", log.CallbackAddr.Big()),
+						Topics:          topics,
+						BlockNumber:     log.Raw.BlockNumber,
+						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
+						TransactionHash: fmt.Sprintf("%x", log.Raw.TxHash.Big()),
+						TxIndex:         log.Raw.TxIndex,
+						LogIndex:        log.Raw.Index,
+						Removed:         log.Raw.Removed,
+						CallbackAddr:    fmt.Sprintf("%x", log.CallbackAddr.Big()),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&mLog)
+						tx.LogCallbackTriggeredFor = append(tx.LogCallbackTriggeredFor, mLog)
+						db.Save(&tx)
 						fmt.Println("Saved Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
 					} else {
 						fmt.Println("duplicate Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
@@ -228,7 +325,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 		}()
 		return errc
 	},
-	5: func(ctx context.Context, db *gorm.DB, eventc chan interface{}) chan error {
+	5: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
 		errc := make(chan error)
 		go func() {
 			for {
@@ -243,17 +340,26 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					if !ok {
 						continue
 					}
-
+					var topics []string
+					for i := range log.Raw.Topics {
+						topics = append(topics, fmt.Sprintf("%x", log.Raw.Topics[i].Big()))
+					}
+					tx := getTx(log.Raw.TxHash, client, db)
+					if tx == nil {
+						continue
+					}
 					mLog := models.LogRequestFromNonExistentUC{
-						BlockNumber: log.Raw.BlockNumber,
-						BlockHash:   fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
-						TxHash:      fmt.Sprintf("%x", log.Raw.TxHash.Big()),
-						TxIndex:     log.Raw.TxIndex,
-						LogIndex:    log.Raw.Index,
-						Removed:     log.Raw.Removed,
+						Topics:          topics,
+						BlockNumber:     log.Raw.BlockNumber,
+						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
+						TransactionHash: fmt.Sprintf("%x", log.Raw.TxHash.Big()),
+						TxIndex:         log.Raw.TxIndex,
+						LogIndex:        log.Raw.Index,
+						Removed:         log.Raw.Removed,
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&mLog)
+						tx.LogRequestFromNonExistentUC = append(tx.LogRequestFromNonExistentUC, mLog)
+						db.Save(&tx)
 						fmt.Println("Saved Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
 					} else {
 						fmt.Println("duplicate Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
@@ -263,7 +369,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 		}()
 		return errc
 	},
-	6: func(ctx context.Context, db *gorm.DB, eventc chan interface{}) chan error {
+	6: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
 		errc := make(chan error)
 		go func() {
 			for {
@@ -278,11 +384,19 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					if !ok {
 						continue
 					}
-
+					var topics []string
+					for i := range log.Raw.Topics {
+						topics = append(topics, fmt.Sprintf("%x", log.Raw.Topics[i].Big()))
+					}
+					tx := getTx(log.Raw.TxHash, client, db)
+					if tx == nil {
+						continue
+					}
 					mLog := models.LogUpdateRandom{
+						Topics:            topics,
 						BlockNumber:       log.Raw.BlockNumber,
 						BlockHash:         fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
-						TxHash:            fmt.Sprintf("%x", log.Raw.TxHash.Big()),
+						TransactionHash:   fmt.Sprintf("%x", log.Raw.TxHash.Big()),
 						TxIndex:           log.Raw.TxIndex,
 						LogIndex:          log.Raw.Index,
 						Removed:           log.Raw.Removed,
@@ -290,8 +404,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						DispatchedGroupId: fmt.Sprintf("%x", log.DispatchedGroupId),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&mLog)
-						fmt.Println("Saved Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
+						tx.LogUpdateRandom = append(tx.LogUpdateRandom, mLog)
+						db.Save(&tx)
 					} else {
 						fmt.Println("duplicate Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
 					}
@@ -300,7 +414,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 		}()
 		return errc
 	},
-	7: func(ctx context.Context, db *gorm.DB, eventc chan interface{}) chan error {
+	7: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
 		errc := make(chan error)
 		go func() {
 			for {
@@ -315,23 +429,32 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					if !ok {
 						continue
 					}
-
+					var topics []string
+					for i := range log.Raw.Topics {
+						topics = append(topics, fmt.Sprintf("%x", log.Raw.Topics[i].Big()))
+					}
+					tx := getTx(log.Raw.TxHash, client, db)
+					if tx == nil {
+						continue
+					}
 					mLog := models.LogValidationResult{
-						BlockNumber: log.Raw.BlockNumber,
-						BlockHash:   fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
-						TxHash:      fmt.Sprintf("%x", log.Raw.TxHash.Big()),
-						TxIndex:     log.Raw.TxIndex,
-						LogIndex:    log.Raw.Index,
-						Removed:     log.Raw.Removed,
-						TrafficType: log.TrafficType,
-						TrafficId:   fmt.Sprintf("%x", log.TrafficId),
-						Message:     log.Message,
-						Signature:   []string{fmt.Sprintf("%x", log.Signature[0]), fmt.Sprintf("%x", log.Signature[1])},
-						PubKey:      []string{fmt.Sprintf("%x", log.PubKey[0]), fmt.Sprintf("%x", log.PubKey[1]), fmt.Sprintf("%x", log.PubKey[2]), fmt.Sprintf("%x", log.PubKey[3])},
-						Pass:        log.Pass,
+						Topics:          topics,
+						BlockNumber:     log.Raw.BlockNumber,
+						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
+						TransactionHash: fmt.Sprintf("%x", log.Raw.TxHash.Big()),
+						TxIndex:         log.Raw.TxIndex,
+						LogIndex:        log.Raw.Index,
+						Removed:         log.Raw.Removed,
+						TrafficType:     log.TrafficType,
+						TrafficId:       fmt.Sprintf("%x", log.TrafficId),
+						Message:         log.Message,
+						Signature:       []string{fmt.Sprintf("%x", log.Signature[0]), fmt.Sprintf("%x", log.Signature[1])},
+						PubKey:          []string{fmt.Sprintf("%x", log.PubKey[0]), fmt.Sprintf("%x", log.PubKey[1]), fmt.Sprintf("%x", log.PubKey[2]), fmt.Sprintf("%x", log.PubKey[3])},
+						Pass:            log.Pass,
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&mLog)
+						tx.LogValidationResult = append(tx.LogValidationResult, mLog)
+						db.Save(&tx)
 						fmt.Println("Saved Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
 					} else {
 						fmt.Println("duplicate Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
@@ -341,7 +464,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 		}()
 		return errc
 	},
-	8: func(ctx context.Context, db *gorm.DB, eventc chan interface{}) chan error {
+	8: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
 		errc := make(chan error)
 		go func() {
 			for {
@@ -356,18 +479,27 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					if !ok {
 						continue
 					}
-
+					var topics []string
+					for i := range log.Raw.Topics {
+						topics = append(topics, fmt.Sprintf("%x", log.Raw.Topics[i].Big()))
+					}
+					tx := getTx(log.Raw.TxHash, client, db)
+					if tx == nil {
+						continue
+					}
 					mLog := models.LogInsufficientPendingNode{
+						Topics:          topics,
 						BlockNumber:     log.Raw.BlockNumber,
 						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
-						TxHash:          fmt.Sprintf("%x", log.Raw.TxHash.Big()),
+						TransactionHash: fmt.Sprintf("%x", log.Raw.TxHash.Big()),
 						TxIndex:         log.Raw.TxIndex,
 						LogIndex:        log.Raw.Index,
 						Removed:         log.Raw.Removed,
 						NumPendingNodes: log.NumPendingNodes.Uint64(),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&mLog)
+						tx.LogInsufficientPendingNode = append(tx.LogInsufficientPendingNode, mLog)
+						db.Save(&tx)
 						fmt.Println("Saved Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
 					} else {
 						fmt.Println("duplicate Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
@@ -377,7 +509,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 		}()
 		return errc
 	},
-	9: func(ctx context.Context, db *gorm.DB, eventc chan interface{}) chan error {
+	9: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
 		errc := make(chan error)
 		go func() {
 			for {
@@ -393,11 +525,19 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					if !ok {
 						continue
 					}
-
+					var topics []string
+					for i := range log.Raw.Topics {
+						topics = append(topics, fmt.Sprintf("%x", log.Raw.Topics[i].Big()))
+					}
+					tx := getTx(log.Raw.TxHash, client, db)
+					if tx == nil {
+						continue
+					}
 					mLog := models.LogInsufficientWorkingGroup{
+						Topics:           topics,
 						BlockNumber:      log.Raw.BlockNumber,
 						BlockHash:        fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
-						TxHash:           fmt.Sprintf("%x", log.Raw.TxHash.Big()),
+						TransactionHash:  fmt.Sprintf("%x", log.Raw.TxHash.Big()),
 						TxIndex:          log.Raw.TxIndex,
 						LogIndex:         log.Raw.Index,
 						Removed:          log.Raw.Removed,
@@ -405,7 +545,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						NumPendingGroups: log.NumPendingGroups.Uint64(),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&mLog)
+						tx.LogInsufficientWorkingGroup = append(tx.LogInsufficientWorkingGroup, mLog)
+						db.Save(&tx)
 						fmt.Println("Saved Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
 					} else {
 						fmt.Println("duplicate Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
@@ -415,7 +556,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 		}()
 		return errc
 	},
-	10: func(ctx context.Context, db *gorm.DB, eventc chan interface{}) chan error {
+	10: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
 		errc := make(chan error)
 		go func() {
 			for {
@@ -430,22 +571,32 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					if !ok {
 						continue
 					}
+					var topics []string
+					for i := range log.Raw.Topics {
+						topics = append(topics, fmt.Sprintf("%x", log.Raw.Topics[i].Big()))
+					}
 					var nodeIdstr []string
 					for _, n := range log.NodeId {
 						nodeIdstr = append(nodeIdstr, fmt.Sprintf("%x", n.Big()))
 					}
+					tx := getTx(log.Raw.TxHash, client, db)
+					if tx == nil {
+						continue
+					}
 					mLog := models.LogGrouping{
-						BlockNumber: log.Raw.BlockNumber,
-						BlockHash:   fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
-						TxHash:      fmt.Sprintf("%x", log.Raw.TxHash.Big()),
-						TxIndex:     log.Raw.TxIndex,
-						LogIndex:    log.Raw.Index,
-						Removed:     log.Raw.Removed,
-						GroupId:     fmt.Sprintf("%x", log.GroupId),
-						NodeId:      nodeIdstr,
+						Topics:          topics,
+						BlockNumber:     log.Raw.BlockNumber,
+						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
+						TransactionHash: fmt.Sprintf("%x", log.Raw.TxHash.Big()),
+						TxIndex:         log.Raw.TxIndex,
+						LogIndex:        log.Raw.Index,
+						Removed:         log.Raw.Removed,
+						GroupId:         fmt.Sprintf("%x", log.GroupId),
+						NodeId:          nodeIdstr,
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&mLog)
+						tx.LogGrouping = append(tx.LogGrouping, mLog)
+						db.Save(&tx)
 						fmt.Println("Saved Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
 					} else {
 						fmt.Println("duplicate Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
@@ -455,7 +606,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 		}()
 		return errc
 	},
-	11: func(ctx context.Context, db *gorm.DB, eventc chan interface{}) chan error {
+	11: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
 		errc := make(chan error)
 		go func() {
 			for {
@@ -470,11 +621,19 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					if !ok {
 						continue
 					}
-
+					var topics []string
+					for i := range log.Raw.Topics {
+						topics = append(topics, fmt.Sprintf("%x", log.Raw.Topics[i].Big()))
+					}
+					tx := getTx(log.Raw.TxHash, client, db)
+					if tx == nil {
+						continue
+					}
 					mLog := models.LogPublicKeyAccepted{
+						Topics:           topics,
 						BlockNumber:      log.Raw.BlockNumber,
 						BlockHash:        fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
-						TxHash:           fmt.Sprintf("%x", log.Raw.TxHash.Big()),
+						TransactionHash:  fmt.Sprintf("%x", log.Raw.TxHash.Big()),
 						TxIndex:          log.Raw.TxIndex,
 						LogIndex:         log.Raw.Index,
 						Removed:          log.Raw.Removed,
@@ -483,7 +642,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						NumWorkingGroups: log.NumWorkingGroups.Uint64(),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&mLog)
+						tx.LogPublicKeyAccepted = append(tx.LogPublicKeyAccepted, mLog)
+						db.Save(&tx)
 						fmt.Println("Saved Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
 					} else {
 						fmt.Println("duplicate Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
@@ -493,7 +653,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 		}()
 		return errc
 	},
-	12: func(ctx context.Context, db *gorm.DB, eventc chan interface{}) chan error {
+	12: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
 		errc := make(chan error)
 		go func() {
 			for {
@@ -508,19 +668,28 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					if !ok {
 						continue
 					}
-
+					var topics []string
+					for i := range log.Raw.Topics {
+						topics = append(topics, fmt.Sprintf("%x", log.Raw.Topics[i].Big()))
+					}
+					tx := getTx(log.Raw.TxHash, client, db)
+					if tx == nil {
+						continue
+					}
 					mLog := models.LogPublicKeySuggested{
-						BlockNumber: log.Raw.BlockNumber,
-						BlockHash:   fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
-						TxHash:      fmt.Sprintf("%x", log.Raw.TxHash.Big()),
-						TxIndex:     log.Raw.TxIndex,
-						LogIndex:    log.Raw.Index,
-						Removed:     log.Raw.Removed,
-						GroupId:     fmt.Sprintf("%x", log.GroupId),
-						PubKeyCount: log.PubKeyCount.Uint64(),
+						Topics:          topics,
+						BlockNumber:     log.Raw.BlockNumber,
+						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
+						TransactionHash: fmt.Sprintf("%x", log.Raw.TxHash.Big()),
+						TxIndex:         log.Raw.TxIndex,
+						LogIndex:        log.Raw.Index,
+						Removed:         log.Raw.Removed,
+						GroupId:         fmt.Sprintf("%x", log.GroupId),
+						PubKeyCount:     log.PubKeyCount.Uint64(),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&mLog)
+						tx.LogPublicKeySuggested = append(tx.LogPublicKeySuggested, mLog)
+						db.Save(&tx)
 						fmt.Println("Saved Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
 					} else {
 						fmt.Println("duplicate Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
@@ -530,7 +699,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 		}()
 		return errc
 	},
-	13: func(ctx context.Context, db *gorm.DB, eventc chan interface{}) chan error {
+	13: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
 		errc := make(chan error)
 		go func() {
 			for {
@@ -545,18 +714,27 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					if !ok {
 						continue
 					}
-
+					var topics []string
+					for i := range log.Raw.Topics {
+						topics = append(topics, fmt.Sprintf("%x", log.Raw.Topics[i].Big()))
+					}
+					tx := getTx(log.Raw.TxHash, client, db)
+					if tx == nil {
+						continue
+					}
 					mLog := models.LogGroupDissolve{
-						BlockNumber: log.Raw.BlockNumber,
-						BlockHash:   fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
-						TxHash:      fmt.Sprintf("%x", log.Raw.TxHash.Big()),
-						TxIndex:     log.Raw.TxIndex,
-						LogIndex:    log.Raw.Index,
-						Removed:     log.Raw.Removed,
-						GroupId:     fmt.Sprintf("%x", log.GroupId),
+						Topics:          topics,
+						BlockNumber:     log.Raw.BlockNumber,
+						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
+						TransactionHash: fmt.Sprintf("%x", log.Raw.TxHash.Big()),
+						TxIndex:         log.Raw.TxIndex,
+						LogIndex:        log.Raw.Index,
+						Removed:         log.Raw.Removed,
+						GroupId:         fmt.Sprintf("%x", log.GroupId),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&mLog)
+						tx.LogGroupDissolve = append(tx.LogGroupDissolve, mLog)
+						db.Save(&tx)
 						fmt.Println("Saved Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
 					} else {
 						fmt.Println("duplicate Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
@@ -566,7 +744,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 		}()
 		return errc
 	},
-	14: func(ctx context.Context, db *gorm.DB, eventc chan interface{}) chan error {
+	14: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
 		errc := make(chan error)
 		go func() {
 			for {
@@ -581,18 +759,27 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					if !ok {
 						continue
 					}
-
+					var topics []string
+					for i := range log.Raw.Topics {
+						topics = append(topics, fmt.Sprintf("%x", log.Raw.Topics[i].Big()))
+					}
+					tx := getTx(log.Raw.TxHash, client, db)
+					if tx == nil {
+						continue
+					}
 					mLog := models.LogRegisteredNewPendingNode{
-						BlockNumber: log.Raw.BlockNumber,
-						BlockHash:   fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
-						TxHash:      fmt.Sprintf("%x", log.Raw.TxHash.Big()),
-						TxIndex:     log.Raw.TxIndex,
-						LogIndex:    log.Raw.Index,
-						Removed:     log.Raw.Removed,
-						Node:        fmt.Sprintf("%x", log.Node),
+						Topics:          topics,
+						BlockNumber:     log.Raw.BlockNumber,
+						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
+						TransactionHash: fmt.Sprintf("%x", log.Raw.TxHash.Big()),
+						TxIndex:         log.Raw.TxIndex,
+						LogIndex:        log.Raw.Index,
+						Removed:         log.Raw.Removed,
+						Node:            fmt.Sprintf("%x", log.Node),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&mLog)
+						tx.LogRegisteredNewPendingNode = append(tx.LogRegisteredNewPendingNode, mLog)
+						db.Save(&tx)
 						fmt.Println("Saved Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
 					} else {
 						fmt.Println("duplicate Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
@@ -602,7 +789,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 		}()
 		return errc
 	},
-	15: func(ctx context.Context, db *gorm.DB, eventc chan interface{}) chan error {
+	15: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
 		errc := make(chan error)
 		go func() {
 			for {
@@ -617,11 +804,19 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					if !ok {
 						continue
 					}
-
+					var topics []string
+					for i := range log.Raw.Topics {
+						topics = append(topics, fmt.Sprintf("%x", log.Raw.Topics[i].Big()))
+					}
+					tx := getTx(log.Raw.TxHash, client, db)
+					if tx == nil {
+						continue
+					}
 					mLog := models.LogGroupingInitiated{
+						Topics:            topics,
 						BlockNumber:       log.Raw.BlockNumber,
 						BlockHash:         fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
-						TxHash:            fmt.Sprintf("%x", log.Raw.TxHash.Big()),
+						TransactionHash:   fmt.Sprintf("%x", log.Raw.TxHash.Big()),
 						TxIndex:           log.Raw.TxIndex,
 						LogIndex:          log.Raw.Index,
 						Removed:           log.Raw.Removed,
@@ -630,7 +825,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						Groupingthreshold: log.Groupingthreshold.Uint64(),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&mLog)
+						tx.LogGroupingInitiated = append(tx.LogGroupingInitiated, mLog)
+						db.Save(&tx)
 						fmt.Println("Saved Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
 					} else {
 						fmt.Println("duplicate Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
@@ -640,7 +836,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 		}()
 		return errc
 	},
-	16: func(ctx context.Context, db *gorm.DB, eventc chan interface{}) chan error {
+	16: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
 		errc := make(chan error)
 		go func() {
 			for {
@@ -655,18 +851,27 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					if !ok {
 						continue
 					}
-
+					var topics []string
+					for i := range log.Raw.Topics {
+						topics = append(topics, fmt.Sprintf("%x", log.Raw.Topics[i].Big()))
+					}
+					tx := getTx(log.Raw.TxHash, client, db)
+					if tx == nil {
+						continue
+					}
 					mLog := models.LogNoPendingGroup{
-						BlockNumber: log.Raw.BlockNumber,
-						BlockHash:   fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
-						TxHash:      fmt.Sprintf("%x", log.Raw.TxHash.Big()),
-						TxIndex:     log.Raw.TxIndex,
-						LogIndex:    log.Raw.Index,
-						Removed:     log.Raw.Removed,
-						GroupId:     fmt.Sprintf("%x", log.GroupId),
+						Topics:          topics,
+						BlockNumber:     log.Raw.BlockNumber,
+						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
+						TransactionHash: fmt.Sprintf("%x", log.Raw.TxHash.Big()),
+						TxIndex:         log.Raw.TxIndex,
+						LogIndex:        log.Raw.Index,
+						Removed:         log.Raw.Removed,
+						GroupId:         fmt.Sprintf("%x", log.GroupId),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&mLog)
+						tx.LogNoPendingGroup = append(tx.LogNoPendingGroup, mLog)
+						db.Save(&tx)
 						fmt.Println("Saved Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
 					} else {
 						fmt.Println("duplicate Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
@@ -676,7 +881,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 		}()
 		return errc
 	},
-	17: func(ctx context.Context, db *gorm.DB, eventc chan interface{}) chan error {
+	17: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
 		errc := make(chan error)
 		go func() {
 			for {
@@ -691,18 +896,27 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					if !ok {
 						continue
 					}
-
+					var topics []string
+					for i := range log.Raw.Topics {
+						topics = append(topics, fmt.Sprintf("%x", log.Raw.Topics[i].Big()))
+					}
+					tx := getTx(log.Raw.TxHash, client, db)
+					if tx == nil {
+						continue
+					}
 					mLog := models.LogPendingGroupRemoved{
-						BlockNumber: log.Raw.BlockNumber,
-						BlockHash:   fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
-						TxHash:      fmt.Sprintf("%x", log.Raw.TxHash.Big()),
-						TxIndex:     log.Raw.TxIndex,
-						LogIndex:    log.Raw.Index,
-						Removed:     log.Raw.Removed,
-						GroupId:     fmt.Sprintf("%x", log.GroupId),
+						Topics:          topics,
+						BlockNumber:     log.Raw.BlockNumber,
+						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
+						TransactionHash: fmt.Sprintf("%x", log.Raw.TxHash.Big()),
+						TxIndex:         log.Raw.TxIndex,
+						LogIndex:        log.Raw.Index,
+						Removed:         log.Raw.Removed,
+						GroupId:         fmt.Sprintf("%x", log.GroupId),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&mLog)
+						tx.LogPendingGroupRemoved = append(tx.LogPendingGroupRemoved, mLog)
+						db.Save(&tx)
 						fmt.Println("Saved Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
 					} else {
 						fmt.Println("duplicate Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
@@ -712,7 +926,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 		}()
 		return errc
 	},
-	18: func(ctx context.Context, db *gorm.DB, eventc chan interface{}) chan error {
+	18: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
 		errc := make(chan error)
 		go func() {
 			for {
@@ -727,18 +941,27 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					if !ok {
 						continue
 					}
-
+					var topics []string
+					for i := range log.Raw.Topics {
+						topics = append(topics, fmt.Sprintf("%x", log.Raw.Topics[i].Big()))
+					}
+					tx := getTx(log.Raw.TxHash, client, db)
+					if tx == nil {
+						continue
+					}
 					mLog := models.LogError{
-						BlockNumber: log.Raw.BlockNumber,
-						BlockHash:   fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
-						TxHash:      fmt.Sprintf("%x", log.Raw.TxHash.Big()),
-						TxIndex:     log.Raw.TxIndex,
-						LogIndex:    log.Raw.Index,
-						Removed:     log.Raw.Removed,
-						Err:         log.Err,
+						Topics:          topics,
+						BlockNumber:     log.Raw.BlockNumber,
+						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
+						TransactionHash: fmt.Sprintf("%x", log.Raw.TxHash.Big()),
+						TxIndex:         log.Raw.TxIndex,
+						LogIndex:        log.Raw.Index,
+						Removed:         log.Raw.Removed,
+						Err:             log.Err,
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&mLog)
+						tx.LogError = append(tx.LogError, mLog)
+						db.Save(&tx)
 						fmt.Println("Saved Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
 					} else {
 						fmt.Println("duplicate Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
@@ -748,7 +971,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 		}()
 		return errc
 	},
-	19: func(ctx context.Context, db *gorm.DB, eventc chan interface{}) chan error {
+	19: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
 		errc := make(chan error)
 		go func() {
 			for {
@@ -763,19 +986,28 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					if !ok {
 						continue
 					}
-
+					var topics []string
+					for i := range log.Raw.Topics {
+						topics = append(topics, fmt.Sprintf("%x", log.Raw.Topics[i].Big()))
+					}
+					tx := getTx(log.Raw.TxHash, client, db)
+					if tx == nil {
+						continue
+					}
 					mLog := models.UpdateGroupToPick{
-						BlockNumber: log.Raw.BlockNumber,
-						BlockHash:   fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
-						TxHash:      fmt.Sprintf("%x", log.Raw.TxHash.Big()),
-						TxIndex:     log.Raw.TxIndex,
-						LogIndex:    log.Raw.Index,
-						Removed:     log.Raw.Removed,
-						OldNum:      log.OldNum.Uint64(),
-						NewNum:      log.NewNum.Uint64(),
+						Topics:          topics,
+						BlockNumber:     log.Raw.BlockNumber,
+						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
+						TransactionHash: fmt.Sprintf("%x", log.Raw.TxHash.Big()),
+						TxIndex:         log.Raw.TxIndex,
+						LogIndex:        log.Raw.Index,
+						Removed:         log.Raw.Removed,
+						OldNum:          log.OldNum.Uint64(),
+						NewNum:          log.NewNum.Uint64(),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&mLog)
+						tx.UpdateGroupToPick = append(tx.UpdateGroupToPick, mLog)
+						db.Save(&tx)
 						fmt.Println("Saved Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
 					} else {
 						fmt.Println("duplicate Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
@@ -785,7 +1017,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 		}()
 		return errc
 	},
-	20: func(ctx context.Context, db *gorm.DB, eventc chan interface{}) chan error {
+	20: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
 		errc := make(chan error)
 		go func() {
 			for {
@@ -800,19 +1032,28 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					if !ok {
 						continue
 					}
-
+					var topics []string
+					for i := range log.Raw.Topics {
+						topics = append(topics, fmt.Sprintf("%x", log.Raw.Topics[i].Big()))
+					}
+					tx := getTx(log.Raw.TxHash, client, db)
+					if tx == nil {
+						continue
+					}
 					mLog := models.UpdateGroupSize{
-						BlockNumber: log.Raw.BlockNumber,
-						BlockHash:   fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
-						TxHash:      fmt.Sprintf("%x", log.Raw.TxHash.Big()),
-						TxIndex:     log.Raw.TxIndex,
-						LogIndex:    log.Raw.Index,
-						Removed:     log.Raw.Removed,
-						OldSize:     log.OldSize.Uint64(),
-						NewSize:     log.NewSize.Uint64(),
+						Topics:          topics,
+						BlockNumber:     log.Raw.BlockNumber,
+						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
+						TransactionHash: fmt.Sprintf("%x", log.Raw.TxHash.Big()),
+						TxIndex:         log.Raw.TxIndex,
+						LogIndex:        log.Raw.Index,
+						Removed:         log.Raw.Removed,
+						OldSize:         log.OldSize.Uint64(),
+						NewSize:         log.NewSize.Uint64(),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&mLog)
+						tx.UpdateGroupSize = append(tx.UpdateGroupSize, mLog)
+						db.Save(&tx)
 						fmt.Println("Saved Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
 					} else {
 						fmt.Println("duplicate Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
@@ -822,7 +1063,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 		}()
 		return errc
 	},
-	21: func(ctx context.Context, db *gorm.DB, eventc chan interface{}) chan error {
+	21: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
 		errc := make(chan error)
 		go func() {
 			for {
@@ -837,19 +1078,28 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					if !ok {
 						continue
 					}
-
+					var topics []string
+					for i := range log.Raw.Topics {
+						topics = append(topics, fmt.Sprintf("%x", log.Raw.Topics[i].Big()))
+					}
+					tx := getTx(log.Raw.TxHash, client, db)
+					if tx == nil {
+						continue
+					}
 					mLog := models.UpdateGroupingThreshold{
-						BlockNumber:  log.Raw.BlockNumber,
-						BlockHash:    fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
-						TxHash:       fmt.Sprintf("%x", log.Raw.TxHash.Big()),
-						TxIndex:      log.Raw.TxIndex,
-						LogIndex:     log.Raw.Index,
-						Removed:      log.Raw.Removed,
-						OldThreshold: log.OldThreshold.Uint64(),
-						NewThreshold: log.NewThreshold.Uint64(),
+						Topics:          topics,
+						BlockNumber:     log.Raw.BlockNumber,
+						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
+						TransactionHash: fmt.Sprintf("%x", log.Raw.TxHash.Big()),
+						TxIndex:         log.Raw.TxIndex,
+						LogIndex:        log.Raw.Index,
+						Removed:         log.Raw.Removed,
+						OldThreshold:    log.OldThreshold.Uint64(),
+						NewThreshold:    log.NewThreshold.Uint64(),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&mLog)
+						tx.UpdateGroupingThreshold = append(tx.UpdateGroupingThreshold, mLog)
+						db.Save(&tx)
 						fmt.Println("Saved Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
 					} else {
 						fmt.Println("duplicate Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
@@ -859,7 +1109,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 		}()
 		return errc
 	},
-	22: func(ctx context.Context, db *gorm.DB, eventc chan interface{}) chan error {
+	22: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
 		errc := make(chan error)
 		go func() {
 			for {
@@ -874,19 +1124,28 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					if !ok {
 						continue
 					}
-
+					var topics []string
+					for i := range log.Raw.Topics {
+						topics = append(topics, fmt.Sprintf("%x", log.Raw.Topics[i].Big()))
+					}
+					tx := getTx(log.Raw.TxHash, client, db)
+					if tx == nil {
+						continue
+					}
 					mLog := models.UpdateGroupMaturityPeriod{
-						BlockNumber: log.Raw.BlockNumber,
-						BlockHash:   fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
-						TxHash:      fmt.Sprintf("%x", log.Raw.TxHash.Big()),
-						TxIndex:     log.Raw.TxIndex,
-						LogIndex:    log.Raw.Index,
-						Removed:     log.Raw.Removed,
-						OldPeriod:   log.OldPeriod.Uint64(),
-						NewPeriod:   log.NewPeriod.Uint64(),
+						Topics:          topics,
+						BlockNumber:     log.Raw.BlockNumber,
+						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
+						TransactionHash: fmt.Sprintf("%x", log.Raw.TxHash.Big()),
+						TxIndex:         log.Raw.TxIndex,
+						LogIndex:        log.Raw.Index,
+						Removed:         log.Raw.Removed,
+						OldPeriod:       log.OldPeriod.Uint64(),
+						NewPeriod:       log.NewPeriod.Uint64(),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&mLog)
+						tx.UpdateGroupMaturityPeriod = append(tx.UpdateGroupMaturityPeriod, mLog)
+						db.Save(&tx)
 						fmt.Println("Saved Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
 					} else {
 						fmt.Println("duplicate Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
@@ -896,7 +1155,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 		}()
 		return errc
 	},
-	23: func(ctx context.Context, db *gorm.DB, eventc chan interface{}) chan error {
+	23: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
 		errc := make(chan error)
 		go func() {
 			for {
@@ -911,19 +1170,28 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					if !ok {
 						continue
 					}
-
+					var topics []string
+					for i := range log.Raw.Topics {
+						topics = append(topics, fmt.Sprintf("%x", log.Raw.Topics[i].Big()))
+					}
+					tx := getTx(log.Raw.TxHash, client, db)
+					if tx == nil {
+						continue
+					}
 					mLog := models.UpdateBootstrapCommitDuration{
-						BlockNumber: log.Raw.BlockNumber,
-						BlockHash:   fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
-						TxHash:      fmt.Sprintf("%x", log.Raw.TxHash.Big()),
-						TxIndex:     log.Raw.TxIndex,
-						LogIndex:    log.Raw.Index,
-						Removed:     log.Raw.Removed,
-						OldDuration: log.OldDuration.Uint64(),
-						NewDuration: log.NewDuration.Uint64(),
+						Topics:          topics,
+						BlockNumber:     log.Raw.BlockNumber,
+						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
+						TransactionHash: fmt.Sprintf("%x", log.Raw.TxHash.Big()),
+						TxIndex:         log.Raw.TxIndex,
+						LogIndex:        log.Raw.Index,
+						Removed:         log.Raw.Removed,
+						OldDuration:     log.OldDuration.Uint64(),
+						NewDuration:     log.NewDuration.Uint64(),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&mLog)
+						tx.UpdateBootstrapCommitDuration = append(tx.UpdateBootstrapCommitDuration, mLog)
+						db.Save(&tx)
 						fmt.Println("Saved Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
 					} else {
 						fmt.Println("duplicate Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
@@ -933,7 +1201,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 		}()
 		return errc
 	},
-	24: func(ctx context.Context, db *gorm.DB, eventc chan interface{}) chan error {
+	24: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
 		errc := make(chan error)
 		go func() {
 			for {
@@ -948,19 +1216,28 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					if !ok {
 						continue
 					}
-
+					var topics []string
+					for i := range log.Raw.Topics {
+						topics = append(topics, fmt.Sprintf("%x", log.Raw.Topics[i].Big()))
+					}
+					tx := getTx(log.Raw.TxHash, client, db)
+					if tx == nil {
+						continue
+					}
 					mLog := models.UpdateBootstrapRevealDuration{
-						BlockNumber: log.Raw.BlockNumber,
-						BlockHash:   fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
-						TxHash:      fmt.Sprintf("%x", log.Raw.TxHash.Big()),
-						TxIndex:     log.Raw.TxIndex,
-						LogIndex:    log.Raw.Index,
-						Removed:     log.Raw.Removed,
-						OldDuration: log.OldDuration.Uint64(),
-						NewDuration: log.NewDuration.Uint64(),
+						Topics:          topics,
+						BlockNumber:     log.Raw.BlockNumber,
+						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
+						TransactionHash: fmt.Sprintf("%x", log.Raw.TxHash.Big()),
+						TxIndex:         log.Raw.TxIndex,
+						LogIndex:        log.Raw.Index,
+						Removed:         log.Raw.Removed,
+						OldDuration:     log.OldDuration.Uint64(),
+						NewDuration:     log.NewDuration.Uint64(),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&mLog)
+						tx.UpdateBootstrapRevealDuration = append(tx.UpdateBootstrapRevealDuration, mLog)
+						db.Save(&tx)
 						fmt.Println("Saved Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
 					} else {
 						fmt.Println("duplicate Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
@@ -970,7 +1247,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 		}()
 		return errc
 	},
-	25: func(ctx context.Context, db *gorm.DB, eventc chan interface{}) chan error {
+	25: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
 		errc := make(chan error)
 		go func() {
 			for {
@@ -985,19 +1262,28 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					if !ok {
 						continue
 					}
-
+					var topics []string
+					for i := range log.Raw.Topics {
+						topics = append(topics, fmt.Sprintf("%x", log.Raw.Topics[i].Big()))
+					}
+					tx := getTx(log.Raw.TxHash, client, db)
+					if tx == nil {
+						continue
+					}
 					mLog := models.UpdatebootstrapStartThreshold{
-						BlockNumber:  log.Raw.BlockNumber,
-						BlockHash:    fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
-						TxHash:       fmt.Sprintf("%x", log.Raw.TxHash.Big()),
-						TxIndex:      log.Raw.TxIndex,
-						LogIndex:     log.Raw.Index,
-						Removed:      log.Raw.Removed,
-						OldThreshold: log.OldThreshold.Uint64(),
-						NewThreshold: log.NewThreshold.Uint64(),
+						Topics:          topics,
+						BlockNumber:     log.Raw.BlockNumber,
+						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
+						TransactionHash: fmt.Sprintf("%x", log.Raw.TxHash.Big()),
+						TxIndex:         log.Raw.TxIndex,
+						LogIndex:        log.Raw.Index,
+						Removed:         log.Raw.Removed,
+						OldThreshold:    log.OldThreshold.Uint64(),
+						NewThreshold:    log.NewThreshold.Uint64(),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&mLog)
+						tx.UpdatebootstrapStartThreshold = append(tx.UpdatebootstrapStartThreshold, mLog)
+						db.Save(&tx)
 						fmt.Println("Saved Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
 					} else {
 						fmt.Println("duplicate Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
@@ -1007,7 +1293,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 		}()
 		return errc
 	},
-	26: func(ctx context.Context, db *gorm.DB, eventc chan interface{}) chan error {
+	26: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
 		errc := make(chan error)
 		go func() {
 			for {
@@ -1022,19 +1308,28 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					if !ok {
 						continue
 					}
-
+					var topics []string
+					for i := range log.Raw.Topics {
+						topics = append(topics, fmt.Sprintf("%x", log.Raw.Topics[i].Big()))
+					}
+					tx := getTx(log.Raw.TxHash, client, db)
+					if tx == nil {
+						continue
+					}
 					mLog := models.UpdatePendingGroupMaxLife{
-						BlockNumber:   log.Raw.BlockNumber,
-						BlockHash:     fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
-						TxHash:        fmt.Sprintf("%x", log.Raw.TxHash.Big()),
-						TxIndex:       log.Raw.TxIndex,
-						LogIndex:      log.Raw.Index,
-						Removed:       log.Raw.Removed,
-						OldLifeBlocks: log.OldLifeBlocks.Uint64(),
-						NewLifeBlocks: log.NewLifeBlocks.Uint64(),
+						Topics:          topics,
+						BlockNumber:     log.Raw.BlockNumber,
+						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
+						TransactionHash: fmt.Sprintf("%x", log.Raw.TxHash.Big()),
+						TxIndex:         log.Raw.TxIndex,
+						LogIndex:        log.Raw.Index,
+						Removed:         log.Raw.Removed,
+						OldLifeBlocks:   log.OldLifeBlocks.Uint64(),
+						NewLifeBlocks:   log.NewLifeBlocks.Uint64(),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&mLog)
+						tx.UpdatePendingGroupMaxLife = append(tx.UpdatePendingGroupMaxLife, mLog)
+						db.Save(&tx)
 						fmt.Println("Saved Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
 					} else {
 						fmt.Println("duplicate Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
@@ -1044,7 +1339,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 		}()
 		return errc
 	},
-	27: func(ctx context.Context, db *gorm.DB, eventc chan interface{}) chan error {
+	27: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
 		errc := make(chan error)
 		go func() {
 			for {
@@ -1059,19 +1354,28 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					if !ok {
 						continue
 					}
-
+					var topics []string
+					for i := range log.Raw.Topics {
+						topics = append(topics, fmt.Sprintf("%x", log.Raw.Topics[i].Big()))
+					}
+					tx := getTx(log.Raw.TxHash, client, db)
+					if tx == nil {
+						continue
+					}
 					mLog := models.GuardianReward{
-						BlockNumber: log.Raw.BlockNumber,
-						BlockHash:   fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
-						TxHash:      fmt.Sprintf("%x", log.Raw.TxHash.Big()),
-						TxIndex:     log.Raw.TxIndex,
-						LogIndex:    log.Raw.Index,
-						Removed:     log.Raw.Removed,
-						BlkNum:      log.BlkNum.Uint64(),
-						Guardian:    fmt.Sprintf("%x", log.Guardian.Big()),
+						Topics:          topics,
+						BlockNumber:     log.Raw.BlockNumber,
+						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
+						TransactionHash: fmt.Sprintf("%x", log.Raw.TxHash.Big()),
+						TxIndex:         log.Raw.TxIndex,
+						LogIndex:        log.Raw.Index,
+						Removed:         log.Raw.Removed,
+						BlkNum:          log.BlkNum.Uint64(),
+						Guardian:        fmt.Sprintf("%x", log.Guardian.Big()),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&mLog)
+						tx.GuardianReward = append(tx.GuardianReward, mLog)
+						db.Save(&tx)
 						fmt.Println("Saved Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
 					} else {
 						fmt.Println("duplicate Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
