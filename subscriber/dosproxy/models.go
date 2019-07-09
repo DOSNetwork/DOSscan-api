@@ -39,9 +39,11 @@ func getTx(txHash common.Hash, client *ethclient.Client, db *gorm.DB) *models.Tr
 		fmt.Println("TransactionByHash err", err)
 		return nil
 	}
-	methodName := "ExternalCall"
+	var methodName string
 	if method, err := proxyAbi.MethodById(tx.Data()[:4]); err == nil {
 		methodName = method.Name
+	} else {
+		methodName = fmt.Sprintf("ExternalCall 0x%x", tx.Data()[:4])
 	}
 	mTx := models.Transaction{
 		Hash:     fmt.Sprintf("%x", txHash.Big()),
@@ -117,6 +119,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogURL{
+						EventLog:          "LogURL",
+						Method:            tx.Method,
 						Topics:            topics,
 						BlockNumber:       log.Raw.BlockNumber,
 						BlockHash:         fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
@@ -166,6 +170,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogRequestUserRandom{
+						EventLog:             "LogRequestUserRandom",
+						Method:               tx.Method,
 						Topics:               topics,
 						BlockNumber:          log.Raw.BlockNumber,
 						BlockHash:            fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
@@ -214,6 +220,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogNonSupportedType{
+						EventLog:        "LogNonSupportedType",
+						Method:          tx.Method,
 						Topics:          topics,
 						BlockNumber:     log.Raw.BlockNumber,
 						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
@@ -259,6 +267,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogNonContractCall{
+						EventLog:        "LogNonContractCall",
+						Method:          tx.Method,
 						Topics:          topics,
 						BlockNumber:     log.Raw.BlockNumber,
 						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
@@ -304,6 +314,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogCallbackTriggeredFor{
+						EventLog:        "LogCallbackTriggeredFor",
+						Method:          tx.Method,
 						Topics:          topics,
 						BlockNumber:     log.Raw.BlockNumber,
 						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
@@ -349,6 +361,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogRequestFromNonExistentUC{
+						EventLog:        "LogRequestFromNonExistentUC",
+						Method:          tx.Method,
 						Topics:          topics,
 						BlockNumber:     log.Raw.BlockNumber,
 						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
@@ -393,6 +407,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogUpdateRandom{
+						EventLog:          "LogUpdateRandom",
+						Method:            tx.Method,
 						Topics:            topics,
 						BlockNumber:       log.Raw.BlockNumber,
 						BlockHash:         fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
@@ -438,6 +454,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogValidationResult{
+						EventLog:        "LogValidationResult",
+						Method:          tx.Method,
 						Topics:          topics,
 						BlockNumber:     log.Raw.BlockNumber,
 						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
@@ -488,6 +506,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogInsufficientPendingNode{
+						EventLog:        "LogInsufficientPendingNode",
+						Method:          tx.Method,
 						Topics:          topics,
 						BlockNumber:     log.Raw.BlockNumber,
 						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
@@ -534,6 +554,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogInsufficientWorkingGroup{
+						EventLog:         "LogInsufficientWorkingGroup",
+						Method:           tx.Method,
 						Topics:           topics,
 						BlockNumber:      log.Raw.BlockNumber,
 						BlockHash:        fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
@@ -584,6 +606,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogGrouping{
+						EventLog:        "LogGrouping",
+						Method:          tx.Method,
 						Topics:          topics,
 						BlockNumber:     log.Raw.BlockNumber,
 						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
@@ -630,6 +654,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogPublicKeyAccepted{
+						EventLog:         "LogPublicKeyAccepted",
+						Method:           tx.Method,
 						Topics:           topics,
 						BlockNumber:      log.Raw.BlockNumber,
 						BlockHash:        fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
@@ -677,6 +703,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogPublicKeySuggested{
+						EventLog:        "LogPublicKeySuggested",
+						Method:          tx.Method,
 						Topics:          topics,
 						BlockNumber:     log.Raw.BlockNumber,
 						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
@@ -723,6 +751,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogGroupDissolve{
+						EventLog:        "LogGroupDissolve",
+						Method:          tx.Method,
 						Topics:          topics,
 						BlockNumber:     log.Raw.BlockNumber,
 						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
@@ -768,6 +798,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogRegisteredNewPendingNode{
+						EventLog:        "LogRegisteredNewPendingNode",
+						Method:          tx.Method,
 						Topics:          topics,
 						BlockNumber:     log.Raw.BlockNumber,
 						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
@@ -813,6 +845,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogGroupingInitiated{
+						EventLog:          "LogGroupingInitiated",
+						Method:            tx.Method,
 						Topics:            topics,
 						BlockNumber:       log.Raw.BlockNumber,
 						BlockHash:         fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
@@ -860,6 +894,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogNoPendingGroup{
+						EventLog:        "LogNoPendingGroup",
+						Method:          tx.Method,
 						Topics:          topics,
 						BlockNumber:     log.Raw.BlockNumber,
 						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
@@ -905,6 +941,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogPendingGroupRemoved{
+						EventLog:        "LogPendingGroupRemoved",
+						Method:          tx.Method,
 						Topics:          topics,
 						BlockNumber:     log.Raw.BlockNumber,
 						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
@@ -950,6 +988,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogError{
+						EventLog:        "LogError",
+						Method:          tx.Method,
 						Topics:          topics,
 						BlockNumber:     log.Raw.BlockNumber,
 						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
@@ -995,6 +1035,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.UpdateGroupToPick{
+						EventLog:        "UpdateGroupToPick",
+						Method:          tx.Method,
 						Topics:          topics,
 						BlockNumber:     log.Raw.BlockNumber,
 						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
@@ -1041,6 +1083,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.UpdateGroupSize{
+						EventLog:        "UpdateGroupSize",
+						Method:          tx.Method,
 						Topics:          topics,
 						BlockNumber:     log.Raw.BlockNumber,
 						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
@@ -1087,6 +1131,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.UpdateGroupingThreshold{
+						EventLog:        "UpdateGroupingThreshold",
+						Method:          tx.Method,
 						Topics:          topics,
 						BlockNumber:     log.Raw.BlockNumber,
 						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
@@ -1133,6 +1179,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.UpdateGroupMaturityPeriod{
+						EventLog:        "UpdateGroupMaturityPeriod",
+						Method:          tx.Method,
 						Topics:          topics,
 						BlockNumber:     log.Raw.BlockNumber,
 						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
@@ -1179,6 +1227,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.UpdateBootstrapCommitDuration{
+						EventLog:        "UpdateBootstrapCommitDuration",
+						Method:          tx.Method,
 						Topics:          topics,
 						BlockNumber:     log.Raw.BlockNumber,
 						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
@@ -1225,6 +1275,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.UpdateBootstrapRevealDuration{
+						EventLog:        "UpdateBootstrapRevealDuration",
+						Method:          tx.Method,
 						Topics:          topics,
 						BlockNumber:     log.Raw.BlockNumber,
 						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
@@ -1271,6 +1323,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.UpdatebootstrapStartThreshold{
+						EventLog:        "UpdatebootstrapStartThreshold",
+						Method:          tx.Method,
 						Topics:          topics,
 						BlockNumber:     log.Raw.BlockNumber,
 						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
@@ -1317,6 +1371,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.UpdatePendingGroupMaxLife{
+						EventLog:        "UpdatePendingGroupMaxLife",
+						Method:          tx.Method,
 						Topics:          topics,
 						BlockNumber:     log.Raw.BlockNumber,
 						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
@@ -1363,6 +1419,8 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.GuardianReward{
+						EventLog:        "GuardianReward",
+						Method:          tx.Method,
 						Topics:          topics,
 						BlockNumber:     log.Raw.BlockNumber,
 						BlockHash:       fmt.Sprintf("%x", log.Raw.BlockHash.Big()),
