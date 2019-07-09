@@ -31,34 +31,34 @@ type Body struct {
 type searchEventFunc func(int, int, *gin.Context) bool
 
 var searchEventTable = map[string]searchEventFunc{
-	"LogURL":                        searchLogURL,
-	"LogRequestUserRandom":          searchLogRequestUserRandom,
-	"LogNonSupportedType":           searchLogNonSupportedType,
-	"LogNonContractCall":            searchLogNonContractCall,
-	"LogCallbackTriggeredFor":       searchLogCallbackTriggeredFor,
-	"LogRequestFromNonExistentUC":   searchLogRequestFromNonExistentUC,
-	"LogUpdateRandom":               searchLogUpdateRandom,
-	"LogValidationResult":           searchLogValidationResult,
-	"LogInsufficientPendingNode":    searchLogInsufficientPendingNode,
-	"LogInsufficientWorkingGroup":   searchLogInsufficientWorkingGroup,
-	"LogGrouping":                   searchLogGrouping,
-	"LogPublicKeyAccepted":          searchLogPublicKeyAccepted,
-	"LogPublicKeySuggested":         searchLogPublicKeySuggested,
-	"LogGroupDissolve":              searchLogGroupDissolve,
-	"LogRegisteredNewPendingNode":   searchLogRegisteredNewPendingNode,
-	"LogGroupingInitiated":          searchLogGroupingInitiated,
-	"LogNoPendingGroup":             searchLogNoPendingGroup,
-	"LogPendingGroupRemoved":        searchLogPendingGroupRemoved,
-	"LogError":                      searchLogError,
-	"UpdateGroupToPick":             searchUpdateGroupToPick,
-	"UpdateGroupSize":               searchUpdateGroupSize,
-	"UpdateGroupingThreshold":       searchUpdateGroupingThreshold,
-	"UpdateGroupMaturityPeriod":     searchUpdateGroupMaturityPeriod,
-	"UpdateBootstrapCommitDuration": searchUpdateBootstrapCommitDuration,
-	"UpdateBootstrapRevealDuration": searchUpdateBootstrapRevealDuration,
-	"UpdatebootstrapStartThreshold": searchUpdatebootstrapStartThreshold,
-	"UpdatePendingGroupMaxLife":     searchUpdatePendingGroupMaxLife,
-	"GuardianReward":                searchGuardianReward,
+	"logurl":                        searchLogURL,
+	"logrequestuserrandom":          searchLogRequestUserRandom,
+	"lognonsupportedtype":           searchLogNonSupportedType,
+	"lognoncontractcall":            searchLogNonContractCall,
+	"logcallbacktriggeredfor":       searchLogCallbackTriggeredFor,
+	"logrequestfromnonexistentuc":   searchLogRequestFromNonExistentUC,
+	"logupdaterandom":               searchLogUpdateRandom,
+	"logvalidationresult":           searchLogValidationResult,
+	"loginsufficientpendingnode":    searchLogInsufficientPendingNode,
+	"loginsufficientworkinggroup":   searchLogInsufficientWorkingGroup,
+	"loggrouping":                   searchLogGrouping,
+	"logpublickeyaccepted":          searchLogPublicKeyAccepted,
+	"logpublickeysuggested":         searchLogPublicKeySuggested,
+	"loggroupdissolve":              searchLogGroupDissolve,
+	"logregisterednewpendingnode":   searchLogRegisteredNewPendingNode,
+	"loggroupinginitiated":          searchLogGroupingInitiated,
+	"lognopendinggroup":             searchLogNoPendingGroup,
+	"logpendinggroupremoved":        searchLogPendingGroupRemoved,
+	"logerror":                      searchLogError,
+	"updategrouptopick":             searchUpdateGroupToPick,
+	"updategroupsize":               searchUpdateGroupSize,
+	"updategroupingthreshold":       searchUpdateGroupingThreshold,
+	"updategroupmaturityperiod":     searchUpdateGroupMaturityPeriod,
+	"updatebootstrapcommitduration": searchUpdateBootstrapCommitDuration,
+	"updatebootstraprevealduration": searchUpdateBootstrapRevealDuration,
+	"updatebootstrapstartthreshold": searchUpdatebootstrapStartThreshold,
+	"updatependinggroupmaxlife":     searchUpdatePendingGroupMaxLife,
+	"guardianreward":                searchGuardianReward,
 }
 
 func searchLogURL(limit, offset int, c *gin.Context) bool {
@@ -610,12 +610,13 @@ func search(c *gin.Context) {
 
 	fmt.Println("search", text, pageSize, pageIndex)
 
-	f := searchEventTable[text]
+	f := searchEventTable[strings.ToLower(text)]
 	if f != nil {
 		if f(pageSize, pageIndex*pageSize, c) {
 			return
 		}
 	}
+
 	if !searchTx(pageSize, pageIndex*pageSize, text, c) {
 		sendError(c, 0, "There are no results that match your search")
 	}
