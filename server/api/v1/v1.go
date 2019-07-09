@@ -452,7 +452,7 @@ func searchTx(limit, offset int, condition string, c *gin.Context) bool {
 	db = db.Preload("UpdateBootstrapRevealDuration").Preload("UpdatebootstrapStartThreshold").Preload("UpdatePendingGroupMaxLife")
 	db = db.Preload("GuardianReward")
 
-	if err := db.Where("hash LIKE ?", "%"+condition+"%").Or("method LIKE ?", "%"+condition+"%").Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+	if err := db.Where("hash ILIKE ?", "%"+condition+"%").Or("method ILIKE ?", "%"+condition+"%").Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
 		fmt.Println(err)
 		return false
 	} else {
