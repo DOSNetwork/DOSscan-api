@@ -21,7 +21,7 @@ var methodMap map[string]string
 var proxyAbi abi.ABI
 
 func init() {
-	jsonFile, err := os.Open("/Users/chenhaonien/go/src/github.com/DOSNetwork/explorer-Api/subscriber/abi/DOSProxy.abi")
+	jsonFile, err := os.Open("./abi/DOSProxy.abi")
 	// if we os.Open returns an error then handle it
 	if err != nil {
 		fmt.Println(err)
