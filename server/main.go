@@ -21,7 +21,6 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 	r.ForwardedByClientIP = true
-	r.Use(middleware.Limit())
 	r.Use(middleware.CORS())
 	api.ApplyRoutes(r)
 	// Using port :8080 by default
