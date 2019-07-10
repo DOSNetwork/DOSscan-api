@@ -4,13 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"sort"
 	"strconv"
 	"strings"
 
-	"github.com/DOSNetwork/DOSscan-api/models"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 )
 
 const (
@@ -29,111 +26,6 @@ type Body struct {
 	Nodelist []interface{} `json:"nodelist,omitempty"`
 }
 
-func searchTx(limit, offset int, condition string) []interface{} {
-	logs := []models.Transaction{}
-	var resp []interface{}
-	db := models.DB.Preload("LogURL").Preload("LogRequestUserRandom").Preload("LogNonSupportedType")
-	db = db.Preload("LogNonContractCall").Preload("LogCallbackTriggeredFor").Preload("LogRequestFromNonExistentUC")
-	db = db.Preload("LogUpdateRandom").Preload("LogValidationResult").Preload("LogInsufficientPendingNode")
-	db = db.Preload("LogInsufficientWorkingGroup").Preload("LogGrouping").Preload("LogPublicKeyAccepted")
-	db = db.Preload("LogPublicKeySuggested").Preload("LogGroupDissolve").Preload("LogRegisteredNewPendingNode")
-	db = db.Preload("LogGroupingInitiated").Preload("LogNoPendingGroup").Preload("LogPendingGroupRemoved")
-	db = db.Preload("LogError").Preload("UpdateGroupToPick").Preload("UpdateGroupSize")
-	db = db.Preload("UpdateGroupingThreshold").Preload("UpdateGroupMaturityPeriod").Preload("UpdateBootstrapCommitDuration")
-	db = db.Preload("UpdateBootstrapRevealDuration").Preload("UpdatebootstrapStartThreshold").Preload("UpdatePendingGroupMaxLife")
-	db = db.Preload("GuardianReward")
-
-	if err := db.Where("hash ILIKE ?", "%"+condition+"%").Or("method ILIKE ?", "%"+condition+"%").Offset(offset).Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
-		fmt.Println("searchTx ", len(logs))
-		for _, log := range logs {
-			for _, l := range log.LogURL {
-				resp = append(resp, l)
-			}
-			for _, l := range log.LogRequestUserRandom {
-				resp = append(resp, l)
-			}
-			for _, l := range log.LogNonSupportedType {
-				resp = append(resp, l)
-			}
-			for _, l := range log.LogNonContractCall {
-				resp = append(resp, l)
-			}
-			for _, l := range log.LogCallbackTriggeredFor {
-				resp = append(resp, l)
-			}
-			for _, l := range log.LogRequestFromNonExistentUC {
-				resp = append(resp, l)
-			}
-			for _, l := range log.LogUpdateRandom {
-				resp = append(resp, l)
-			}
-			for _, l := range log.LogValidationResult {
-				resp = append(resp, l)
-			}
-			for _, l := range log.LogInsufficientPendingNode {
-				resp = append(resp, l)
-			}
-			for _, l := range log.LogInsufficientWorkingGroup {
-				resp = append(resp, l)
-			}
-			for _, l := range log.LogGrouping {
-				resp = append(resp, l)
-			}
-			for _, l := range log.LogPublicKeyAccepted {
-				resp = append(resp, l)
-			}
-			for _, l := range log.LogPublicKeySuggested {
-				resp = append(resp, l)
-			}
-			for _, l := range log.LogGroupDissolve {
-				resp = append(resp, l)
-			}
-			for _, l := range log.LogRegisteredNewPendingNode {
-				resp = append(resp, l)
-			}
-			for _, l := range log.LogGroupingInitiated {
-				resp = append(resp, l)
-			}
-			for _, l := range log.LogNoPendingGroup {
-				resp = append(resp, l)
-			}
-			for _, l := range log.LogPendingGroupRemoved {
-				resp = append(resp, l)
-			}
-			for _, l := range log.LogError {
-				resp = append(resp, l)
-			}
-			for _, l := range log.UpdateGroupToPick {
-				resp = append(resp, l)
-			}
-			for _, l := range log.UpdateGroupSize {
-				resp = append(resp, l)
-			}
-			for _, l := range log.UpdateGroupingThreshold {
-				resp = append(resp, l)
-			}
-			for _, l := range log.UpdateGroupMaturityPeriod {
-				resp = append(resp, l)
-			}
-			for _, l := range log.UpdateBootstrapCommitDuration {
-				resp = append(resp, l)
-			}
-			for _, l := range log.UpdateBootstrapRevealDuration {
-				resp = append(resp, l)
-			}
-			for _, l := range log.UpdatebootstrapStartThreshold {
-				resp = append(resp, l)
-			}
-			for _, l := range log.UpdatePendingGroupMaxLife {
-				resp = append(resp, l)
-			}
-			for _, l := range log.GuardianReward {
-				resp = append(resp, l)
-			}
-		}
-	}
-	return resp
-}
 func sendError(c *gin.Context, code int, err string) {
 	resp := Response{
 		Code:    0,
@@ -141,6 +33,7 @@ func sendError(c *gin.Context, code int, err string) {
 	}
 	c.JSON(404, resp)
 }
+
 func sendResponse(rType int, logs []interface{}, c *gin.Context) {
 	var resp Response
 	switch rType {
@@ -187,6 +80,16 @@ func search(c *gin.Context) {
 	}
 
 	fmt.Println("search", text, pageSize, pageIndex)
+	if strings.HasPrefix(text, "0x") {
+		//address or requestID or GroupID
+	} else {
+		f := searchEventTable[strings.ToLower(text)]
+		if f != nil {
+			fmt.Println("case 1")
+			sendResponse(eventList, f(pageSize, pageIndex*pageSize), c)
+			return
+		}
+	}
 	// 1) text is a full event name
 	/*
 		f := searchEventTable[strings.ToLower(text)]
@@ -197,8 +100,8 @@ func search(c *gin.Context) {
 		}
 	*/
 	// 2)
-	offset := pageIndex * pageSize
-	limit := pageSize
+	//	offset := pageIndex * pageSize
+	//	limit := pageSize
 	var resp []interface{}
 	/*
 		keys := make([]string, 0)
@@ -220,10 +123,10 @@ func search(c *gin.Context) {
 			offset = pageIndex*pageSize - len(resp)
 		}
 	*/
-	offset = pageIndex*pageSize - len(resp)
+	//	offset = pageIndex*pageSize - len(resp)
 	// 2) Check if text is included in tx,method or event
-	resp = append(resp, searchTx(limit, offset, text)...)
-	fmt.Println("case 3 from event total, ", len(resp))
+	//resp = append(resp, searchTx(limit, offset, text)...)
+	//fmt.Println("case 3 from event total, ", len(resp))
 
 	if len(resp) >= pageSize {
 		sendResponse(eventList, resp[:pageSize], c)

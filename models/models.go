@@ -1,19 +1,10 @@
 package models
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/lib/pq"
-	log "github.com/sirupsen/logrus"
-)
-
-const (
-	DB_USER     = "postgres"
-	DB_PASSWORD = "postgres"
-	DB_NAME     = "postgres"
 )
 
 type Transaction struct {
@@ -642,26 +633,4 @@ type GuardianReward struct {
 
 func (GuardianReward) TableName() string {
 	return "guardianreward"
-}
-
-var DB *gorm.DB
-
-func Connect() *gorm.DB {
-	postgres_url := fmt.Sprintf("postgres://%s:%s@localhost:5432/%s?sslmode=disable", DB_USER, DB_PASSWORD, DB_NAME)
-	var db *gorm.DB
-	db, err := gorm.Open("postgres", postgres_url)
-	if err != nil {
-		log.Fatal(err)
-	}
-	//&LogPublicKeySuggested{},
-
-	// AutoMigrate will ONLY create tables, missing columns and missing indexes,
-	// and WON’T change existing column’s type or delete unused columns to protect your data.
-	db.AutoMigrate(&Transaction{}, &LogURL{}, &LogRequestUserRandom{}, &LogNonSupportedType{}, &LogNonContractCall{}, &LogCallbackTriggeredFor{}, &LogRequestFromNonExistentUC{}, &LogUpdateRandom{}, &LogValidationResult{}, &LogInsufficientPendingNode{}, &LogInsufficientWorkingGroup{}, &LogGrouping{}, &LogPublicKeyAccepted{}, &LogPublicKeySuggested{}, &LogGroupDissolve{}, &LogRegisteredNewPendingNode{}, &LogGroupingInitiated{}, &LogNoPendingGroup{}, &LogPendingGroupRemoved{}, &LogError{}, &UpdateGroupToPick{}, &UpdateGroupSize{}, &UpdateGroupingThreshold{}, &UpdateGroupMaturityPeriod{}, &UpdateBootstrapCommitDuration{}, &UpdateBootstrapRevealDuration{}, &UpdatebootstrapStartThreshold{}, &UpdatePendingGroupMaxLife{}, &GuardianReward{})
-	//db.AutoMigrate(&LogURL{}, &LogRequestUserRandom{}, &LogNonSupportedType{}, &LogNonContractCall{}, &LogCallbackTriggeredFor{}, &LogRequestFromNonExistentUC{}, &LogUpdateRandom{}, &LogValidationResult{}, &LogInsufficientPendingNode{}, &LogInsufficientWorkingGroup{}, &LogGrouping{}, &LogPublicKeyAccepted{}, &LogGroupDissolve{}, &LogRegisteredNewPendingNode{}, &LogGroupingInitiated{}, &LogNoPendingGroup{}, &LogPendingGroupRemoved{}, &LogError{}, &UpdateGroupToPick{}, &UpdateGroupSize{}, &UpdateGroupingThreshold{}, &UpdateGroupMaturityPeriod{}, &UpdateBootstrapCommitDuration{}, &UpdateBootstrapRevealDuration{}, &UpdatebootstrapStartThreshold{}, &UpdatePendingGroupMaxLife{}, &GuardianReward{})
-
-	// DB.LogMode(true)
-	log.Info("DB Connected")
-	DB = db
-	return db
 }

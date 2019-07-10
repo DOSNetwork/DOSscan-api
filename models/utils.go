@@ -8,6 +8,17 @@ import (
 
 type loadEventFunc func(int, int, *gorm.DB) []interface{}
 
+//TODO : Change to Method to Events
+var events []string
+
+func init() {
+	events = []string{"LogURL", "LogRequestUserRandom", "LogNonSupportedType", "LogNonContractCall", "LogCallbackTriggeredFor", "LogRequestFromNonExistentUC",
+		"LogUpdateRandom", "LogValidationResult", "LogInsufficientPendingNode", "LogInsufficientWorkingGroup", "LogGrouping", "LogPublicKeyAccepted",
+		"LogPublicKeySuggested", "LogGroupDissolve", "LogRegisteredNewPendingNode", "LogGroupingInitiated", "LogNoPendingGroup", "LogPendingGroupRemoved",
+		"LogError", "UpdateGroupToPick", "UpdateGroupSize", "UpdateGroupingThreshold", "UpdateGroupMaturityPeriod", "UpdateBootstrapCommitDuration",
+		"UpdateBootstrapRevealDuration", "UpdatebootstrapStartThreshold", "UpdatePendingGroupMaxLife", "GuardianReward"}
+}
+
 var LoadEventTable = map[string]loadEventFunc{
 	"logurl":                        loadLogURL,
 	"logrequestuserrandom":          loadLogRequestUserRandom,
@@ -130,30 +141,19 @@ func relatedEvents(txs []Transaction) []interface{} {
 	return resp
 }
 
-func SearchEventsByTx(limit int, events []string, condition string, db *gorm.DB) []interface{} {
+//TODO : Should check method name and load corresponging event only
+func SearchRelatedEvents(limit int, field, condition string, db *gorm.DB) []interface{} {
 	logs := []Transaction{}
 	var resp []interface{}
-	for _, event := range events {
-		db = db.Preload(event)
-	}
+	if field == "sender" || field == "hash" || field == "method" {
+		for _, event := range events {
+			db = db.Preload(event)
+		}
 
-	if err := db.Where("hash ILIKE ?", "%"+condition+"%").Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
-		fmt.Println("searchTx ", len(logs))
-		resp = relatedEvents(logs)
-	}
-	return resp
-}
-
-func SearchEventsByMethod(limit int, events []string, condition string, db *gorm.DB) []interface{} {
-	logs := []Transaction{}
-	var resp []interface{}
-	for _, event := range events {
-		db = db.Preload(event)
-	}
-
-	if err := db.Where("method = ?", condition).Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
-		fmt.Println("searchmethod ", len(logs))
-		resp = relatedEvents(logs)
+		if err := db.Where(field+" ILIKE ?", "%"+condition+"%").Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
+			fmt.Println("searchTx ", len(logs))
+			resp = relatedEvents(logs)
+		}
 	}
 	return resp
 }
