@@ -23,6 +23,7 @@ type Transaction struct {
 	Value                         uint64                          `gorm:"column:value" json:"value"`
 	GasLimit                      uint64                          `gorm:"column:gas_limit" json:"gasLimit"`
 	Nonce                         uint64                          `gorm:"column:nonce" json:"nonce"`
+	From                          string                          `gorm:"column:from" json:"from"`
 	To                            string                          `gorm:"column:to" json:"to"`
 	Data                          []byte                          `gorm:"column:data;type:bytea" json:"data"`
 	Method                        string                          `gorm:"column:method;index" json:"method"`
