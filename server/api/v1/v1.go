@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -28,419 +29,9 @@ type Body struct {
 	Nodelist []interface{} `json:"nodelist,omitempty"`
 }
 
-type searchEventFunc func(int, int, *gin.Context) bool
-
-var searchEventTable = map[string]searchEventFunc{
-	"logurl":                        searchLogURL,
-	"logrequestuserrandom":          searchLogRequestUserRandom,
-	"lognonsupportedtype":           searchLogNonSupportedType,
-	"lognoncontractcall":            searchLogNonContractCall,
-	"logcallbacktriggeredfor":       searchLogCallbackTriggeredFor,
-	"logrequestfromnonexistentuc":   searchLogRequestFromNonExistentUC,
-	"logupdaterandom":               searchLogUpdateRandom,
-	"logvalidationresult":           searchLogValidationResult,
-	"loginsufficientpendingnode":    searchLogInsufficientPendingNode,
-	"loginsufficientworkinggroup":   searchLogInsufficientWorkingGroup,
-	"loggrouping":                   searchLogGrouping,
-	"logpublickeyaccepted":          searchLogPublicKeyAccepted,
-	"logpublickeysuggested":         searchLogPublicKeySuggested,
-	"loggroupdissolve":              searchLogGroupDissolve,
-	"logregisterednewpendingnode":   searchLogRegisteredNewPendingNode,
-	"loggroupinginitiated":          searchLogGroupingInitiated,
-	"lognopendinggroup":             searchLogNoPendingGroup,
-	"logpendinggroupremoved":        searchLogPendingGroupRemoved,
-	"logerror":                      searchLogError,
-	"updategrouptopick":             searchUpdateGroupToPick,
-	"updategroupsize":               searchUpdateGroupSize,
-	"updategroupingthreshold":       searchUpdateGroupingThreshold,
-	"updategroupmaturityperiod":     searchUpdateGroupMaturityPeriod,
-	"updatebootstrapcommitduration": searchUpdateBootstrapCommitDuration,
-	"updatebootstraprevealduration": searchUpdateBootstrapRevealDuration,
-	"updatebootstrapstartthreshold": searchUpdatebootstrapStartThreshold,
-	"updatependinggroupmaxlife":     searchUpdatePendingGroupMaxLife,
-	"guardianreward":                searchGuardianReward,
-}
-
-func searchLogURL(limit, offset int, c *gin.Context) bool {
-	logs := []models.LogURL{}
-	if err := models.DB.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
-		return false
-	} else {
-		var resp []interface{}
-		for _, log := range logs {
-			resp = append(resp, log)
-		}
-		sendResponse(eventList, resp, c)
-		return true
-	}
-}
-
-func searchLogRequestUserRandom(limit, offset int, c *gin.Context) bool {
-	logs := []models.LogRequestUserRandom{}
-	if err := models.DB.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
-		return false
-	} else {
-		var resp []interface{}
-		for _, log := range logs {
-			resp = append(resp, log)
-		}
-		sendResponse(eventList, resp, c)
-		return true
-	}
-}
-func searchLogNonSupportedType(limit, offset int, c *gin.Context) bool {
-	logs := []models.LogNonSupportedType{}
-	if err := models.DB.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
-		return false
-	} else {
-		var resp []interface{}
-		for _, log := range logs {
-			resp = append(resp, log)
-		}
-		sendResponse(eventList, resp, c)
-		return true
-	}
-}
-
-func searchLogNonContractCall(limit, offset int, c *gin.Context) bool {
-	logs := []models.LogNonContractCall{}
-	if err := models.DB.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
-		return false
-	} else {
-		var resp []interface{}
-		for _, log := range logs {
-			resp = append(resp, log)
-		}
-		sendResponse(eventList, resp, c)
-		return true
-	}
-}
-
-func searchLogCallbackTriggeredFor(limit, offset int, c *gin.Context) bool {
-	logs := []models.LogCallbackTriggeredFor{}
-	if err := models.DB.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
-		return false
-	} else {
-		var resp []interface{}
-		for _, log := range logs {
-			resp = append(resp, log)
-		}
-		sendResponse(eventList, resp, c)
-		return true
-	}
-}
-
-func searchLogRequestFromNonExistentUC(limit, offset int, c *gin.Context) bool {
-	logs := []models.LogRequestFromNonExistentUC{}
-	if err := models.DB.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
-		return false
-	} else {
-		var resp []interface{}
-		for _, log := range logs {
-			resp = append(resp, log)
-		}
-		sendResponse(eventList, resp, c)
-		return true
-	}
-}
-
-func searchLogUpdateRandom(limit, offset int, c *gin.Context) bool {
-	logs := []models.LogUpdateRandom{}
-	if err := models.DB.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
-		return false
-	} else {
-		var resp []interface{}
-		for _, log := range logs {
-			resp = append(resp, log)
-		}
-		sendResponse(eventList, resp, c)
-		return true
-	}
-}
-func searchLogValidationResult(limit, offset int, c *gin.Context) bool {
-	logs := []models.LogValidationResult{}
-	if err := models.DB.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
-		return false
-	} else {
-		var resp []interface{}
-		for _, log := range logs {
-			resp = append(resp, log)
-		}
-		sendResponse(eventList, resp, c)
-		return true
-	}
-}
-
-func searchLogInsufficientPendingNode(limit, offset int, c *gin.Context) bool {
-	logs := []models.LogInsufficientPendingNode{}
-	if err := models.DB.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
-		return false
-	} else {
-		var resp []interface{}
-		for _, log := range logs {
-			resp = append(resp, log)
-		}
-		sendResponse(eventList, resp, c)
-		return true
-	}
-}
-func searchLogInsufficientWorkingGroup(limit, offset int, c *gin.Context) bool {
-	logs := []models.LogInsufficientWorkingGroup{}
-	if err := models.DB.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
-		return false
-	} else {
-		var resp []interface{}
-		for _, log := range logs {
-			resp = append(resp, log)
-		}
-		sendResponse(eventList, resp, c)
-		return true
-	}
-}
-
-func searchLogGrouping(limit, offset int, c *gin.Context) bool {
-	logs := []models.LogGrouping{}
-	if err := models.DB.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
-		return false
-	} else {
-		var resp []interface{}
-		for _, log := range logs {
-			resp = append(resp, log)
-		}
-		sendResponse(eventList, resp, c)
-		return true
-	}
-}
-func searchLogPublicKeyAccepted(limit, offset int, c *gin.Context) bool {
-	logs := []models.LogPublicKeyAccepted{}
-	if err := models.DB.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
-		return false
-	} else {
-		var resp []interface{}
-		for _, log := range logs {
-			resp = append(resp, log)
-		}
-		sendResponse(eventList, resp, c)
-		return true
-	}
-}
-
-func searchLogPublicKeySuggested(limit, offset int, c *gin.Context) bool {
-	logs := []models.LogPublicKeySuggested{}
-	if err := models.DB.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
-		return false
-	} else {
-		var resp []interface{}
-		for _, log := range logs {
-			resp = append(resp, log)
-		}
-		sendResponse(eventList, resp, c)
-		return true
-	}
-}
-func searchLogGroupDissolve(limit, offset int, c *gin.Context) bool {
-	logs := []models.LogGroupDissolve{}
-	if err := models.DB.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
-		return false
-	} else {
-		var resp []interface{}
-		for _, log := range logs {
-			resp = append(resp, log)
-		}
-		sendResponse(eventList, resp, c)
-		return true
-	}
-}
-
-func searchLogRegisteredNewPendingNode(limit, offset int, c *gin.Context) bool {
-	logs := []models.LogRegisteredNewPendingNode{}
-	if err := models.DB.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
-		return false
-	} else {
-		var resp []interface{}
-		for _, log := range logs {
-			resp = append(resp, log)
-		}
-		sendResponse(eventList, resp, c)
-		return true
-	}
-}
-func searchLogGroupingInitiated(limit, offset int, c *gin.Context) bool {
-	logs := []models.LogGroupingInitiated{}
-	if err := models.DB.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
-		return false
-	} else {
-		var resp []interface{}
-		for _, log := range logs {
-			resp = append(resp, log)
-		}
-		sendResponse(eventList, resp, c)
-		return true
-	}
-}
-
-func searchLogNoPendingGroup(limit, offset int, c *gin.Context) bool {
-	logs := []models.LogNoPendingGroup{}
-	if err := models.DB.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
-		return false
-	} else {
-		var resp []interface{}
-		for _, log := range logs {
-			resp = append(resp, log)
-		}
-		sendResponse(eventList, resp, c)
-		return true
-	}
-}
-func searchLogPendingGroupRemoved(limit, offset int, c *gin.Context) bool {
-	logs := []models.LogPendingGroupRemoved{}
-	if err := models.DB.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
-		return false
-	} else {
-		var resp []interface{}
-		for _, log := range logs {
-			resp = append(resp, log)
-		}
-		sendResponse(eventList, resp, c)
-		return true
-	}
-}
-
-func searchLogError(limit, offset int, c *gin.Context) bool {
-	logs := []models.LogError{}
-	if err := models.DB.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
-		return false
-	} else {
-		var resp []interface{}
-		for _, log := range logs {
-			resp = append(resp, log)
-		}
-		sendResponse(eventList, resp, c)
-		return true
-	}
-}
-func searchUpdateGroupToPick(limit, offset int, c *gin.Context) bool {
-	logs := []models.UpdateGroupToPick{}
-	if err := models.DB.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
-		return false
-	} else {
-		var resp []interface{}
-		for _, log := range logs {
-			resp = append(resp, log)
-		}
-		sendResponse(eventList, resp, c)
-		return true
-	}
-}
-
-func searchUpdateGroupSize(limit, offset int, c *gin.Context) bool {
-	logs := []models.UpdateGroupSize{}
-	if err := models.DB.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
-		return false
-	} else {
-		var resp []interface{}
-		for _, log := range logs {
-			resp = append(resp, log)
-		}
-		sendResponse(eventList, resp, c)
-		return true
-	}
-}
-func searchUpdateGroupingThreshold(limit, offset int, c *gin.Context) bool {
-	logs := []models.UpdateGroupingThreshold{}
-	if err := models.DB.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
-		return false
-	} else {
-		var resp []interface{}
-		for _, log := range logs {
-			resp = append(resp, log)
-		}
-		sendResponse(eventList, resp, c)
-		return true
-	}
-}
-func searchUpdateGroupMaturityPeriod(limit, offset int, c *gin.Context) bool {
-	logs := []models.UpdateGroupMaturityPeriod{}
-	if err := models.DB.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
-		return false
-	} else {
-		var resp []interface{}
-		for _, log := range logs {
-			resp = append(resp, log)
-		}
-		sendResponse(eventList, resp, c)
-		return true
-	}
-}
-func searchUpdateBootstrapCommitDuration(limit, offset int, c *gin.Context) bool {
-	logs := []models.UpdateBootstrapCommitDuration{}
-	if err := models.DB.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
-		return false
-	} else {
-		var resp []interface{}
-		for _, log := range logs {
-			resp = append(resp, log)
-		}
-		sendResponse(eventList, resp, c)
-		return true
-	}
-}
-func searchUpdateBootstrapRevealDuration(limit, offset int, c *gin.Context) bool {
-	logs := []models.UpdateBootstrapRevealDuration{}
-	if err := models.DB.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
-		return false
-	} else {
-		var resp []interface{}
-		for _, log := range logs {
-			resp = append(resp, log)
-		}
-		sendResponse(eventList, resp, c)
-		return true
-	}
-}
-func searchUpdatebootstrapStartThreshold(limit, offset int, c *gin.Context) bool {
-	logs := []models.UpdatebootstrapStartThreshold{}
-	if err := models.DB.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
-		return false
-	} else {
-		var resp []interface{}
-		for _, log := range logs {
-			resp = append(resp, log)
-		}
-		sendResponse(eventList, resp, c)
-		return true
-	}
-}
-func searchUpdatePendingGroupMaxLife(limit, offset int, c *gin.Context) bool {
-	logs := []models.UpdatePendingGroupMaxLife{}
-	if err := models.DB.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
-		return false
-	} else {
-		var resp []interface{}
-		for _, log := range logs {
-			resp = append(resp, log)
-		}
-		sendResponse(eventList, resp, c)
-		return true
-	}
-}
-
-func searchGuardianReward(limit, offset int, c *gin.Context) bool {
-	logs := []models.GuardianReward{}
-	if err := models.DB.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
-		return false
-	} else {
-		var resp []interface{}
-		for _, log := range logs {
-			resp = append(resp, log)
-		}
-		sendResponse(eventList, resp, c)
-		return true
-	}
-}
-
-func searchTx(limit, offset int, condition string, c *gin.Context) bool {
+func searchTx(limit, offset int, condition string) []interface{} {
 	logs := []models.Transaction{}
+	var resp []interface{}
 	db := models.DB.Preload("LogURL").Preload("LogRequestUserRandom").Preload("LogNonSupportedType")
 	db = db.Preload("LogNonContractCall").Preload("LogCallbackTriggeredFor").Preload("LogRequestFromNonExistentUC")
 	db = db.Preload("LogUpdateRandom").Preload("LogValidationResult").Preload("LogInsufficientPendingNode")
@@ -452,11 +43,8 @@ func searchTx(limit, offset int, condition string, c *gin.Context) bool {
 	db = db.Preload("UpdateBootstrapRevealDuration").Preload("UpdatebootstrapStartThreshold").Preload("UpdatePendingGroupMaxLife")
 	db = db.Preload("GuardianReward")
 
-	if err := db.Where("hash ILIKE ?", "%"+condition+"%").Or("method ILIKE ?", "%"+condition+"%").Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
-		fmt.Println(err)
-		return false
-	} else {
-		var resp []interface{}
+	if err := db.Where("hash ILIKE ?", "%"+condition+"%").Or("method ILIKE ?", "%"+condition+"%").Offset(offset).Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
+		fmt.Println("searchTx ", len(logs))
 		for _, log := range logs {
 			for _, l := range log.LogURL {
 				resp = append(resp, l)
@@ -543,18 +131,8 @@ func searchTx(limit, offset int, condition string, c *gin.Context) bool {
 				resp = append(resp, l)
 			}
 		}
-		if offset >= len(resp) {
-			offset = len(resp) - (len(resp) % limit)
-		}
-
-		if offset+limit >= len(resp) {
-			sendResponse(eventList, resp[offset:], c)
-		} else {
-			sendResponse(eventList, resp[offset:(offset+limit)], c)
-		}
-
-		return true
 	}
+	return resp
 }
 func sendError(c *gin.Context, code int, err string) {
 	resp := Response{
@@ -609,17 +187,54 @@ func search(c *gin.Context) {
 	}
 
 	fmt.Println("search", text, pageSize, pageIndex)
-
-	f := searchEventTable[strings.ToLower(text)]
-	if f != nil {
-		if f(pageSize, pageIndex*pageSize, c) {
+	// 1) text is a full event name
+	/*
+		f := searchEventTable[strings.ToLower(text)]
+		if f != nil {
+			fmt.Println("case 1")
+			sendResponse(eventList, f(pageSize, pageIndex*pageSize), c)
 			return
 		}
-	}
+	*/
+	// 2)
+	offset := pageIndex * pageSize
+	limit := pageSize
+	var resp []interface{}
+	/*
+		keys := make([]string, 0)
+		for k, _ := range searchEventTable {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
 
-	if !searchTx(pageSize, pageIndex*pageSize, text, c) {
-		sendError(c, 0, "There are no results that match your search")
+		for _, key := range keys {
+			if caseInsensitiveContains(key, text) {
+				resp = append(resp, searchEventTable[key](limit, offset)...)
+			}
+			fmt.Println("case 2 from event ", key, "  ", len(resp))
+			if len(resp) >= pageSize {
+				fmt.Println("case 2 total, ", len(resp[:pageSize]))
+				sendResponse(eventList, resp[:pageSize], c)
+				return
+			}
+			offset = pageIndex*pageSize - len(resp)
+		}
+	*/
+	offset = pageIndex*pageSize - len(resp)
+	// 2) Check if text is included in tx,method or event
+	resp = append(resp, searchTx(limit, offset, text)...)
+	fmt.Println("case 3 from event total, ", len(resp))
+
+	if len(resp) >= pageSize {
+		sendResponse(eventList, resp[:pageSize], c)
+	} else {
+		sendResponse(eventList, resp, c)
 	}
+}
+
+func caseInsensitiveContains(s, substr string) bool {
+	s, substr = strings.ToLower(s), strings.ToLower(substr)
+	return strings.Contains(s, substr)
 }
 
 ///test http://localhost:8080/api/v1/validationResult/bb14823effa49c05f3b3f970aec6ffcab4da4cb1c6596044bfc6ba95b83a79b
