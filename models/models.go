@@ -8,7 +8,7 @@ import (
 )
 
 type Transaction struct {
-	gorm.Model                    `json:"-"`
+	gorm.Model
 	Hash                          string                          `gorm:"primary_key;index"`
 	GasPrice                      uint64                          `gorm:"column:gas_price" json:"gasPrice"`
 	Value                         uint64                          `gorm:"column:value" json:"value"`
@@ -56,7 +56,7 @@ func (Transaction) TableName() string {
 
 // `LogURL` belongs to `Transaction`, `TransactionID` is the foreign key
 type LogUrl struct {
-	gorm.Model        `json:"-"`
+	gorm.Model
 	Method            string         `gorm:"column:method" json:"method"`
 	EventLog          string         `gorm:"column:event_log" json:"eventLog"`
 	Transaction       Transaction    `gorm:"association_foreignkey:Hash" json:"-"`
@@ -185,7 +185,7 @@ func (LogRequestFromNonExistentUC) TableName() string {
 }
 
 type LogUpdateRandom struct {
-	gorm.Model        `json:"-"`
+	gorm.Model
 	Method            string         `gorm:"column:method" json:"method"`
 	EventLog          string         `gorm:"column:event_log" json:"eventLog"`
 	Topics            pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
@@ -220,10 +220,10 @@ type LogValidationResult struct {
 
 	TrafficType uint8          `gorm:"column:traffic_type" json:"trafficType"`
 	TrafficId   string         `gorm:"column:traffic_id" json:"trafficId"`
-	Message     []byte         `gorm:"column:message;type:bytea" json:"message"`
+	Message     string         `gorm:"column:message;type:bytea" json:"message"`
 	Signature   pq.StringArray `gorm:"column:signature;type:varchar(100)[]" json:"signature"`
 	PubKey      pq.StringArray `gorm:"column:pub_key;type:varchar(100)[]" json:"pubKey"`
-	Pass        bool           `gorm:"column:pass;" json:"pass"`
+	Pass        bool           `gorm:"column:pass" json:"pass"`
 }
 
 // Set User's table name to be `profiles`
@@ -252,7 +252,7 @@ func (LogInsufficientPendingNode) TableName() string {
 }
 
 type LogInsufficientWorkingGroup struct {
-	gorm.Model       `json:"-"`
+	gorm.Model
 	Method           string         `gorm:"column:method" json:"method"`
 	EventLog         string         `gorm:"column:event_log" json:"eventLog"`
 	Topics           pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
@@ -378,7 +378,7 @@ func (LogRegisteredNewPendingNode) TableName() string {
 }
 
 type LogGroupingInitiated struct {
-	gorm.Model        `json:"-"`
+	gorm.Model
 	Method            string         `gorm:"column:method" json:"method"`
 	EventLog          string         `gorm:"column:event_log" json:"eventLog"`
 	Topics            pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`

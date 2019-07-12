@@ -474,10 +474,16 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						Removed:         log.Raw.Removed,
 						TrafficType:     log.TrafficType,
 						TrafficId:       hexutil.Encode(log.TrafficId.Bytes()),
-						Message:         log.Message,
 						Signature:       []string{hexutil.Encode(log.Signature[0].Bytes()), hexutil.Encode(log.Signature[1].Bytes())},
 						PubKey:          []string{hexutil.Encode(log.PubKey[0].Bytes()), hexutil.Encode(log.PubKey[1].Bytes()), hexutil.Encode(log.PubKey[2].Bytes()), hexutil.Encode(log.PubKey[3].Bytes())},
 						Pass:            log.Pass,
+					}
+
+					if log.TrafficType == 2 {
+						mLog.Message = string(log.Message)
+					} else {
+						mLog.Message = hexutil.Encode(log.Message)
+						return
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
 						tx.LogValidationResult = append(tx.LogValidationResult, mLog)
