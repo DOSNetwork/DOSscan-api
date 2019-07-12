@@ -138,7 +138,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						LogIndex:          log.Raw.Index,
 						Removed:           log.Raw.Removed,
 						QueryId:           hexutil.Encode(log.QueryId.Bytes()),
-						Timeout:           hexutil.Encode(log.Timeout.Bytes()),
+						Timeout:           log.Timeout.String(),
 						DataSource:        log.DataSource,
 						Selector:          log.Selector,
 						Randomness:        hexutil.Encode(log.Randomness.Bytes()),
