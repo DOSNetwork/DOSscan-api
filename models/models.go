@@ -218,8 +218,8 @@ type LogValidationResult struct {
 	Removed         bool           `gorm:"column:removed;" json:"-"`
 	Date            time.Time      `gorm:"column:date;" json:"-"`
 
-	TrafficType uint8          `gorm:"column:traffic_type"`
-	TrafficId   string         `gorm:"column:traffic_id"`
+	TrafficType uint8          `gorm:"column:traffic_type" json:"trafficType"`
+	TrafficId   string         `gorm:"column:traffic_id" json:"trafficId"`
 	Message     []byte         `gorm:"column:message;type:bytea" json:"message"`
 	Signature   pq.StringArray `gorm:"column:signature;type:varchar(100)[]" json:"signature"`
 	PubKey      pq.StringArray `gorm:"column:pub_key;type:varchar(100)[]" json:"pubKey"`
