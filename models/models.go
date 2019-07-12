@@ -82,11 +82,11 @@ func (LogUrl) TableName() string {
 }
 
 type LogRequestUserRandom struct {
-	gorm.Model      `json:"-"`
+	gorm.Model
 	Method          string         `gorm:"column:method" json:"method"`
 	EventLog        string         `gorm:"column:event_log" json:"eventLog"`
 	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
-	BlockNumber     uint64         `gorm:"column:block_number;" json:"-"`
+	BlockNumber     uint64         `gorm:"column:block_number" json:"blockNumber"`
 	BlockHash       string         `gorm:"column:block_hash" json:"-"`
 	TransactionHash string         `gorm:"column:transaction_hash" json:"txHash"`
 	TxIndex         uint           `gorm:"column:transaction_index" json:"-"`
@@ -106,11 +106,11 @@ func (LogRequestUserRandom) TableName() string {
 }
 
 type LogNonSupportedType struct {
-	gorm.Model      `json:"-"`
+	gorm.Model
 	Method          string         `gorm:"column:method" json:"method"`
 	EventLog        string         `gorm:"column:event_log" json:"eventLog"`
 	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
-	BlockNumber     uint64         `gorm:"column:block_number;" json:"-"`
+	BlockNumber     uint64         `gorm:"column:block_number" json:"blockNumber"`
 	BlockHash       string         `gorm:"column:block_hash" json:"-"`
 	TransactionHash string         `gorm:"column:transaction_hash" json:"txHash"`
 	TxIndex         uint           `gorm:"column:transaction_index"json:"-"`
@@ -126,11 +126,11 @@ func (LogNonSupportedType) TableName() string {
 }
 
 type LogNonContractCall struct {
-	gorm.Model      `json:"-"`
+	gorm.Model
 	Method          string         `gorm:"column:method" json:"method"`
 	EventLog        string         `gorm:"column:event_log" json:"eventLog"`
 	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
-	BlockNumber     uint64         `gorm:"column:block_number;" json:"-"`
+	BlockNumber     uint64         `gorm:"column:block_number" json:"blockNumber"`
 	BlockHash       string         `gorm:"column:block_hash" json:"-"`
 	TransactionHash string         `gorm:"column:transaction_hash" json:"txHash"`
 	TxIndex         uint           `gorm:"column:transaction_index" json:"-"`
@@ -146,11 +146,11 @@ func (LogNonContractCall) TableName() string {
 }
 
 type LogCallbackTriggeredFor struct {
-	gorm.Model      `json:"-"`
+	gorm.Model
 	Method          string         `gorm:"column:method" json:"method"`
 	EventLog        string         `gorm:"column:event_log" json:"eventLog"`
 	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
-	BlockNumber     uint64         `gorm:"column:block_number;" json:"-"`
+	BlockNumber     uint64         `gorm:"column:block_number" json:"blockNumber"`
 	BlockHash       string         `gorm:"column:block_hash" json:"-"`
 	TransactionHash string         `gorm:"column:transaction_hash" json:"txHash"`
 	TxIndex         uint           `gorm:"column:transaction_index" json:"-"`
@@ -166,11 +166,11 @@ func (LogCallbackTriggeredFor) TableName() string {
 }
 
 type LogRequestFromNonExistentUC struct {
-	gorm.Model      `json:"-"`
+	gorm.Model
 	Method          string         `gorm:"column:method" json:"method"`
 	EventLog        string         `gorm:"column:event_log" json:"eventLog"`
 	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
-	BlockNumber     uint64         `gorm:"column:block_number;" json:"-"`
+	BlockNumber     uint64         `gorm:"column:block_number" json:"blockNumber"`
 	BlockHash       string         `gorm:"column:block_hash" json:"-"`
 	TransactionHash string         `gorm:"column:transaction_hash" json:"txHash"`
 	TxIndex         uint           `gorm:"column:transaction_index" json:"-"`
@@ -189,7 +189,7 @@ type LogUpdateRandom struct {
 	Method            string         `gorm:"column:method" json:"method"`
 	EventLog          string         `gorm:"column:event_log" json:"eventLog"`
 	Topics            pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
-	BlockNumber       uint64         `gorm:"column:block_number;" json:"-"`
+	BlockNumber       uint64         `gorm:"column:block_number;"`
 	BlockHash         string         `gorm:"column:block_hash" json:"-"`
 	TransactionHash   string         `gorm:"column:transaction_hash" json:"txHash"`
 	TxIndex           uint           `gorm:"column:transaction_index" json:"-"`
@@ -206,11 +206,11 @@ func (LogUpdateRandom) TableName() string {
 }
 
 type LogValidationResult struct {
-	gorm.Model      `json:"-"`
+	gorm.Model
 	Method          string         `gorm:"column:method" json:"method"`
 	EventLog        string         `gorm:"column:event_log" json:"eventLog"`
 	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
-	BlockNumber     uint64         `gorm:"column:block_number;" json:"-"`
+	BlockNumber     uint64         `gorm:"column:block_number" json:"blockNumber"`
 	BlockHash       string         `gorm:"column:block_hash" json:"-"`
 	TransactionHash string         `gorm:"column:transaction_hash" json:"txHash"`
 	TxIndex         uint           `gorm:"column:transaction_index" json:"-"`
@@ -231,11 +231,11 @@ func (LogValidationResult) TableName() string {
 }
 
 type LogInsufficientPendingNode struct {
-	gorm.Model      `json:"-"`
+	gorm.Model
 	Method          string         `gorm:"column:method" json:"method"`
 	EventLog        string         `gorm:"column:event_log" json:"eventLog"`
 	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
-	BlockNumber     uint64         `gorm:"column:block_number;" json:"-"`
+	BlockNumber     uint64         `gorm:"column:block_number" json:"blockNumber"`
 	BlockHash       string         `gorm:"column:block_hash" json:"-"`
 	TransactionHash string         `gorm:"column:transaction_hash" json:"txHash"`
 	TxIndex         uint           `gorm:"column:transaction_index" json:"-"`
@@ -255,7 +255,7 @@ type LogInsufficientWorkingGroup struct {
 	Method           string         `gorm:"column:method" json:"method"`
 	EventLog         string         `gorm:"column:event_log" json:"eventLog"`
 	Topics           pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
-	BlockNumber      uint64         `gorm:"column:block_number;" json:"-"`
+	BlockNumber      uint64         `gorm:"column:block_number;"`
 	BlockHash        string         `gorm:"column:block_hash" json:"-"`
 	TransactionHash  string         `gorm:"column:transaction_hash" json:"txHash"`
 	TxIndex          uint           `gorm:"column:transaction_index" json:"-"`
@@ -272,11 +272,11 @@ func (LogInsufficientWorkingGroup) TableName() string {
 }
 
 type LogGrouping struct {
-	gorm.Model      `json:"-"`
+	gorm.Model
 	Method          string         `gorm:"column:method" json:"method"`
 	EventLog        string         `gorm:"column:event_log" json:"eventLog"`
 	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
-	BlockNumber     uint64         `gorm:"column:block_number;" json:"-"`
+	BlockNumber     uint64         `gorm:"column:block_number" json:"blockNumber"`
 	BlockHash       string         `gorm:"column:block_hash" json:"-"`
 	TransactionHash string         `gorm:"column:transaction_hash" json:"txHash"`
 	TxIndex         uint           `gorm:"column:transaction_index" json:"-"`
@@ -293,11 +293,11 @@ func (LogGrouping) TableName() string {
 }
 
 type LogPublicKeyAccepted struct {
-	gorm.Model       `json:"-"`
+	gorm.Model
 	Method           string         `gorm:"column:method" json:"method"`
 	EventLog         string         `gorm:"column:event_log" json:"eventLog"`
 	Topics           pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
-	BlockNumber      uint64         `gorm:"column:block_number;" json:"-"`
+	BlockNumber      uint64         `gorm:"column:block_number;"`
 	BlockHash        string         `gorm:"column:block_hash" json:"-"`
 	TransactionHash  string         `gorm:"column:transaction_hash" json:"txHash"`
 	TxIndex          uint           `gorm:"column:transaction_index" json:"-"`
@@ -315,11 +315,11 @@ func (LogPublicKeyAccepted) TableName() string {
 }
 
 type LogPublicKeySuggested struct {
-	gorm.Model      `json:"-"`
+	gorm.Model
 	Method          string         `gorm:"column:method" json:"method"`
 	EventLog        string         `gorm:"column:event_log" json:"eventLog"`
 	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
-	BlockNumber     uint64         `gorm:"column:block_number;" json:"-"`
+	BlockNumber     uint64         `gorm:"column:block_number" json:"blockNumber"`
 	BlockHash       string         `gorm:"column:block_hash" json:"-"`
 	TransactionHash string         `gorm:"column:transaction_hash" json:"txHash"`
 	TxIndex         uint           `gorm:"column:transaction_index" json:"-"`
@@ -336,11 +336,11 @@ func (LogPublicKeySuggested) TableName() string {
 }
 
 type LogGroupDissolve struct {
-	gorm.Model      `json:"-"`
+	gorm.Model
 	Method          string         `gorm:"column:method" json:"method"`
 	EventLog        string         `gorm:"column:event_log" json:"eventLog"`
 	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
-	BlockNumber     uint64         `gorm:"column:block_number;" json:"-"`
+	BlockNumber     uint64         `gorm:"column:block_number" json:"blockNumber"`
 	BlockHash       string         `gorm:"column:block_hash" json:"-"`
 	TransactionHash string         `gorm:"column:transaction_hash" json:"txHash"`
 	TxIndex         uint           `gorm:"column:transaction_index" json:"-"`
@@ -356,11 +356,11 @@ func (LogGroupDissolve) TableName() string {
 }
 
 type LogRegisteredNewPendingNode struct {
-	gorm.Model      `json:"-"`
+	gorm.Model
 	Method          string         `gorm:"column:method" json:"method"`
 	EventLog        string         `gorm:"column:event_log" json:"eventLog"`
 	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
-	BlockNumber     uint64         `gorm:"column:block_number;" json:"-"`
+	BlockNumber     uint64         `gorm:"column:block_number" json:"blockNumber"`
 	BlockHash       string         `gorm:"column:block_hash" json:"-"`
 	TransactionHash string         `gorm:"column:transaction_hash" json:"txHash"`
 	TxIndex         uint           `gorm:"column:transaction_index" json:"-"`
@@ -380,7 +380,7 @@ type LogGroupingInitiated struct {
 	Method            string         `gorm:"column:method" json:"method"`
 	EventLog          string         `gorm:"column:event_log" json:"eventLog"`
 	Topics            pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
-	BlockNumber       uint64         `gorm:"column:block_number;" json:"-"`
+	BlockNumber       uint64         `gorm:"column:block_number;"`
 	BlockHash         string         `gorm:"column:block_hash" json:"-"`
 	TransactionHash   string         `gorm:"column:transaction_hash" json:"txHash"`
 	TxIndex           uint           `gorm:"column:transaction_index" json:"-"`
@@ -398,11 +398,11 @@ func (LogGroupingInitiated) TableName() string {
 }
 
 type LogNoPendingGroup struct {
-	gorm.Model      `json:"-"`
+	gorm.Model
 	Method          string         `gorm:"column:method" json:"method"`
 	EventLog        string         `gorm:"column:event_log" json:"eventLog"`
 	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
-	BlockNumber     uint64         `gorm:"column:block_number;" json:"-"`
+	BlockNumber     uint64         `gorm:"column:block_number" json:"blockNumber"`
 	BlockHash       string         `gorm:"column:block_hash" json:"-"`
 	TransactionHash string         `gorm:"column:transaction_hash" json:"txHash"`
 	TxIndex         uint           `gorm:"column:transaction_index" json:"-"`
@@ -418,11 +418,11 @@ func (LogNoPendingGroup) TableName() string {
 }
 
 type LogPendingGroupRemoved struct {
-	gorm.Model      `json:"-"`
+	gorm.Model
 	Method          string         `gorm:"column:method" json:"method"`
 	EventLog        string         `gorm:"column:event_log" json:"eventLog"`
 	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
-	BlockNumber     uint64         `gorm:"column:block_number;" json:"-"`
+	BlockNumber     uint64         `gorm:"column:block_number" json:"blockNumber"`
 	BlockHash       string         `gorm:"column:block_hash" json:"-"`
 	TransactionHash string         `gorm:"column:transaction_hash" json:"txHash"`
 	TxIndex         uint           `gorm:"column:transaction_index" json:"-"`
@@ -438,11 +438,11 @@ func (LogPendingGroupRemoved) TableName() string {
 }
 
 type LogError struct {
-	gorm.Model      `json:"-"`
+	gorm.Model
 	Method          string         `gorm:"column:method" json:"method"`
 	EventLog        string         `gorm:"column:event_log" json:"eventLog"`
 	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
-	BlockNumber     uint64         `gorm:"column:block_number;" json:"-"`
+	BlockNumber     uint64         `gorm:"column:block_number" json:"blockNumber"`
 	BlockHash       string         `gorm:"column:block_hash" json:"-"`
 	TransactionHash string         `gorm:"column:transaction_hash" json:"txHash"`
 	TxIndex         uint           `gorm:"column:transaction_index" json:"-"`
@@ -457,11 +457,11 @@ func (LogError) TableName() string {
 }
 
 type UpdateGroupToPick struct {
-	gorm.Model      `json:"-"`
+	gorm.Model
 	Method          string         `gorm:"column:method" json:"method"`
 	EventLog        string         `gorm:"column:event_log" json:"eventLog"`
 	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
-	BlockNumber     uint64         `gorm:"column:block_number;" json:"-"`
+	BlockNumber     uint64         `gorm:"column:block_number" json:"blockNumber"`
 	BlockHash       string         `gorm:"column:block_hash" json:"-"`
 	TransactionHash string         `gorm:"column:transaction_hash" json:"txHash"`
 	TxIndex         uint           `gorm:"column:transaction_index" json:"-"`
@@ -477,11 +477,11 @@ func (UpdateGroupToPick) TableName() string {
 }
 
 type UpdateGroupSize struct {
-	gorm.Model      `json:"-"`
+	gorm.Model
 	Method          string         `gorm:"column:method" json:"method"`
 	EventLog        string         `gorm:"column:event_log" json:"eventLog"`
 	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
-	BlockNumber     uint64         `gorm:"column:block_number;" json:"-"`
+	BlockNumber     uint64         `gorm:"column:block_number" json:"blockNumber"`
 	BlockHash       string         `gorm:"column:block_hash" json:"-"`
 	TransactionHash string         `gorm:"column:transaction_hash" json:"txHash"`
 	TxIndex         uint           `gorm:"column:transaction_index" json:"-"`
@@ -497,11 +497,11 @@ func (UpdateGroupSize) TableName() string {
 }
 
 type UpdateGroupingThreshold struct {
-	gorm.Model      `json:"-"`
+	gorm.Model
 	Method          string         `gorm:"column:method" json:"method"`
 	EventLog        string         `gorm:"column:event_log" json:"eventLog"`
 	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
-	BlockNumber     uint64         `gorm:"column:block_number;" json:"-"`
+	BlockNumber     uint64         `gorm:"column:block_number" json:"blockNumber"`
 	BlockHash       string         `gorm:"column:block_hash" json:"-"`
 	TransactionHash string         `gorm:"column:transaction_hash" json:"txHash"`
 	TxIndex         uint           `gorm:"column:transaction_index" json:"-"`
@@ -517,11 +517,11 @@ func (UpdateGroupingThreshold) TableName() string {
 }
 
 type UpdateGroupMaturityPeriod struct {
-	gorm.Model      `json:"-"`
+	gorm.Model
 	Method          string         `gorm:"column:method" json:"method"`
 	EventLog        string         `gorm:"column:event_log" json:"eventLog"`
 	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
-	BlockNumber     uint64         `gorm:"column:block_number;" json:"-"`
+	BlockNumber     uint64         `gorm:"column:block_number" json:"blockNumber"`
 	BlockHash       string         `gorm:"column:block_hash" json:"-"`
 	TransactionHash string         `gorm:"column:transaction_hash" json:"txHash"`
 	TxIndex         uint           `gorm:"column:transaction_index" json:"-"`
@@ -537,11 +537,11 @@ func (UpdateGroupMaturityPeriod) TableName() string {
 }
 
 type UpdateBootstrapCommitDuration struct {
-	gorm.Model      `json:"-"`
+	gorm.Model
 	Method          string         `gorm:"column:method" json:"method"`
 	EventLog        string         `gorm:"column:event_log" json:"eventLog"`
 	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
-	BlockNumber     uint64         `gorm:"column:block_number;" json:"-"`
+	BlockNumber     uint64         `gorm:"column:block_number" json:"blockNumber"`
 	BlockHash       string         `gorm:"column:block_hash" json:"-"`
 	TransactionHash string         `gorm:"column:transaction_hash" json:"txHash"`
 	TxIndex         uint           `gorm:"column:transaction_index" json:"-"`
@@ -557,11 +557,11 @@ func (UpdateBootstrapCommitDuration) TableName() string {
 }
 
 type UpdateBootstrapRevealDuration struct {
-	gorm.Model      `json:"-"`
+	gorm.Model
 	Method          string         `gorm:"column:method" json:"method"`
 	EventLog        string         `gorm:"column:event_log" json:"eventLog"`
 	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
-	BlockNumber     uint64         `gorm:"column:block_number;" json:"-"`
+	BlockNumber     uint64         `gorm:"column:block_number" json:"blockNumber"`
 	BlockHash       string         `gorm:"column:block_hash" json:"-"`
 	TransactionHash string         `gorm:"column:transaction_hash" json:"txHash"`
 	TxIndex         uint           `gorm:"column:transaction_index" json:"-"`
@@ -577,11 +577,11 @@ func (UpdateBootstrapRevealDuration) TableName() string {
 }
 
 type UpdatebootstrapStartThreshold struct {
-	gorm.Model      `json:"-"`
+	gorm.Model
 	Method          string         `gorm:"column:method" json:"method"`
 	EventLog        string         `gorm:"column:event_log" json:"eventLog"`
 	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
-	BlockNumber     uint64         `gorm:"column:block_number;" json:"-"`
+	BlockNumber     uint64         `gorm:"column:block_number" json:"blockNumber"`
 	BlockHash       string         `gorm:"column:block_hash" json:"-"`
 	TransactionHash string         `gorm:"column:transaction_hash" json:"txHash"`
 	TxIndex         uint           `gorm:"column:transaction_index" json:"-"`
@@ -597,11 +597,11 @@ func (UpdatebootstrapStartThreshold) TableName() string {
 }
 
 type UpdatePendingGroupMaxLife struct {
-	gorm.Model      `json:"-"`
+	gorm.Model
 	Method          string         `gorm:"column:method" json:"method"`
 	EventLog        string         `gorm:"column:event_log" json:"eventLog"`
 	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
-	BlockNumber     uint64         `gorm:"column:block_number;" json:"-"`
+	BlockNumber     uint64         `gorm:"column:block_number" json:"blockNumber"`
 	BlockHash       string         `gorm:"column:block_hash" json:"-"`
 	TransactionHash string         `gorm:"column:transaction_hash" json:"txHash"`
 	TxIndex         uint           `gorm:"column:transaction_index" json:"-"`
@@ -617,11 +617,11 @@ func (UpdatePendingGroupMaxLife) TableName() string {
 }
 
 type GuardianReward struct {
-	gorm.Model      `json:"-"`
+	gorm.Model
 	Method          string         `gorm:"column:method" json:"method"`
 	EventLog        string         `gorm:"column:event_log" json:"eventLog"`
 	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
-	BlockNumber     uint64         `gorm:"column:block_number;" json:"-"`
+	BlockNumber     uint64         `gorm:"column:block_number" json:"blockNumber"`
 	BlockHash       string         `gorm:"column:block_hash" json:"-"`
 	TransactionHash string         `gorm:"column:transaction_hash" json:"txHash"`
 	TxIndex         uint           `gorm:"column:transaction_index" json:"-"`

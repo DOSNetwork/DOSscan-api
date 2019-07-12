@@ -30,7 +30,7 @@ func main() {
 
 	//Set api route
 	api := r.Group("/api")
-	v1 := api.Group("/v1")
+	v1 := api.Group("/explorer")
 	v1.GET("/search", searchHandler.Search)
 
 	// Using port :8080 by default

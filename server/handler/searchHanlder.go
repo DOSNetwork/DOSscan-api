@@ -77,7 +77,7 @@ func (s *SearchHandler) Search(c *gin.Context) {
 		if pageSize >= len(events) {
 			resp, err = setResponse(0, "success", eventList, len(events), events)
 		} else {
-			resp, err = setResponse(0, "success", eventList, len(events), events[:pageSize])
+			resp, err = setResponse(0, "success", eventList, pageSize, events[:pageSize])
 		}
 		c.String(http.StatusOK, resp)
 		return
@@ -100,7 +100,6 @@ func (s *SearchHandler) Search(c *gin.Context) {
 		offset = len(events) - (len(events) % limit)
 	}
 	if offset+limit >= len(events) {
-		fmt.Println("eee ", len(events[offset:]))
 		resp, err = setResponse(0, "success", eventList, len(events), events[offset:])
 	} else {
 		resp, err = setResponse(0, "success", eventList, len(events), events[offset:(offset+limit)])
