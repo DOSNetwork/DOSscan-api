@@ -16,9 +16,10 @@ type Transaction struct {
 	Nonce                         uint64                          `gorm:"column:nonce" json:"nonce"`
 	Sender                        string                          `gorm:"column:sender" json:"sender"`
 	To                            string                          `gorm:"column:to" json:"to"`
+	BlockNumber                   uint64                          `gorm:"column:block_number" json:"-"`
 	Data                          []byte                          `gorm:"column:data;type:bytea" json:"data"`
 	Method                        string                          `gorm:"column:method;index" json:"method"`
-	LogURL                        []LogURL                        `gorm:"foreignkey:TransactionHash"`
+	LogUrl                        []LogUrl                        `gorm:"foreignkey:TransactionHash"`
 	LogRequestUserRandom          []LogRequestUserRandom          `gorm:"foreignkey:TransactionHash"`
 	LogNonSupportedType           []LogNonSupportedType           `gorm:"foreignkey:TransactionHash"`
 	LogNonContractCall            []LogNonContractCall            `gorm:"foreignkey:TransactionHash"`
@@ -54,7 +55,7 @@ func (Transaction) TableName() string {
 }
 
 // `LogURL` belongs to `Transaction`, `TransactionID` is the foreign key
-type LogURL struct {
+type LogUrl struct {
 	gorm.Model        `json:"-"`
 	Method            string         `gorm:"column:method" json:"method"`
 	EventLog          string         `gorm:"column:event_log" json:"eventLog"`
@@ -76,7 +77,7 @@ type LogURL struct {
 }
 
 // Set User's table name to be `logurl`
-func (LogURL) TableName() string {
+func (LogUrl) TableName() string {
 	return "logurl"
 }
 

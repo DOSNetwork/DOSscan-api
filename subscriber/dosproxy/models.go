@@ -35,7 +35,7 @@ func init() {
 	}
 }
 
-func getTx(txHash common.Hash, blockhash common.Hash, index uint, client *ethclient.Client, db *gorm.DB) *models.Transaction {
+func getTx(txHash common.Hash, blockNum uint64, blockhash common.Hash, index uint, client *ethclient.Client, db *gorm.DB) *models.Transaction {
 	tx, _, err := client.TransactionByHash(context.Background(), txHash)
 	if err != nil {
 		fmt.Println("TransactionByHash err", err)
@@ -53,15 +53,16 @@ func getTx(txHash common.Hash, blockhash common.Hash, index uint, client *ethcli
 		methodName = fmt.Sprintf("ExternalCall 0x%x", tx.Data()[:4])
 	}
 	mTx := models.Transaction{
-		Hash:     txHash.Hex(),
-		GasPrice: tx.GasPrice().Uint64(),
-		Value:    tx.Value().Uint64(),
-		GasLimit: tx.Gas(),
-		Nonce:    tx.Nonce(),
-		Sender:   sender.Hex(),
-		To:       tx.To().Hex(),
-		Data:     tx.Data(),
-		Method:   methodName,
+		Hash:        txHash.Hex(),
+		GasPrice:    tx.GasPrice().Uint64(),
+		Value:       tx.Value().Uint64(),
+		GasLimit:    tx.Gas(),
+		Nonce:       tx.Nonce(),
+		Sender:      sender.Hex(),
+		To:          tx.To().Hex(),
+		BlockNumber: blockNum,
+		Data:        tx.Data(),
+		Method:      methodName,
 	}
 	if err := db.Where("Hash = ?", mTx.Hash).First(&mTx).Error; gorm.IsRecordNotFoundError(err) {
 		db.Create(&mTx)
@@ -122,12 +123,12 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					for i := range log.Raw.Topics {
 						topics = append(topics, log.Raw.Topics[i].Hex())
 					}
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockHash, log.Raw.Index, client, db)
+					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, client, db)
 					if tx == nil {
 						continue
 					}
-					mLog := models.LogURL{
-						EventLog:          "LogURL",
+					mLog := models.LogUrl{
+						EventLog:          "LogUrl",
 						Method:            tx.Method,
 						Topics:            topics,
 						BlockNumber:       log.Raw.BlockNumber,
@@ -144,7 +145,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						DispatchedGroupId: hexutil.Encode(log.DispatchedGroupId.Bytes()),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
-						tx.LogURL = append(tx.LogURL, mLog)
+						tx.LogUrl = append(tx.LogUrl, mLog)
 						db.Save(&tx)
 					} else {
 						fmt.Println("duplicate Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
@@ -173,7 +174,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					for i := range log.Raw.Topics {
 						topics = append(topics, log.Raw.Topics[i].Hex())
 					}
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockHash, log.Raw.Index, client, db)
+					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, client, db)
 					if tx == nil {
 						continue
 					}
@@ -223,7 +224,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					for i := range log.Raw.Topics {
 						topics = append(topics, log.Raw.Topics[i].Hex())
 					}
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockHash, log.Raw.Index, client, db)
+					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, client, db)
 					if tx == nil {
 						continue
 					}
@@ -270,7 +271,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					for i := range log.Raw.Topics {
 						topics = append(topics, log.Raw.Topics[i].Hex())
 					}
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockHash, log.Raw.Index, client, db)
+					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, client, db)
 					if tx == nil {
 						continue
 					}
@@ -317,7 +318,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					for i := range log.Raw.Topics {
 						topics = append(topics, log.Raw.Topics[i].Hex())
 					}
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockHash, log.Raw.Index, client, db)
+					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, client, db)
 					if tx == nil {
 						continue
 					}
@@ -364,7 +365,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					for i := range log.Raw.Topics {
 						topics = append(topics, log.Raw.Topics[i].Hex())
 					}
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockHash, log.Raw.Index, client, db)
+					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, client, db)
 					if tx == nil {
 						continue
 					}
@@ -410,7 +411,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					for i := range log.Raw.Topics {
 						topics = append(topics, log.Raw.Topics[i].Hex())
 					}
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockHash, log.Raw.Index, client, db)
+					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, client, db)
 					if tx == nil {
 						continue
 					}
@@ -457,7 +458,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					for i := range log.Raw.Topics {
 						topics = append(topics, log.Raw.Topics[i].Hex())
 					}
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockHash, log.Raw.Index, client, db)
+					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, client, db)
 					if tx == nil {
 						continue
 					}
@@ -509,7 +510,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					for i := range log.Raw.Topics {
 						topics = append(topics, log.Raw.Topics[i].Hex())
 					}
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockHash, log.Raw.Index, client, db)
+					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, client, db)
 					if tx == nil {
 						continue
 					}
@@ -557,7 +558,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					for i := range log.Raw.Topics {
 						topics = append(topics, log.Raw.Topics[i].Hex())
 					}
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockHash, log.Raw.Index, client, db)
+					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, client, db)
 					if tx == nil {
 						continue
 					}
@@ -609,7 +610,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					for _, n := range log.NodeId {
 						nodeIdstr = append(nodeIdstr, n.Hex())
 					}
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockHash, log.Raw.Index, client, db)
+					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, client, db)
 					if tx == nil {
 						continue
 					}
@@ -657,7 +658,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					for i := range log.Raw.Topics {
 						topics = append(topics, log.Raw.Topics[i].Hex())
 					}
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockHash, log.Raw.Index, client, db)
+					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, client, db)
 					if tx == nil {
 						continue
 					}
@@ -706,7 +707,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					for i := range log.Raw.Topics {
 						topics = append(topics, log.Raw.Topics[i].Hex())
 					}
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockHash, log.Raw.Index, client, db)
+					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, client, db)
 					if tx == nil {
 						continue
 					}
@@ -754,7 +755,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					for i := range log.Raw.Topics {
 						topics = append(topics, log.Raw.Topics[i].Hex())
 					}
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockHash, log.Raw.Index, client, db)
+					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, client, db)
 					if tx == nil {
 						continue
 					}
@@ -801,7 +802,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					for i := range log.Raw.Topics {
 						topics = append(topics, log.Raw.Topics[i].Hex())
 					}
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockHash, log.Raw.Index, client, db)
+					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, client, db)
 					if tx == nil {
 						continue
 					}
@@ -848,7 +849,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					for i := range log.Raw.Topics {
 						topics = append(topics, log.Raw.Topics[i].Hex())
 					}
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockHash, log.Raw.Index, client, db)
+					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, client, db)
 					if tx == nil {
 						continue
 					}
@@ -897,7 +898,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					for i := range log.Raw.Topics {
 						topics = append(topics, log.Raw.Topics[i].Hex())
 					}
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockHash, log.Raw.Index, client, db)
+					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, client, db)
 					if tx == nil {
 						continue
 					}
@@ -944,7 +945,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					for i := range log.Raw.Topics {
 						topics = append(topics, log.Raw.Topics[i].Hex())
 					}
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockHash, log.Raw.Index, client, db)
+					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, client, db)
 					if tx == nil {
 						continue
 					}
@@ -991,7 +992,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					for i := range log.Raw.Topics {
 						topics = append(topics, log.Raw.Topics[i].Hex())
 					}
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockHash, log.Raw.Index, client, db)
+					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, client, db)
 					if tx == nil {
 						continue
 					}
@@ -1038,7 +1039,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					for i := range log.Raw.Topics {
 						topics = append(topics, log.Raw.Topics[i].Hex())
 					}
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockHash, log.Raw.Index, client, db)
+					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, client, db)
 					if tx == nil {
 						continue
 					}
@@ -1086,7 +1087,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					for i := range log.Raw.Topics {
 						topics = append(topics, log.Raw.Topics[i].Hex())
 					}
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockHash, log.Raw.Index, client, db)
+					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, client, db)
 					if tx == nil {
 						continue
 					}
@@ -1134,7 +1135,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					for i := range log.Raw.Topics {
 						topics = append(topics, log.Raw.Topics[i].Hex())
 					}
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockHash, log.Raw.Index, client, db)
+					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, client, db)
 					if tx == nil {
 						continue
 					}
@@ -1182,7 +1183,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					for i := range log.Raw.Topics {
 						topics = append(topics, log.Raw.Topics[i].Hex())
 					}
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockHash, log.Raw.Index, client, db)
+					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, client, db)
 					if tx == nil {
 						continue
 					}
@@ -1230,7 +1231,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					for i := range log.Raw.Topics {
 						topics = append(topics, log.Raw.Topics[i].Hex())
 					}
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockHash, log.Raw.Index, client, db)
+					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, client, db)
 					if tx == nil {
 						continue
 					}
@@ -1278,7 +1279,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					for i := range log.Raw.Topics {
 						topics = append(topics, log.Raw.Topics[i].Hex())
 					}
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockHash, log.Raw.Index, client, db)
+					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, client, db)
 					if tx == nil {
 						continue
 					}
@@ -1326,7 +1327,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					for i := range log.Raw.Topics {
 						topics = append(topics, log.Raw.Topics[i].Hex())
 					}
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockHash, log.Raw.Index, client, db)
+					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, client, db)
 					if tx == nil {
 						continue
 					}
@@ -1374,7 +1375,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					for i := range log.Raw.Topics {
 						topics = append(topics, log.Raw.Topics[i].Hex())
 					}
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockHash, log.Raw.Index, client, db)
+					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, client, db)
 					if tx == nil {
 						continue
 					}
@@ -1422,7 +1423,7 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					for i := range log.Raw.Topics {
 						topics = append(topics, log.Raw.Topics[i].Hex())
 					}
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockHash, log.Raw.Index, client, db)
+					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, client, db)
 					if tx == nil {
 						continue
 					}

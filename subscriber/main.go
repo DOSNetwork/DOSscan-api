@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/DOSNetwork/DOSscan-api/models"
+	"github.com/DOSNetwork/DOSscan-api/server/repository"
 	"github.com/DOSNetwork/DOSscan-api/subscriber/commitreveal"
 	"github.com/DOSNetwork/DOSscan-api/subscriber/dosbridge"
 	"github.com/DOSNetwork/DOSscan-api/subscriber/dosproxy"
@@ -57,7 +57,7 @@ var proxyEvent = []string{
 
 func main() {
 	ctx := context.Background()
-	db := models.Connect()
+	db := repository.Connect("postgres", "postgres", "postgres")
 
 	client, err := ethclient.Dial("wss://rinkeby.infura.io/ws/v3/db19cf9028054762865cb9ce883c6ab8")
 	if err != nil {

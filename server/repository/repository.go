@@ -18,7 +18,7 @@ func Connect(user, password, dbName string) *gorm.DB {
 
 	// AutoMigrate will ONLY create tables, missing columns and missing indexes,
 	// and WON’T change existing column’s type or delete unused columns to protect your data.
-	db.AutoMigrate(&models.Transaction{}, &models.LogURL{}, &models.LogRequestUserRandom{}, &models.LogNonSupportedType{}, &models.LogNonContractCall{}, &models.LogCallbackTriggeredFor{}, &models.LogRequestFromNonExistentUC{}, &models.LogUpdateRandom{}, &models.LogValidationResult{}, &models.LogInsufficientPendingNode{}, &models.LogInsufficientWorkingGroup{}, &models.LogGrouping{}, &models.LogPublicKeyAccepted{}, &models.LogPublicKeySuggested{}, &models.LogGroupDissolve{}, &models.LogRegisteredNewPendingNode{}, &models.LogGroupingInitiated{}, &models.LogNoPendingGroup{}, &models.LogPendingGroupRemoved{}, &models.LogError{}, &models.UpdateGroupToPick{}, &models.UpdateGroupSize{}, &models.UpdateGroupingThreshold{}, &models.UpdateGroupMaturityPeriod{}, &models.UpdateBootstrapCommitDuration{}, &models.UpdateBootstrapRevealDuration{}, &models.UpdatebootstrapStartThreshold{}, &models.UpdatePendingGroupMaxLife{}, &models.GuardianReward{})
+	db.AutoMigrate(&models.Transaction{}, &models.LogUrl{}, &models.LogRequestUserRandom{}, &models.LogNonSupportedType{}, &models.LogNonContractCall{}, &models.LogCallbackTriggeredFor{}, &models.LogRequestFromNonExistentUC{}, &models.LogUpdateRandom{}, &models.LogValidationResult{}, &models.LogInsufficientPendingNode{}, &models.LogInsufficientWorkingGroup{}, &models.LogGrouping{}, &models.LogPublicKeyAccepted{}, &models.LogPublicKeySuggested{}, &models.LogGroupDissolve{}, &models.LogRegisteredNewPendingNode{}, &models.LogGroupingInitiated{}, &models.LogNoPendingGroup{}, &models.LogPendingGroupRemoved{}, &models.LogError{}, &models.UpdateGroupToPick{}, &models.UpdateGroupSize{}, &models.UpdateGroupingThreshold{}, &models.UpdateGroupMaturityPeriod{}, &models.UpdateBootstrapCommitDuration{}, &models.UpdateBootstrapRevealDuration{}, &models.UpdatebootstrapStartThreshold{}, &models.UpdatePendingGroupMaxLife{}, &models.GuardianReward{})
 	//db.AutoMigrate(&LogURL{}, &LogRequestUserRandom{}, &LogNonSupportedType{}, &LogNonContractCall{}, &LogCallbackTriggeredFor{}, &LogRequestFromNonExistentUC{}, &LogUpdateRandom{}, &LogValidationResult{}, &LogInsufficientPendingNode{}, &LogInsufficientWorkingGroup{}, &LogGrouping{}, &LogPublicKeyAccepted{}, &LogGroupDissolve{}, &LogRegisteredNewPendingNode{}, &LogGroupingInitiated{}, &LogNoPendingGroup{}, &LogPendingGroupRemoved{}, &LogError{}, &UpdateGroupToPick{}, &UpdateGroupSize{}, &UpdateGroupingThreshold{}, &UpdateGroupMaturityPeriod{}, &UpdateBootstrapCommitDuration{}, &UpdateBootstrapRevealDuration{}, &UpdatebootstrapStartThreshold{}, &UpdatePendingGroupMaxLife{}, &GuardianReward{})
 	fmt.Println("DB Connected")
 	return db
@@ -26,6 +26,8 @@ func Connect(user, password, dbName string) *gorm.DB {
 
 // PostRepo explain...
 type EventsRepo interface {
-	LoadEvent(limit, offset int, event string) []interface{}
-	SearchRelatedEvents(limit int, field, condition string) []interface{}
+	GetEvent(limit, offset int, event string, query interface{}, args ...interface{}) []interface{}
+	SetTxRelatedEvents(r []string)
+	GetLatestTxEvents(order string, limit int) []interface{}
+	GetEventsByTxAttr(limit, offset int, query interface{}, args ...interface{}) []interface{}
 }

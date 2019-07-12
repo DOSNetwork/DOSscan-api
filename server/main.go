@@ -22,7 +22,7 @@ func main() {
 	db := repository.Connect(DB_USER, DB_PASSWORD, DB_NAME)
 	eventsRepo := repository.NewDBEventsRepository(db)
 	searchHandler := handler.NesSearchHandler(eventsRepo)
-
+	searchHandler.Init()
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 	r.ForwardedByClientIP = true

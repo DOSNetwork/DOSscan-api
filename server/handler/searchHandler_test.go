@@ -2,14 +2,12 @@ package handler
 
 import (
 	"fmt"
-	"io/ioutil"
-	"os"
+
 	"reflect"
-	"strings"
 	"testing"
 
-	"github.com/DOSNetwork/DOSscan-api/models"
-	"github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/DOSNetwork/DOSscan-api/server/repository"
+	//"github.com/DOSNetwork/DOSscan-api/models"
 	//"github.com/jinzhu/gorm"
 )
 
@@ -17,36 +15,30 @@ const (
 	abiPath = "../../abi/DOSProxy.abi"
 )
 
-func TestReadABI(t *testing.T) {
-	var proxyAbi abi.ABI
-	jsonFile, err := os.Open(abiPath)
-	// if we os.Open returns an error then handle it
+func TestGetEventsAndMethodFromABI(t *testing.T) {
+	events, methods, err := getEventsAndMethodFromABI(abiPath)
 	if err != nil {
-		t.Errorf("TestReadABI Error : %s.", err.Error())
+		t.Errorf("TestGetEventsAndMethodFromABI Error : %s.", err.Error())
 	}
-	abiJsonByte, _ := ioutil.ReadAll(jsonFile)
-	proxyAbi, err = abi.JSON(strings.NewReader(string(abiJsonByte)))
-	if err != nil {
-		t.Errorf("TestReadABI Error : %s.", err.Error())
-	}
-	for key, _ := range proxyAbi.Methods {
-		fmt.Println("Method: ", key)
-	}
-	for key, _ := range proxyAbi.Events {
-		fmt.Println("Event: ", key)
-	}
+	fmt.Println(events)
+	fmt.Println(methods)
 }
 
-func TestLoadEventTable(t *testing.T) {
-	db := models.Connect()
-	r := models.LoadEventTable["logurl"](2, 0, db)
-	fmt.Println(reflect.TypeOf(r[0]))
-	if reflect.TypeOf(r[0]).String() != "models.LogURL" {
-		t.Errorf("TestLoadEventTable Error : %s.", reflect.TypeOf(r[0]))
+func TestSearchEvents(t *testing.T) {
+	db := repository.Connect("postgres", "postgres", "postgres")
+	repo := repository.NewDBEventsRepository(db)
+	repo.SetTxRelatedEvents(events)
+	//r, err := searchEvents(repo, "0xa49a38aa1c69090e9d4927535b3be2dfe027eb47190dd7809511e6e26a317934", 100, 0)
+	eventMap, _, err := getEventsAndMethodFromABI(abiPath)
+	if err != nil {
+		t.Errorf("TestGetEventsAndMethodFromABI Error : %s.", err.Error())
 	}
-	r = models.LoadEventTable["guardianreward"](2, 0, db)
-	fmt.Println(reflect.TypeOf(r[0]))
-	if reflect.TypeOf(r[0]).String() != "models.GuardianReward" {
-		t.Errorf("TestLoadEventTable Error : %s.", reflect.TypeOf(r[0]))
+
+	r, err := searchEventsByEventName(repo, eventMap, events, "log", 100, 0)
+	if err != nil {
+		t.Errorf("TestSearchEvents Error : %s.", err.Error())
+	}
+	for _, event := range r {
+		fmt.Println("event ", reflect.TypeOf(event).String())
 	}
 }

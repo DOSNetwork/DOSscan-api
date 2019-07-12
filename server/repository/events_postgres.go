@@ -2,10 +2,8 @@ package repository
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/DOSNetwork/DOSscan-api/models"
-
 	"github.com/jinzhu/gorm"
 )
 
@@ -33,74 +31,101 @@ func NewDBEventsRepository(db *gorm.DB) EventsRepo {
 	}
 }
 
-func (d *dbEventsRepo) SetRelatedEvents(r []string) {
+func (d *dbEventsRepo) SetTxRelatedEvents(r []string) {
 	d.events = r
 }
 
-func (d *dbEventsRepo) LoadEvent(limit, offset int, event string) []interface{} {
+func checkQuery(query interface{}, args ...interface{}) bool {
+	_ = query
+	_ = args
+	return true
+}
+
+//
+func (d *dbEventsRepo) GetEvent(limit, offset int, event string, query interface{}, args ...interface{}) []interface{} {
 	var resp []interface{}
-	f := loadEventTable[strings.ToLower(event)]
-	if f != nil {
-		resp = f(limit, offset, d.db)
+	if checkQuery(query, args) {
+		f := loadEventTable[event]
+		if f != nil {
+			resp = loadEventTable[event](d.db, limit, offset, query, args...)
+		} else {
+			fmt.Println("cant find", event)
+		}
 	}
 	return resp
 }
 
 //TODO : Should check method name and load corresponging event only
-func (d *dbEventsRepo) SearchRelatedEvents(limit int, field, condition string) []interface{} {
+func (d *dbEventsRepo) GetLatestTxEvents(order string, limit int) []interface{} {
 	logs := []models.Transaction{}
 	var resp []interface{}
 	db := d.db
-	if field == "sender" || field == "hash" || field == "method" {
+	for _, event := range d.events {
+		db = db.Preload(event)
+	}
+
+	if err := db.Order(order).Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
+		resp = relatedEvents(logs)
+	}
+
+	return resp
+}
+
+//TODO : Should check method name and load corresponging event only
+func (d *dbEventsRepo) GetEventsByTxAttr(limit, offset int, query interface{}, args ...interface{}) []interface{} {
+	logs := []models.Transaction{}
+	var resp []interface{}
+	db := d.db
+	if checkQuery(query, args) {
 		for _, event := range d.events {
 			db = db.Preload(event)
 		}
 
-		if err := db.Where(field+" ILIKE ?", "%"+condition+"%").Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
-			fmt.Println("searchTx ", len(logs))
+		if err := db.Offset(offset).Limit(limit).Where(query, args).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
 			resp = relatedEvents(logs)
 		}
 	}
 	return resp
 }
 
-type loadEventFunc func(int, int, *gorm.DB) []interface{}
+type searchEventFunc func(*gorm.DB, int, int, interface{}, ...interface{}) []interface{}
 
-var loadEventTable = map[string]loadEventFunc{
-	"logurl":                        loadLogURL,
-	"logrequestuserrandom":          loadLogRequestUserRandom,
-	"lognonsupportedtype":           loadLogNonSupportedType,
-	"lognoncontractcall":            loadLogNonContractCall,
-	"logcallbacktriggeredfor":       loadLogCallbackTriggeredFor,
-	"logrequestfromnonexistentuc":   loadLogRequestFromNonExistentUC,
-	"logupdaterandom":               loadLogUpdateRandom,
-	"logvalidationresult":           loadLogValidationResult,
-	"loginsufficientpendingnode":    loadLogInsufficientPendingNode,
-	"loginsufficientworkinggroup":   loadLogInsufficientWorkingGroup,
-	"loggrouping":                   loadLogGrouping,
-	"logpublickeyaccepted":          loadLogPublicKeyAccepted,
-	"logpublickeysuggested":         loadLogPublicKeySuggested,
-	"loggroupdissolve":              loadLogGroupDissolve,
-	"logregisterednewpendingnode":   loadLogRegisteredNewPendingNode,
-	"loggroupinginitiated":          loadLogGroupingInitiated,
-	"lognopendinggroup":             loadLogNoPendingGroup,
-	"logpendinggroupremoved":        loadLogPendingGroupRemoved,
-	"logerror":                      loadLogError,
-	"updategrouptopick":             loadUpdateGroupToPick,
-	"updategroupsize":               loadUpdateGroupSize,
-	"updategroupingthreshold":       loadUpdateGroupingThreshold,
-	"updategroupmaturityperiod":     loadUpdateGroupMaturityPeriod,
-	"updatebootstrapcommitduration": loadUpdateBootstrapCommitDuration,
-	"updatebootstraprevealduration": loadUpdateBootstrapRevealDuration,
-	"updatebootstrapstartthreshold": loadUpdatebootstrapStartThreshold,
-	"updatependinggroupmaxlife":     loadUpdatePendingGroupMaxLife,
-	"guardianreward":                loadGuardianReward,
+var loadEventTable = map[string]searchEventFunc{
+	"logurl":                        searchLogURL,
+	"logrequestuserrandom":          searchLogRequestUserRandom,
+	"lognonsupportedtype":           searchLogNonSupportedType,
+	"lognoncontractcall":            searchLogNonContractCall,
+	"logcallbacktriggeredfor":       searchLogCallbackTriggeredFor,
+	"logrequestfromnonexistentuc":   searchLogRequestFromNonExistentUC,
+	"logupdaterandom":               searchLogUpdateRandom,
+	"logvalidationresult":           searchLogValidationResult,
+	"loginsufficientpendingnode":    searchLogInsufficientPendingNode,
+	"loginsufficientworkinggroup":   searchLogInsufficientWorkingGroup,
+	"loggrouping":                   searchLogGrouping,
+	"logpublickeyaccepted":          searchLogPublicKeyAccepted,
+	"logpublickeysuggested":         searchLogPublicKeySuggested,
+	"loggroupdissolve":              searchLogGroupDissolve,
+	"logregisterednewpendingnode":   searchLogRegisteredNewPendingNode,
+	"loggroupinginitiated":          searchLogGroupingInitiated,
+	"lognopendinggroup":             searchLogNoPendingGroup,
+	"logpendinggroupremoved":        searchLogPendingGroupRemoved,
+	"logerror":                      searchLogError,
+	"updategrouptopick":             searchUpdateGroupToPick,
+	"updategroupsize":               searchUpdateGroupSize,
+	"updategroupingthreshold":       searchUpdateGroupingThreshold,
+	"updategroupmaturityperiod":     searchUpdateGroupMaturityPeriod,
+	"updatebootstrapcommitduration": searchUpdateBootstrapCommitDuration,
+	"updatebootstraprevealduration": searchUpdateBootstrapRevealDuration,
+	"updatebootstrapstartthreshold": searchUpdatebootstrapStartThreshold,
+	"updatependinggroupmaxlife":     searchUpdatePendingGroupMaxLife,
+	"guardianreward":                searchGuardianReward,
 }
 
 func relatedEvents(txs []models.Transaction) []interface{} {
 	var resp []interface{}
 	for _, tx := range txs {
-		for _, event := range tx.LogURL {
+		fmt.Println("blockNum ", tx.BlockNumber)
+		for _, event := range tx.LogUrl {
 			resp = append(resp, event)
 		}
 		for _, event := range tx.LogRequestUserRandom {
@@ -188,298 +213,549 @@ func relatedEvents(txs []models.Transaction) []interface{} {
 	return resp
 }
 
-func loadLogURL(limit, offset int, db *gorm.DB) []interface{} {
-	logs := []models.LogURL{}
+func searchLogURL(db *gorm.DB, limit, offset int, query interface{}, args ...interface{}) []interface{} {
+	logs := []models.LogUrl{}
 	var resp []interface{}
-	if err := db.Offset(offset).Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
-		for _, log := range logs {
-			resp = append(resp, log)
+	if query == nil {
+		if err := db.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+			fmt.Println(err)
 		}
+	} else {
+		if err := db.Offset(offset).Limit(limit).Where(query, args).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+			fmt.Println(err)
+		}
+		fmt.Println(len(logs))
+	}
+	for _, log := range logs {
+		resp = append(resp, log)
 	}
 	return resp
 }
 
-func loadLogRequestUserRandom(limit, offset int, db *gorm.DB) []interface{} {
+func searchLogRequestUserRandom(db *gorm.DB, limit, offset int, query interface{}, args ...interface{}) []interface{} {
 	logs := []models.LogRequestUserRandom{}
 	var resp []interface{}
-	if err := db.Offset(offset).Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
-		for _, log := range logs {
-			resp = append(resp, log)
+	if query == nil {
+		if err := db.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+			fmt.Println(err)
 		}
+	} else {
+		if checkQuery(query, args) {
+			if err := db.Offset(offset).Limit(limit).Where(query, args).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+				fmt.Println(err)
+			}
+		}
+	}
+	for _, log := range logs {
+		resp = append(resp, log)
 	}
 	return resp
 }
 
-func loadLogNonSupportedType(limit, offset int, db *gorm.DB) []interface{} {
+func searchLogNonSupportedType(db *gorm.DB, limit, offset int, query interface{}, args ...interface{}) []interface{} {
 	logs := []models.LogNonSupportedType{}
 	var resp []interface{}
-	if err := db.Offset(offset).Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
-		for _, log := range logs {
-			resp = append(resp, log)
+	if query == nil {
+		if err := db.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+			fmt.Println(err)
 		}
+	} else {
+		if checkQuery(query, args) {
+			if err := db.Offset(offset).Limit(limit).Where(query, args).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+				fmt.Println(err)
+			}
+		}
+	}
+	for _, log := range logs {
+		resp = append(resp, log)
 	}
 	return resp
 }
 
-func loadLogNonContractCall(limit, offset int, db *gorm.DB) []interface{} {
+func searchLogNonContractCall(db *gorm.DB, limit, offset int, query interface{}, args ...interface{}) []interface{} {
 	logs := []models.LogNonContractCall{}
 	var resp []interface{}
-	if err := db.Offset(offset).Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
-		for _, log := range logs {
-			resp = append(resp, log)
+	if query == nil {
+		if err := db.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+			fmt.Println(err)
 		}
+	} else {
+		if checkQuery(query, args) {
+			if err := db.Offset(offset).Limit(limit).Where(query, args).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+				fmt.Println(err)
+			}
+		}
+	}
+	for _, log := range logs {
+		resp = append(resp, log)
 	}
 	return resp
 }
 
-func loadLogCallbackTriggeredFor(limit, offset int, db *gorm.DB) []interface{} {
+func searchLogCallbackTriggeredFor(db *gorm.DB, limit, offset int, query interface{}, args ...interface{}) []interface{} {
 	logs := []models.LogCallbackTriggeredFor{}
 	var resp []interface{}
-	if err := db.Offset(offset).Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
-		for _, log := range logs {
-			resp = append(resp, log)
+	if query == nil {
+		if err := db.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+			fmt.Println(err)
 		}
+	} else {
+		if checkQuery(query, args) {
+			if err := db.Offset(offset).Limit(limit).Where(query, args).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+				fmt.Println(err)
+			}
+		}
+	}
+	for _, log := range logs {
+		resp = append(resp, log)
 	}
 	return resp
 }
 
-func loadLogRequestFromNonExistentUC(limit, offset int, db *gorm.DB) []interface{} {
+func searchLogRequestFromNonExistentUC(db *gorm.DB, limit, offset int, query interface{}, args ...interface{}) []interface{} {
 	logs := []models.LogRequestFromNonExistentUC{}
 	var resp []interface{}
-	if err := db.Offset(offset).Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
-		for _, log := range logs {
-			resp = append(resp, log)
+	if query == nil {
+		if err := db.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+			fmt.Println(err)
 		}
+	} else {
+		if checkQuery(query, args) {
+			if err := db.Offset(offset).Limit(limit).Where(query, args).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+				fmt.Println(err)
+			}
+		}
+	}
+	for _, log := range logs {
+		resp = append(resp, log)
 	}
 	return resp
 }
 
-func loadLogUpdateRandom(limit, offset int, db *gorm.DB) []interface{} {
+func searchLogUpdateRandom(db *gorm.DB, limit, offset int, query interface{}, args ...interface{}) []interface{} {
 	logs := []models.LogUpdateRandom{}
 	var resp []interface{}
-	if err := db.Offset(offset).Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
-		for _, log := range logs {
-			resp = append(resp, log)
+	if query == nil {
+		if err := db.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+			fmt.Println(err)
 		}
+	} else {
+		if checkQuery(query, args) {
+			if err := db.Offset(offset).Limit(limit).Where(query, args).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+				fmt.Println(err)
+			}
+		}
+	}
+	for _, log := range logs {
+		resp = append(resp, log)
 	}
 	return resp
 }
-func loadLogValidationResult(limit, offset int, db *gorm.DB) []interface{} {
+func searchLogValidationResult(db *gorm.DB, limit, offset int, query interface{}, args ...interface{}) []interface{} {
 	logs := []models.LogValidationResult{}
 	var resp []interface{}
-	if err := db.Offset(offset).Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
-		for _, log := range logs {
-			resp = append(resp, log)
+	if query == nil {
+		if err := db.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+			fmt.Println(err)
 		}
+	} else {
+		if checkQuery(query, args) {
+			if err := db.Offset(offset).Limit(limit).Where(query, args).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+				fmt.Println(err)
+			}
+		}
+	}
+	for _, log := range logs {
+		resp = append(resp, log)
 	}
 	return resp
 }
 
-func loadLogInsufficientPendingNode(limit, offset int, db *gorm.DB) []interface{} {
+func searchLogInsufficientPendingNode(db *gorm.DB, limit, offset int, query interface{}, args ...interface{}) []interface{} {
 	logs := []models.LogInsufficientPendingNode{}
 	var resp []interface{}
-	if err := db.Offset(offset).Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
-		for _, log := range logs {
-			resp = append(resp, log)
+	if query == nil {
+		if err := db.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+			fmt.Println(err)
 		}
+	} else {
+		if checkQuery(query, args) {
+			if err := db.Offset(offset).Limit(limit).Where(query, args).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+				fmt.Println(err)
+			}
+		}
+	}
+	for _, log := range logs {
+		resp = append(resp, log)
 	}
 	return resp
 }
-func loadLogInsufficientWorkingGroup(limit, offset int, db *gorm.DB) []interface{} {
+func searchLogInsufficientWorkingGroup(db *gorm.DB, limit, offset int, query interface{}, args ...interface{}) []interface{} {
 	logs := []models.LogInsufficientWorkingGroup{}
 	var resp []interface{}
-	if err := db.Offset(offset).Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
-		for _, log := range logs {
-			resp = append(resp, log)
+	if query == nil {
+		if err := db.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+			fmt.Println(err)
 		}
+	} else {
+		if checkQuery(query, args) {
+			if err := db.Offset(offset).Limit(limit).Where(query, args).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+				fmt.Println(err)
+			}
+		}
+	}
+	for _, log := range logs {
+		resp = append(resp, log)
 	}
 	return resp
 }
 
-func loadLogGrouping(limit, offset int, db *gorm.DB) []interface{} {
+func searchLogGrouping(db *gorm.DB, limit, offset int, query interface{}, args ...interface{}) []interface{} {
 	logs := []models.LogGrouping{}
 	var resp []interface{}
-	if err := db.Offset(offset).Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
-		for _, log := range logs {
-			resp = append(resp, log)
+	if query == nil {
+		if err := db.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+			fmt.Println(err)
 		}
+	} else {
+		if checkQuery(query, args) {
+			if err := db.Offset(offset).Limit(limit).Where(query, args).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+				fmt.Println(err)
+			}
+		}
+	}
+	for _, log := range logs {
+		resp = append(resp, log)
 	}
 	return resp
 }
 
-func loadLogPublicKeyAccepted(limit, offset int, db *gorm.DB) []interface{} {
+func searchLogPublicKeyAccepted(db *gorm.DB, limit, offset int, query interface{}, args ...interface{}) []interface{} {
 	logs := []models.LogPublicKeyAccepted{}
 	var resp []interface{}
-	if err := db.Offset(offset).Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
-		for _, log := range logs {
-			resp = append(resp, log)
+	if query == nil {
+		if err := db.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+			fmt.Println(err)
 		}
+	} else {
+		if checkQuery(query, args) {
+			if err := db.Offset(offset).Limit(limit).Where(query, args).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+				fmt.Println(err)
+			}
+		}
+	}
+	for _, log := range logs {
+		resp = append(resp, log)
 	}
 	return resp
 }
 
-func loadLogPublicKeySuggested(limit, offset int, db *gorm.DB) []interface{} {
+func searchLogPublicKeySuggested(db *gorm.DB, limit, offset int, query interface{}, args ...interface{}) []interface{} {
 	logs := []models.LogPublicKeySuggested{}
 	var resp []interface{}
-	if err := db.Offset(offset).Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
-		for _, log := range logs {
-			resp = append(resp, log)
+	if query == nil {
+		if err := db.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+			fmt.Println(err)
 		}
+	} else {
+		if checkQuery(query, args) {
+			if err := db.Offset(offset).Limit(limit).Where(query, args).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+				fmt.Println(err)
+			}
+		}
+	}
+	for _, log := range logs {
+		resp = append(resp, log)
 	}
 	return resp
 }
-func loadLogGroupDissolve(limit, offset int, db *gorm.DB) []interface{} {
+func searchLogGroupDissolve(db *gorm.DB, limit, offset int, query interface{}, args ...interface{}) []interface{} {
 	logs := []models.LogGroupDissolve{}
 	var resp []interface{}
-	if err := db.Offset(offset).Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
-		for _, log := range logs {
-			resp = append(resp, log)
+	if query == nil {
+		if err := db.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+			fmt.Println(err)
 		}
+	} else {
+		if checkQuery(query, args) {
+			if err := db.Offset(offset).Limit(limit).Where(query, args).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+				fmt.Println(err)
+			}
+		}
+	}
+	for _, log := range logs {
+		resp = append(resp, log)
 	}
 	return resp
 }
 
-func loadLogRegisteredNewPendingNode(limit, offset int, db *gorm.DB) []interface{} {
+func searchLogRegisteredNewPendingNode(db *gorm.DB, limit, offset int, query interface{}, args ...interface{}) []interface{} {
 	logs := []models.LogRegisteredNewPendingNode{}
 	var resp []interface{}
-	if err := db.Offset(offset).Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
-		for _, log := range logs {
-			resp = append(resp, log)
+	if query == nil {
+		if err := db.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+			fmt.Println(err)
 		}
+	} else {
+		if checkQuery(query, args) {
+			if err := db.Offset(offset).Limit(limit).Where(query, args).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+				fmt.Println(err)
+			}
+		}
+	}
+	for _, log := range logs {
+		resp = append(resp, log)
 	}
 	return resp
 }
-func loadLogGroupingInitiated(limit, offset int, db *gorm.DB) []interface{} {
+func searchLogGroupingInitiated(db *gorm.DB, limit, offset int, query interface{}, args ...interface{}) []interface{} {
 	logs := []models.LogGroupingInitiated{}
 	var resp []interface{}
-	if err := db.Offset(offset).Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
-		for _, log := range logs {
-			resp = append(resp, log)
+	if query == nil {
+		if err := db.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+			fmt.Println(err)
 		}
+	} else {
+		if checkQuery(query, args) {
+			if err := db.Offset(offset).Limit(limit).Where(query, args).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+				fmt.Println(err)
+			}
+		}
+	}
+	for _, log := range logs {
+		resp = append(resp, log)
 	}
 	return resp
 }
 
-func loadLogNoPendingGroup(limit, offset int, db *gorm.DB) []interface{} {
+func searchLogNoPendingGroup(db *gorm.DB, limit, offset int, query interface{}, args ...interface{}) []interface{} {
 	logs := []models.LogNoPendingGroup{}
 	var resp []interface{}
-	if err := db.Offset(offset).Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
-		for _, log := range logs {
-			resp = append(resp, log)
+	if query == nil {
+		if err := db.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+			fmt.Println(err)
 		}
+	} else {
+		if checkQuery(query, args) {
+			if err := db.Offset(offset).Limit(limit).Where(query, args).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+				fmt.Println(err)
+			}
+		}
+	}
+	for _, log := range logs {
+		resp = append(resp, log)
 	}
 	return resp
 }
-func loadLogPendingGroupRemoved(limit, offset int, db *gorm.DB) []interface{} {
+func searchLogPendingGroupRemoved(db *gorm.DB, limit, offset int, query interface{}, args ...interface{}) []interface{} {
 	logs := []models.LogPendingGroupRemoved{}
 	var resp []interface{}
-	if err := db.Offset(offset).Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
-		for _, log := range logs {
-			resp = append(resp, log)
+	if query == nil {
+		if err := db.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+			fmt.Println(err)
 		}
+	} else {
+		if checkQuery(query, args) {
+			if err := db.Offset(offset).Limit(limit).Where(query, args).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+				fmt.Println(err)
+			}
+		}
+	}
+	for _, log := range logs {
+		resp = append(resp, log)
 	}
 	return resp
 }
 
-func loadLogError(limit, offset int, db *gorm.DB) []interface{} {
+func searchLogError(db *gorm.DB, limit, offset int, query interface{}, args ...interface{}) []interface{} {
 	logs := []models.LogError{}
 	var resp []interface{}
-	if err := db.Offset(offset).Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
-		for _, log := range logs {
-			resp = append(resp, log)
+	if query == nil {
+		if err := db.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+			fmt.Println(err)
 		}
+	} else {
+		if checkQuery(query, args) {
+			if err := db.Offset(offset).Limit(limit).Where(query, args).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+				fmt.Println(err)
+			}
+		}
+	}
+	for _, log := range logs {
+		resp = append(resp, log)
 	}
 	return resp
 }
-func loadUpdateGroupToPick(limit, offset int, db *gorm.DB) []interface{} {
+func searchUpdateGroupToPick(db *gorm.DB, limit, offset int, query interface{}, args ...interface{}) []interface{} {
 	logs := []models.UpdateGroupToPick{}
 	var resp []interface{}
-	if err := db.Offset(offset).Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
-		for _, log := range logs {
-			resp = append(resp, log)
+	if query == nil {
+		if err := db.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+			fmt.Println(err)
 		}
+	} else {
+		if checkQuery(query, args) {
+			if err := db.Offset(offset).Limit(limit).Where(query, args).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+				fmt.Println(err)
+			}
+		}
+	}
+	for _, log := range logs {
+		resp = append(resp, log)
 	}
 	return resp
 }
 
-func loadUpdateGroupSize(limit, offset int, db *gorm.DB) []interface{} {
+func searchUpdateGroupSize(db *gorm.DB, limit, offset int, query interface{}, args ...interface{}) []interface{} {
 	logs := []models.UpdateGroupSize{}
 	var resp []interface{}
-	if err := db.Offset(offset).Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
-		for _, log := range logs {
-			resp = append(resp, log)
+	if query == nil {
+		if err := db.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+			fmt.Println(err)
 		}
+	} else {
+		if checkQuery(query, args) {
+			if err := db.Offset(offset).Limit(limit).Where(query, args).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+				fmt.Println(err)
+			}
+		}
+	}
+	for _, log := range logs {
+		resp = append(resp, log)
 	}
 	return resp
 }
-func loadUpdateGroupingThreshold(limit, offset int, db *gorm.DB) []interface{} {
+func searchUpdateGroupingThreshold(db *gorm.DB, limit, offset int, query interface{}, args ...interface{}) []interface{} {
 	logs := []models.UpdateGroupingThreshold{}
 	var resp []interface{}
-	if err := db.Offset(offset).Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
-		for _, log := range logs {
-			resp = append(resp, log)
+	if query == nil {
+		if err := db.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+			fmt.Println(err)
 		}
+	} else {
+		if checkQuery(query, args) {
+			if err := db.Offset(offset).Limit(limit).Where(query, args).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+				fmt.Println(err)
+			}
+		}
+	}
+	for _, log := range logs {
+		resp = append(resp, log)
 	}
 	return resp
 }
-func loadUpdateGroupMaturityPeriod(limit, offset int, db *gorm.DB) []interface{} {
+func searchUpdateGroupMaturityPeriod(db *gorm.DB, limit, offset int, query interface{}, args ...interface{}) []interface{} {
 	logs := []models.UpdateGroupMaturityPeriod{}
 	var resp []interface{}
-	if err := db.Offset(offset).Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
-		for _, log := range logs {
-			resp = append(resp, log)
+	if query == nil {
+		if err := db.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+			fmt.Println(err)
 		}
+	} else {
+		if checkQuery(query, args) {
+			if err := db.Offset(offset).Limit(limit).Where(query, args).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+				fmt.Println(err)
+			}
+		}
+	}
+	for _, log := range logs {
+		resp = append(resp, log)
 	}
 	return resp
 }
-func loadUpdateBootstrapCommitDuration(limit, offset int, db *gorm.DB) []interface{} {
+func searchUpdateBootstrapCommitDuration(db *gorm.DB, limit, offset int, query interface{}, args ...interface{}) []interface{} {
 	logs := []models.UpdateBootstrapCommitDuration{}
 	var resp []interface{}
-	if err := db.Offset(offset).Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
-		for _, log := range logs {
-			resp = append(resp, log)
+	if query == nil {
+		if err := db.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+			fmt.Println(err)
 		}
+	} else {
+		if checkQuery(query, args) {
+			if err := db.Offset(offset).Limit(limit).Where(query, args).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+				fmt.Println(err)
+			}
+		}
+	}
+	for _, log := range logs {
+		resp = append(resp, log)
 	}
 	return resp
 }
-func loadUpdateBootstrapRevealDuration(limit, offset int, db *gorm.DB) []interface{} {
+func searchUpdateBootstrapRevealDuration(db *gorm.DB, limit, offset int, query interface{}, args ...interface{}) []interface{} {
 	logs := []models.UpdateBootstrapRevealDuration{}
 	var resp []interface{}
-	if err := db.Offset(offset).Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
-		for _, log := range logs {
-			resp = append(resp, log)
+	if query == nil {
+		if err := db.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+			fmt.Println(err)
 		}
+	} else {
+		if checkQuery(query, args) {
+			if err := db.Offset(offset).Limit(limit).Where(query, args).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+				fmt.Println(err)
+			}
+		}
+	}
+	for _, log := range logs {
+		resp = append(resp, log)
 	}
 	return resp
 }
-func loadUpdatebootstrapStartThreshold(limit, offset int, db *gorm.DB) []interface{} {
+func searchUpdatebootstrapStartThreshold(db *gorm.DB, limit, offset int, query interface{}, args ...interface{}) []interface{} {
 	logs := []models.UpdatebootstrapStartThreshold{}
 	var resp []interface{}
-	if err := db.Offset(offset).Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
-		for _, log := range logs {
-			resp = append(resp, log)
+	if query == nil {
+		if err := db.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+			fmt.Println(err)
 		}
+	} else {
+		if checkQuery(query, args) {
+			if err := db.Offset(offset).Limit(limit).Where(query, args).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+				fmt.Println(err)
+			}
+		}
+	}
+	for _, log := range logs {
+		resp = append(resp, log)
 	}
 	return resp
 }
-func loadUpdatePendingGroupMaxLife(limit, offset int, db *gorm.DB) []interface{} {
+func searchUpdatePendingGroupMaxLife(db *gorm.DB, limit, offset int, query interface{}, args ...interface{}) []interface{} {
 	logs := []models.UpdatePendingGroupMaxLife{}
 	var resp []interface{}
-	if err := db.Offset(offset).Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
-		for _, log := range logs {
-			resp = append(resp, log)
+	if query == nil {
+		if err := db.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+			fmt.Println(err)
 		}
+	} else {
+		if checkQuery(query, args) {
+			if err := db.Offset(offset).Limit(limit).Where(query, args).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+				fmt.Println(err)
+			}
+		}
+	}
+	for _, log := range logs {
+		resp = append(resp, log)
 	}
 	return resp
 }
 
-func loadGuardianReward(limit, offset int, db *gorm.DB) []interface{} {
+func searchGuardianReward(db *gorm.DB, limit, offset int, query interface{}, args ...interface{}) []interface{} {
 	logs := []models.GuardianReward{}
 	var resp []interface{}
-	if err := db.Offset(offset).Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
-		for _, log := range logs {
-			resp = append(resp, log)
+	if query == nil {
+		if err := db.Offset(offset).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+			fmt.Println(err)
 		}
+	} else {
+		if checkQuery(query, args) {
+			if err := db.Offset(offset).Limit(limit).Where(query, args).Limit(limit).Find(&logs).Error; gorm.IsRecordNotFoundError(err) {
+				fmt.Println(err)
+			}
+		}
+	}
+	for _, log := range logs {
+		resp = append(resp, log)
 	}
 	return resp
 }

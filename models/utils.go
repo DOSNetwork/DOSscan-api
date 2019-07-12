@@ -53,7 +53,7 @@ var LoadEventTable = map[string]loadEventFunc{
 func relatedEvents(txs []Transaction) []interface{} {
 	var resp []interface{}
 	for _, tx := range txs {
-		for _, event := range tx.LogURL {
+		for _, event := range tx.LogUrl {
 			resp = append(resp, event)
 		}
 		for _, event := range tx.LogRequestUserRandom {
@@ -159,7 +159,7 @@ func SearchRelatedEvents(limit int, field, condition string, db *gorm.DB) []inte
 }
 
 func loadLogURL(limit, offset int, db *gorm.DB) []interface{} {
-	logs := []LogURL{}
+	logs := []LogUrl{}
 	var resp []interface{}
 	if err := db.Offset(offset).Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
 		for _, log := range logs {

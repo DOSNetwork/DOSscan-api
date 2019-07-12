@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -20,9 +22,10 @@ const (
 )
 
 type SearchHandler struct {
-	repo    repository.EventsRepo
-	events  []string
-	methods []string
+	repo         repository.EventsRepo
+	sortedEvents []string
+	events       map[string]string
+	methods      map[string]string
 }
 
 type Response struct {
@@ -32,8 +35,9 @@ type Response struct {
 }
 
 type Body struct {
-	Events   []interface{} `json:"events,omitempty"`
-	Nodelist []interface{} `json:"nodelist,omitempty"`
+	Events     []interface{} `json:"events,omitempty"`
+	Nodelist   []interface{} `json:"nodelist,omitempty"`
+	TotalCount int           `json:"totalCount,omitempty"`
 }
 
 func NesSearchHandler(repo repository.EventsRepo) *SearchHandler {
@@ -43,62 +47,163 @@ func NesSearchHandler(repo repository.EventsRepo) *SearchHandler {
 }
 
 func (s *SearchHandler) Init() (err error) {
-	s.events, s.methods, err = getEventsAndMethodFromABI("./abi/DOSProxy.abi")
+	s.events, s.methods, err = getEventsAndMethodFromABI("../abi/DOSProxy.abi")
+	for _, event := range s.events {
+		s.sortedEvents = append(s.sortedEvents, event)
+	}
+	sort.Strings(s.sortedEvents)
+	fmt.Println(s.sortedEvents)
+	s.repo.SetTxRelatedEvents(s.sortedEvents)
 	return
 }
 
 func (s *SearchHandler) Search(c *gin.Context) {
+	var err error
+	var resp string
+	var pageSize, pageIndex int
 	text := c.Query("text")
-	_ = text
-	pageSize, err := strconv.Atoi(c.Query("pageSize"))
+	pageSize, err = strconv.Atoi(c.Query("pageSize"))
 	if err != nil {
-		//sendError(c, 0, err.Error())
 		return
 	}
-	_ = pageSize
-	pageIndex, err := strconv.Atoi(c.Query("pageIndex"))
+	pageIndex, err = strconv.Atoi(c.Query("pageIndex"))
 	if err != nil {
-		//sendError(c, 0, err.Error())
 		return
 	}
-	_ = pageIndex
 
-	if strings.HasPrefix(text, "0x") {
-		// 1) tx is hex number that could be address requestID or GroupID
-		//a lengeth of full address is 42 byte
-		if len(text) == 66 {
-			s.repo.SearchRelatedEvents(50, "sender", text)
-			s.repo.SearchRelatedEvents(50, "sender", text)
+	var events []interface{}
+	if text == "" {
+		events = s.repo.GetLatestTxEvents("block_number desc", pageSize)
+		if pageSize >= len(events) {
+			resp, err = setResponse(0, "success", eventList, len(events), events)
 		} else {
-			if len(text) == 42 {
-				s.repo.SearchRelatedEvents(50, "sender", text)
-			}
+			resp, err = setResponse(0, "success", eventList, len(events), events[:pageSize])
 		}
-		//a lengeth of requestID or GroupID is 66 byte
-
+		c.String(http.StatusOK, resp)
+		return
+	} else if strings.HasPrefix(text, "0x") {
+		events, err = searchEventsByHex(s.repo, text, 100, 0)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 	} else {
-		// 2) text is a full event name
-
+		events, err = searchEventsByEventName(s.repo, s.events, s.sortedEvents, text, 100, 0)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 	}
-
+	offset := pageIndex * pageSize
+	limit := pageSize
+	if offset > len(events) {
+		offset = len(events) - (len(events) % limit)
+	}
+	if offset+limit >= len(events) {
+		fmt.Println("eee ", len(events[offset:]))
+		resp, err = setResponse(0, "success", eventList, len(events), events[offset:])
+	} else {
+		resp, err = setResponse(0, "success", eventList, len(events), events[offset:(offset+limit)])
+	}
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	c.String(http.StatusOK, resp)
 	return
 }
 
-func setResponse(code int, msg string, rType int, logs []interface{}) (string, error) {
+func eventsByRequest(repo repository.EventsRepo, limit, offset int, text string) (resp []interface{}) {
+	resp = append(resp, repo.GetEvent(limit, offset, "logurl", "query_id ILIKE ?", text)...)
+	resp = append(resp, repo.GetEvent(limit, offset, "logrequestuserrandom", "request_id ILIKE ?", text)...)
+	resp = append(resp, repo.GetEvent(limit, offset, "logupdaterandom", "last_randomness ILIKE ?", text)...)
+	return
+}
+
+func eventsByGroup(repo repository.EventsRepo, limit, offset int, text string) (resp []interface{}) {
+	resp = append(resp, repo.GetEvent(limit, offset, "logurl", "dispatched_groupid ILIKE ?", text)...)
+	resp = append(resp, repo.GetEvent(limit, offset, "logrequestuserrandom", "dispatched_groupid ILIKE ?", text)...)
+	resp = append(resp, repo.GetEvent(limit, offset, "logupdaterandom", "dispatched_groupid ILIKE ?", text)...)
+	resp = append(resp, repo.GetEvent(limit, offset, "logvalidationresult", "traffic_id ILIKE ?", text)...)
+	resp = append(resp, repo.GetEvent(limit, offset, "loggrouping", "group_id ILIKE ?", text)...)
+	resp = append(resp, repo.GetEvent(limit, offset, "logpublickeyaccepted", "group_id ILIKE ?", text)...)
+	resp = append(resp, repo.GetEvent(limit, offset, "logpublickeysuggested", "group_id ILIKE ?", text)...)
+	resp = append(resp, repo.GetEvent(limit, offset, "loggroupdissolve", "group_id ILIKE ?", text)...)
+	resp = append(resp, repo.GetEvent(limit, offset, "lognopendinggroup", "group_id ILIKE ?", text)...)
+	resp = append(resp, repo.GetEvent(limit, offset, "logpendinggroupremoved", "group_id ILIKE ?", text)...)
+	return
+}
+
+func eventsByAddr(repo repository.EventsRepo, limit, offset int, text string) (resp []interface{}) {
+	resp = append(resp, repo.GetEvent(limit, offset, "logregisterednewpendingnode", "node = ?", text)...)
+	resp = append(resp, repo.GetEvent(limit, offset, "logcallbacktriggeredfor", "call_back_addr = ?", text)...)
+	resp = append(resp, repo.GetEvent(limit, offset, "lognoncontractcall", "call_ddr = ?", text)...)
+	resp = append(resp, repo.GetEventsByTxAttr(100, 0, "sender = ?", text)...)
+	return
+}
+
+func searchEventsByEventName(repo repository.EventsRepo, eventMap map[string]string, sortedEvent []string, text string, pageSize, pageIndex int) ([]interface{}, error) {
+	var resp []interface{}
+	limit := 100
+	offset := 0
+	if eventMap[strings.ToLower(text)] != "" {
+		fmt.Println("searchEventsByEventName 1")
+		resp = append(resp, repo.GetEvent(limit, offset, strings.ToLower(text), nil)...)
+	} else {
+		fmt.Println("searchEventsByEventName 2")
+		for _, event := range sortedEvent {
+			fmt.Println("searchEventsByEventName 2 ", event)
+			if caseInsensitiveContains(event, text) {
+				resp = append(resp, repo.GetEvent(limit, offset, strings.ToLower(event), nil)...)
+			}
+		}
+	}
+	fmt.Println("searchEventsByEventName ", text, len(resp))
+	return resp, nil
+}
+
+func searchEventsByHex(repo repository.EventsRepo, text string, pageSize, pageIndex int) ([]interface{}, error) {
+	var resp []interface{}
+	limit := 100
+	offset := 0
+	fmt.Println("searchEventsByHex ", text)
+
+	// 1) text is a 66 bytes hex number that could be requestID or GroupID
+	if len(text) == 66 {
+		resp = append(resp, eventsByRequest(repo, limit, offset, text)...)
+		resp = append(resp, eventsByGroup(repo, limit, offset, text)...)
+	} else if len(text) <= 66 {
+		// 1) text is a 42 bytes hex number that could be requestID or GroupID
+		if len(text) == 42 {
+			resp = append(resp, eventsByAddr(repo, limit, offset, text)...)
+		}
+		if len(resp) == 0 {
+			resp = append(resp, eventsByRequest(repo, limit, offset, "%"+text+"%")...)
+			resp = append(resp, eventsByGroup(repo, limit, offset, "%"+text+"%")...)
+			resp = append(resp, eventsByAddr(repo, limit, offset, "%"+text+"%")...)
+		}
+	}
+	fmt.Println("searchEventsByHex ", text, len(resp))
+
+	return resp, nil
+}
+
+func setResponse(code int, msg string, rType, totalCount int, logs []interface{}) (string, error) {
 	var resp Response
+	fmt.Println("setResponse ", len(logs))
 	switch rType {
 	case eventList:
 		resp = Response{
 			Code:    code,
 			Message: msg,
-			Body:    &Body{Events: []interface{}{}},
+			Body:    &Body{Events: []interface{}{}, TotalCount: totalCount},
 		}
 		resp.Events = logs
 	case nodeList:
 		resp = Response{
 			Code:    code,
 			Message: msg,
-			Body:    &Body{Nodelist: []interface{}{}},
+			Body:    &Body{Events: []interface{}{}, TotalCount: totalCount},
 		}
 		resp.Nodelist = logs
 	}
@@ -111,9 +216,10 @@ func setResponse(code int, msg string, rType int, logs []interface{}) (string, e
 	return string(jsonData), err
 }
 
-func getEventsAndMethodFromABI(abiPath string) ([]string, []string, error) {
-	var events []string
-	var methods []string
+func getEventsAndMethodFromABI(abiPath string) (map[string]string, map[string]string, error) {
+	events := make(map[string]string)
+
+	methods := make(map[string]string)
 	jsonFile, err := os.Open(abiPath)
 	// if we os.Open returns an error then handle it
 	if err != nil {
@@ -129,10 +235,14 @@ func getEventsAndMethodFromABI(abiPath string) ([]string, []string, error) {
 	}
 
 	for _, event := range proxyAbi.Events {
-		events = append(events, event.Name)
+		if event.Name != "LogUnRegisteredNewPendingNode" &&
+			event.Name != "OwnershipRenounced" &&
+			event.Name != "OwnershipTransferred" {
+			events[strings.ToLower(event.Name)] = event.Name
+		}
 	}
 	for _, method := range proxyAbi.Methods {
-		methods = append(methods, method.Name)
+		methods[strings.ToLower(method.Name)] = method.Name
 	}
 	return events, methods, err
 }
