@@ -483,7 +483,6 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						mLog.Message = string(log.Message)
 					} else {
 						mLog.Message = hexutil.Encode(log.Message)
-						return
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
 						tx.LogValidationResult = append(tx.LogValidationResult, mLog)
