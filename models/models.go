@@ -16,7 +16,7 @@ type Transaction struct {
 	Nonce                         uint64                          `gorm:"column:nonce" json:"nonce"`
 	Sender                        string                          `gorm:"column:sender" json:"sender"`
 	To                            string                          `gorm:"column:to" json:"to"`
-	BlockNumber                   uint64                          `gorm:"column:block_number" json:"-"`
+	BlockNumber                   uint64                          `gorm:"column:block_number" json:"blockNumber"`
 	Data                          []byte                          `gorm:"column:data;type:bytea" json:"data"`
 	Method                        string                          `gorm:"column:method;index" json:"method"`
 	LogUrl                        []LogUrl                        `gorm:"foreignkey:TransactionHash"`
@@ -63,7 +63,7 @@ type LogUrl struct {
 	TransactionHash   string         `gorm:"column:transaction_hash" json:"txHash"`
 	TxIndex           uint           `gorm:"column:transaction_index" json:"-"`
 	Topics            pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
-	BlockNumber       uint64         `gorm:"column:block_number" json:"-"`
+	BlockNumber       uint64         `gorm:"column:block_number" json:"blockNumber"`
 	BlockHash         string         `gorm:"column:block_hash" json:"-"`
 	LogIndex          uint           `gorm:"column:log_index;" json:"-"`
 	Removed           bool           `gorm:"column:removed;" json:"-"`
@@ -189,7 +189,7 @@ type LogUpdateRandom struct {
 	Method            string         `gorm:"column:method" json:"method"`
 	EventLog          string         `gorm:"column:event_log" json:"eventLog"`
 	Topics            pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
-	BlockNumber       uint64         `gorm:"column:block_number;"`
+	BlockNumber       uint64         `gorm:"column:block_number" json:"blockNumber"`
 	BlockHash         string         `gorm:"column:block_hash" json:"-"`
 	TransactionHash   string         `gorm:"column:transaction_hash" json:"txHash"`
 	TxIndex           uint           `gorm:"column:transaction_index" json:"-"`
@@ -217,12 +217,13 @@ type LogValidationResult struct {
 	LogIndex        uint           `gorm:"column:log_index;" json:"-"`
 	Removed         bool           `gorm:"column:removed;" json:"-"`
 	Date            time.Time      `gorm:"column:date;" json:"-"`
-	TrafficType     uint8          `gorm:"column:traffic_type"`
-	TrafficId       string         `gorm:"column:traffic_id"`
-	Message         []byte         `gorm:"column:message;type:bytea" json:"message"`
-	Signature       pq.StringArray `gorm:"column:signature;type:varchar(100)[]" json:"signature"`
-	PubKey          pq.StringArray `gorm:"column:pub_key;type:varchar(100)[]" json:"pubKey"`
-	Pass            bool           `gorm:"column:pass;" json:"pass"`
+
+	TrafficType uint8          `gorm:"column:traffic_type"`
+	TrafficId   string         `gorm:"column:traffic_id"`
+	Message     []byte         `gorm:"column:message;type:bytea" json:"message"`
+	Signature   pq.StringArray `gorm:"column:signature;type:varchar(100)[]" json:"signature"`
+	PubKey      pq.StringArray `gorm:"column:pub_key;type:varchar(100)[]" json:"pubKey"`
+	Pass        bool           `gorm:"column:pass;" json:"pass"`
 }
 
 // Set User's table name to be `profiles`
@@ -255,7 +256,7 @@ type LogInsufficientWorkingGroup struct {
 	Method           string         `gorm:"column:method" json:"method"`
 	EventLog         string         `gorm:"column:event_log" json:"eventLog"`
 	Topics           pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
-	BlockNumber      uint64         `gorm:"column:block_number;"`
+	BlockNumber      uint64         `gorm:"column:block_number" json:"blockNumber"`
 	BlockHash        string         `gorm:"column:block_hash" json:"-"`
 	TransactionHash  string         `gorm:"column:transaction_hash" json:"txHash"`
 	TxIndex          uint           `gorm:"column:transaction_index" json:"-"`
@@ -297,7 +298,7 @@ type LogPublicKeyAccepted struct {
 	Method           string         `gorm:"column:method" json:"method"`
 	EventLog         string         `gorm:"column:event_log" json:"eventLog"`
 	Topics           pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
-	BlockNumber      uint64         `gorm:"column:block_number;"`
+	BlockNumber      uint64         `gorm:"column:block_number" json:"blockNumber"`
 	BlockHash        string         `gorm:"column:block_hash" json:"-"`
 	TransactionHash  string         `gorm:"column:transaction_hash" json:"txHash"`
 	TxIndex          uint           `gorm:"column:transaction_index" json:"-"`
@@ -347,7 +348,8 @@ type LogGroupDissolve struct {
 	LogIndex        uint           `gorm:"column:log_index;" json:"-"`
 	Removed         bool           `gorm:"column:removed;" json:"-"`
 	Date            time.Time      `gorm:"column:date;" json:"-"`
-	GroupId         string         `gorm:"column:group_id" json:"groupId"`
+
+	GroupId string `gorm:"column:group_id" json:"groupId"`
 }
 
 // Set User's table name to be `profiles`
@@ -380,7 +382,7 @@ type LogGroupingInitiated struct {
 	Method            string         `gorm:"column:method" json:"method"`
 	EventLog          string         `gorm:"column:event_log" json:"eventLog"`
 	Topics            pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
-	BlockNumber       uint64         `gorm:"column:block_number;"`
+	BlockNumber       uint64         `gorm:"column:block_number" json:"blockNumber"`
 	BlockHash         string         `gorm:"column:block_hash" json:"-"`
 	TransactionHash   string         `gorm:"column:transaction_hash" json:"txHash"`
 	TxIndex           uint           `gorm:"column:transaction_index" json:"-"`

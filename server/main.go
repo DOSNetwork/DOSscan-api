@@ -5,7 +5,7 @@ import (
 	"github.com/DOSNetwork/DOSscan-api/server/handler"
 	"github.com/DOSNetwork/DOSscan-api/server/middleware"
 	"github.com/DOSNetwork/DOSscan-api/server/repository"
-
+	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 )
 
@@ -27,6 +27,12 @@ func main() {
 	r := gin.Default()
 	r.ForwardedByClientIP = true
 	r.Use(middleware.CORS())
+
+	// Serve frontend static files
+	r.Use(static.Serve("/", static.LocalFile("./view", true)))
+	r.Use(static.Serve("/explorer", static.LocalFile("./view", true)))
+	r.Use(static.Serve("/myaccount", static.LocalFile("./view", true)))
+	r.Use(static.Serve("/nodelist", static.LocalFile("./view", true)))
 
 	//Set api route
 	api := r.Group("/api")

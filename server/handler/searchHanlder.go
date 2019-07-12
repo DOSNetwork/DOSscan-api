@@ -73,6 +73,8 @@ func (s *SearchHandler) Search(c *gin.Context) {
 
 	var events []interface{}
 	if text == "" {
+		//pageSize = 1
+		text = "LogPublicKeyAccepted"
 		events = s.repo.GetLatestTxEvents("block_number desc", pageSize)
 		if pageSize >= len(events) {
 			resp, err = setResponse(0, "success", eventList, len(events), events)
@@ -177,9 +179,13 @@ func searchEventsByHex(repo repository.EventsRepo, text string, pageSize, pageIn
 			resp = append(resp, eventsByAddr(repo, limit, offset, text)...)
 		}
 		if len(resp) == 0 {
+
 			resp = append(resp, eventsByRequest(repo, limit, offset, "%"+text+"%")...)
 			resp = append(resp, eventsByGroup(repo, limit, offset, "%"+text+"%")...)
 			resp = append(resp, eventsByAddr(repo, limit, offset, "%"+text+"%")...)
+			fmt.Println("search hex case3 ", len(resp))
+		} else {
+			fmt.Println("search hex case4 ")
 		}
 	}
 	fmt.Println("searchEventsByHex ", text, len(resp))
