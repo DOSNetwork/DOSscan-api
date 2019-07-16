@@ -4,8 +4,14 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+
+	//	"log"
+	"math"
+	"math/big"
 	"os"
 	"strings"
+
+	//	"time"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 
@@ -33,6 +39,24 @@ func init() {
 	if err != nil {
 		fmt.Println(err)
 	}
+}
+
+func getBalance(client *ethclient.Client, addr common.Address) (balance *big.Float) {
+	wei, err := client.BalanceAt(context.Background(), addr, nil)
+	if err != nil {
+		return
+	}
+
+	balance = new(big.Float)
+	balance.SetString(wei.String())
+	balance = balance.Quo(balance, big.NewFloat(math.Pow10(18)))
+
+	return balance
+}
+
+func remove(slice []string, i int) []string {
+	copy(slice[i:], slice[i+1:])
+	return slice[:len(slice)-1]
 }
 
 func getTx(txHash common.Hash, blockNum uint64, blockhash common.Hash, index uint, client *ethclient.Client, db *gorm.DB) *models.Transaction {
@@ -66,7 +90,6 @@ func getTx(txHash common.Hash, blockNum uint64, blockhash common.Hash, index uin
 	}
 	if err := db.Where("Hash = ?", mTx.Hash).First(&mTx).Error; gorm.IsRecordNotFoundError(err) {
 		db.Create(&mTx)
-		fmt.Println("Saved Tx Log: ", mTx.Hash)
 	} else {
 		fmt.Println("duplicate Tx Log: ", mTx.Hash)
 	}
@@ -101,10 +124,77 @@ func FromBlockNumber(ctx context.Context, event string, db *gorm.DB) (chan uint6
 	return out, errc
 }
 
-var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error{
-	0: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
+func ModelsForDashboard(ctx context.Context, db *gorm.DB, eventc chan interface{}, proxyS *DosproxySession, client *ethclient.Client) chan error {
+	errc := make(chan error)
+	go func() {
+		defer close(errc)
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case event, ok := <-eventc:
+				if !ok {
+					return
+				}
+				switch t := event.(type) {
+				/*
+						case *models.LogUrl:
+						case *models.LogRequestUserRandom:
+						case *models.LogUpdateRandom:
+						case *models.LogRegisteredNewPendingNode:
+
+							case *models.LogGrouping:
+								fmt.Println("!!!!!!!!!!!!!!!!!!LogGrouping ", t.GroupId)
+							case *models.LogPublicKeyAccepted:
+								fmt.Println("!!!!!got LogPublicKeyAccepted")
+								l := models.LogGrouping{GroupId: t.GroupId}
+								if err := db.Where("group_id = ?", t.GroupId).First(&l).Error; gorm.IsRecordNotFoundError(err) {
+									fmt.Println("!!!!!!can't find groupid ", t.GroupId)
+									go func() {
+										time.Sleep(3 * time.Second)
+										select {
+										case <-ctx.Done():
+										case eventc <- event:
+										}
+									}()
+									continue
+								} else {
+									nodes := l.NodeId
+									for _, node := range nodes {
+										nInfo := models.NodeInfo{NodeAddr: node}
+										if err := db.Where("node_addr = ?", node).First(&nInfo).Error; gorm.IsRecordNotFoundError(err) {
+											db.Save(&nInfo)
+										} else {
+											fmt.Println("!!!!!got NodeInfo")
+										}
+										var updatedGIds []string
+										for _, gid := range nInfo.GroupingIds {
+											updatedGIds = append(updatedGIds, gid)
+										}
+										updatedGIds = append(updatedGIds, t.GroupId)
+										db.Model(&nInfo).Update("all_group_ids", updatedGIds)
+									}
+								}
+
+					case *models.LogGroupDissolve:
+				*/
+				default:
+					_ = t
+					continue
+				}
+			}
+		}
+	}()
+	return errc
+}
+
+var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) (chan interface{}, chan error){
+	0: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) (chan interface{}, chan error) {
+		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
+			defer close(out)
+			defer close(errc)
 			for {
 				select {
 				case <-ctx.Done():
@@ -128,15 +218,17 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogUrl{
-						EventLog:          "LogUrl",
-						Method:            tx.Method,
-						Topics:            topics,
-						BlockNumber:       log.Raw.BlockNumber,
-						BlockHash:         log.Raw.BlockHash.Hex(),
-						TransactionHash:   log.Raw.TxHash.Hex(),
-						TxIndex:           log.Raw.TxIndex,
-						LogIndex:          log.Raw.Index,
-						Removed:           log.Raw.Removed,
+						Event: models.Event{
+							EventLog:        "LogUrl",
+							Method:          tx.Method,
+							Topics:          topics,
+							BlockNumber:     log.Raw.BlockNumber,
+							BlockHash:       log.Raw.BlockHash.Hex(),
+							TransactionHash: log.Raw.TxHash.Hex(),
+							TxIndex:         log.Raw.TxIndex,
+							LogIndex:        log.Raw.Index,
+							Removed:         log.Raw.Removed,
+						},
 						QueryId:           hexutil.Encode(log.QueryId.Bytes()),
 						Timeout:           log.Timeout.String(),
 						DataSource:        log.DataSource,
@@ -153,11 +245,14 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 				}
 			}
 		}()
-		return errc
+		return out, errc
 	},
-	1: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
+	1: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) (chan interface{}, chan error) {
+		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
+			defer close(out)
+			defer close(errc)
 			for {
 				select {
 				case <-ctx.Done():
@@ -179,15 +274,17 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogRequestUserRandom{
-						EventLog:             "LogRequestUserRandom",
-						Method:               tx.Method,
-						Topics:               topics,
-						BlockNumber:          log.Raw.BlockNumber,
-						BlockHash:            log.Raw.BlockHash.Hex(),
-						TransactionHash:      log.Raw.TxHash.Hex(),
-						TxIndex:              log.Raw.TxIndex,
-						LogIndex:             log.Raw.Index,
-						Removed:              log.Raw.Removed,
+						Event: models.Event{
+							EventLog:        "LogRequestUserRandom",
+							Method:          tx.Method,
+							Topics:          topics,
+							BlockNumber:     log.Raw.BlockNumber,
+							BlockHash:       log.Raw.BlockHash.Hex(),
+							TransactionHash: log.Raw.TxHash.Hex(),
+							TxIndex:         log.Raw.TxIndex,
+							LogIndex:        log.Raw.Index,
+							Removed:         log.Raw.Removed,
+						},
 						RequestId:            hexutil.Encode(log.RequestId.Bytes()),
 						LastSystemRandomness: hexutil.Encode(log.LastSystemRandomness.Bytes()),
 						UserSeed:             hexutil.Encode(log.UserSeed.Bytes()),
@@ -196,18 +293,20 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
 						tx.LogRequestUserRandom = append(tx.LogRequestUserRandom, mLog)
 						db.Save(&tx)
-						fmt.Println("Saved Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
 					} else {
 						fmt.Println("duplicate Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
 					}
 				}
 			}
 		}()
-		return errc
+		return out, errc
 	},
-	2: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
+	2: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) (chan interface{}, chan error) {
+		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
+			defer close(out)
+			defer close(errc)
 			for {
 				select {
 				case <-ctx.Done():
@@ -229,15 +328,17 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogNonSupportedType{
-						EventLog:        "LogNonSupportedType",
-						Method:          tx.Method,
-						Topics:          topics,
-						BlockNumber:     log.Raw.BlockNumber,
-						BlockHash:       log.Raw.BlockHash.Hex(),
-						TransactionHash: log.Raw.TxHash.Hex(),
-						TxIndex:         log.Raw.TxIndex,
-						LogIndex:        log.Raw.Index,
-						Removed:         log.Raw.Removed,
+						Event: models.Event{
+							EventLog:        "LogNonSupportedType",
+							Method:          tx.Method,
+							Topics:          topics,
+							BlockNumber:     log.Raw.BlockNumber,
+							BlockHash:       log.Raw.BlockHash.Hex(),
+							TransactionHash: log.Raw.TxHash.Hex(),
+							TxIndex:         log.Raw.TxIndex,
+							LogIndex:        log.Raw.Index,
+							Removed:         log.Raw.Removed,
+						},
 						InvalidSelector: log.InvalidSelector,
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
@@ -250,11 +351,14 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 				}
 			}
 		}()
-		return errc
+		return out, errc
 	},
-	3: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
+	3: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) (chan interface{}, chan error) {
+		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
+			defer close(out)
+			defer close(errc)
 			for {
 				select {
 				case <-ctx.Done():
@@ -276,16 +380,18 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogNonContractCall{
-						EventLog:        "LogNonContractCall",
-						Method:          tx.Method,
-						Topics:          topics,
-						BlockNumber:     log.Raw.BlockNumber,
-						BlockHash:       log.Raw.BlockHash.Hex(),
-						TransactionHash: log.Raw.TxHash.Hex(),
-						TxIndex:         log.Raw.TxIndex,
-						LogIndex:        log.Raw.Index,
-						Removed:         log.Raw.Removed,
-						CallAddr:        log.From.Hex(),
+						Event: models.Event{
+							EventLog:        "LogNonContractCall",
+							Method:          tx.Method,
+							Topics:          topics,
+							BlockNumber:     log.Raw.BlockNumber,
+							BlockHash:       log.Raw.BlockHash.Hex(),
+							TransactionHash: log.Raw.TxHash.Hex(),
+							TxIndex:         log.Raw.TxIndex,
+							LogIndex:        log.Raw.Index,
+							Removed:         log.Raw.Removed,
+						},
+						CallAddr: log.From.Hex(),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
 						tx.LogNonContractCall = append(tx.LogNonContractCall, mLog)
@@ -297,11 +403,14 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 				}
 			}
 		}()
-		return errc
+		return out, errc
 	},
-	4: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
+	4: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) (chan interface{}, chan error) {
+		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
+			defer close(out)
+			defer close(errc)
 			for {
 				select {
 				case <-ctx.Done():
@@ -323,16 +432,18 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogCallbackTriggeredFor{
-						EventLog:        "LogCallbackTriggeredFor",
-						Method:          tx.Method,
-						Topics:          topics,
-						BlockNumber:     log.Raw.BlockNumber,
-						BlockHash:       log.Raw.BlockHash.Hex(),
-						TransactionHash: log.Raw.TxHash.Hex(),
-						TxIndex:         log.Raw.TxIndex,
-						LogIndex:        log.Raw.Index,
-						Removed:         log.Raw.Removed,
-						CallbackAddr:    log.CallbackAddr.Hex(),
+						Event: models.Event{
+							EventLog:        "LogCallbackTriggeredFor",
+							Method:          tx.Method,
+							Topics:          topics,
+							BlockNumber:     log.Raw.BlockNumber,
+							BlockHash:       log.Raw.BlockHash.Hex(),
+							TransactionHash: log.Raw.TxHash.Hex(),
+							TxIndex:         log.Raw.TxIndex,
+							LogIndex:        log.Raw.Index,
+							Removed:         log.Raw.Removed,
+						},
+						CallbackAddr: log.CallbackAddr.Hex(),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
 						tx.LogCallbackTriggeredFor = append(tx.LogCallbackTriggeredFor, mLog)
@@ -344,11 +455,14 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 				}
 			}
 		}()
-		return errc
+		return out, errc
 	},
-	5: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
+	5: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) (chan interface{}, chan error) {
+		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
+			defer close(out)
+			defer close(errc)
 			for {
 				select {
 				case <-ctx.Done():
@@ -370,15 +484,17 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogRequestFromNonExistentUC{
-						EventLog:        "LogRequestFromNonExistentUC",
-						Method:          tx.Method,
-						Topics:          topics,
-						BlockNumber:     log.Raw.BlockNumber,
-						BlockHash:       log.Raw.BlockHash.Hex(),
-						TransactionHash: log.Raw.TxHash.Hex(),
-						TxIndex:         log.Raw.TxIndex,
-						LogIndex:        log.Raw.Index,
-						Removed:         log.Raw.Removed,
+						Event: models.Event{
+							EventLog:        "LogRequestFromNonExistentUC",
+							Method:          tx.Method,
+							Topics:          topics,
+							BlockNumber:     log.Raw.BlockNumber,
+							BlockHash:       log.Raw.BlockHash.Hex(),
+							TransactionHash: log.Raw.TxHash.Hex(),
+							TxIndex:         log.Raw.TxIndex,
+							LogIndex:        log.Raw.Index,
+							Removed:         log.Raw.Removed,
+						},
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
 						tx.LogRequestFromNonExistentUC = append(tx.LogRequestFromNonExistentUC, mLog)
@@ -390,11 +506,14 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 				}
 			}
 		}()
-		return errc
+		return out, errc
 	},
-	6: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
+	6: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) (chan interface{}, chan error) {
+		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
+			defer close(out)
+			defer close(errc)
 			for {
 				select {
 				case <-ctx.Done():
@@ -416,15 +535,17 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogUpdateRandom{
-						EventLog:          "LogUpdateRandom",
-						Method:            tx.Method,
-						Topics:            topics,
-						BlockNumber:       log.Raw.BlockNumber,
-						BlockHash:         log.Raw.BlockHash.Hex(),
-						TransactionHash:   log.Raw.TxHash.Hex(),
-						TxIndex:           log.Raw.TxIndex,
-						LogIndex:          log.Raw.Index,
-						Removed:           log.Raw.Removed,
+						Event: models.Event{
+							EventLog:        "LogUpdateRandom",
+							Method:          tx.Method,
+							Topics:          topics,
+							BlockNumber:     log.Raw.BlockNumber,
+							BlockHash:       log.Raw.BlockHash.Hex(),
+							TransactionHash: log.Raw.TxHash.Hex(),
+							TxIndex:         log.Raw.TxIndex,
+							LogIndex:        log.Raw.Index,
+							Removed:         log.Raw.Removed,
+						},
 						LastRandomness:    hexutil.Encode(log.LastRandomness.Bytes()),
 						DispatchedGroupId: hexutil.Encode(log.DispatchedGroupId.Bytes()),
 					}
@@ -437,11 +558,14 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 				}
 			}
 		}()
-		return errc
+		return out, errc
 	},
-	7: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
+	7: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) (chan interface{}, chan error) {
+		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
+			defer close(out)
+			defer close(errc)
 			for {
 				select {
 				case <-ctx.Done():
@@ -463,20 +587,22 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogValidationResult{
-						EventLog:        "LogValidationResult",
-						Method:          tx.Method,
-						Topics:          topics,
-						BlockNumber:     log.Raw.BlockNumber,
-						BlockHash:       log.Raw.BlockHash.Hex(),
-						TransactionHash: log.Raw.TxHash.Hex(),
-						TxIndex:         log.Raw.TxIndex,
-						LogIndex:        log.Raw.Index,
-						Removed:         log.Raw.Removed,
-						TrafficType:     log.TrafficType,
-						TrafficId:       hexutil.Encode(log.TrafficId.Bytes()),
-						Signature:       []string{hexutil.Encode(log.Signature[0].Bytes()), hexutil.Encode(log.Signature[1].Bytes())},
-						PubKey:          []string{hexutil.Encode(log.PubKey[0].Bytes()), hexutil.Encode(log.PubKey[1].Bytes()), hexutil.Encode(log.PubKey[2].Bytes()), hexutil.Encode(log.PubKey[3].Bytes())},
-						Pass:            log.Pass,
+						Event: models.Event{
+							EventLog:        "LogValidationResult",
+							Method:          tx.Method,
+							Topics:          topics,
+							BlockNumber:     log.Raw.BlockNumber,
+							BlockHash:       log.Raw.BlockHash.Hex(),
+							TransactionHash: log.Raw.TxHash.Hex(),
+							TxIndex:         log.Raw.TxIndex,
+							LogIndex:        log.Raw.Index,
+							Removed:         log.Raw.Removed,
+						},
+						TrafficType: log.TrafficType,
+						TrafficId:   hexutil.Encode(log.TrafficId.Bytes()),
+						Signature:   []string{hexutil.Encode(log.Signature[0].Bytes()), hexutil.Encode(log.Signature[1].Bytes())},
+						PubKey:      []string{hexutil.Encode(log.PubKey[0].Bytes()), hexutil.Encode(log.PubKey[1].Bytes()), hexutil.Encode(log.PubKey[2].Bytes()), hexutil.Encode(log.PubKey[3].Bytes())},
+						Pass:        log.Pass,
 					}
 
 					if log.TrafficType == 2 {
@@ -494,11 +620,14 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 				}
 			}
 		}()
-		return errc
+		return out, errc
 	},
-	8: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
+	8: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) (chan interface{}, chan error) {
+		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
+			defer close(out)
+			defer close(errc)
 			for {
 				select {
 				case <-ctx.Done():
@@ -520,15 +649,17 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogInsufficientPendingNode{
-						EventLog:        "LogInsufficientPendingNode",
-						Method:          tx.Method,
-						Topics:          topics,
-						BlockNumber:     log.Raw.BlockNumber,
-						BlockHash:       log.Raw.BlockHash.Hex(),
-						TransactionHash: log.Raw.TxHash.Hex(),
-						TxIndex:         log.Raw.TxIndex,
-						LogIndex:        log.Raw.Index,
-						Removed:         log.Raw.Removed,
+						Event: models.Event{
+							EventLog:        "LogInsufficientPendingNode",
+							Method:          tx.Method,
+							Topics:          topics,
+							BlockNumber:     log.Raw.BlockNumber,
+							BlockHash:       log.Raw.BlockHash.Hex(),
+							TransactionHash: log.Raw.TxHash.Hex(),
+							TxIndex:         log.Raw.TxIndex,
+							LogIndex:        log.Raw.Index,
+							Removed:         log.Raw.Removed,
+						},
 						NumPendingNodes: log.NumPendingNodes.Uint64(),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
@@ -541,11 +672,14 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 				}
 			}
 		}()
-		return errc
+		return out, errc
 	},
-	9: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
+	9: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) (chan interface{}, chan error) {
+		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
+			defer close(out)
+			defer close(errc)
 			for {
 				select {
 				case <-ctx.Done():
@@ -568,15 +702,17 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogInsufficientWorkingGroup{
-						EventLog:         "LogInsufficientWorkingGroup",
-						Method:           tx.Method,
-						Topics:           topics,
-						BlockNumber:      log.Raw.BlockNumber,
-						BlockHash:        log.Raw.BlockHash.Hex(),
-						TransactionHash:  log.Raw.TxHash.Hex(),
-						TxIndex:          log.Raw.TxIndex,
-						LogIndex:         log.Raw.Index,
-						Removed:          log.Raw.Removed,
+						Event: models.Event{
+							EventLog:        "LogInsufficientWorkingGroup",
+							Method:          tx.Method,
+							Topics:          topics,
+							BlockNumber:     log.Raw.BlockNumber,
+							BlockHash:       log.Raw.BlockHash.Hex(),
+							TransactionHash: log.Raw.TxHash.Hex(),
+							TxIndex:         log.Raw.TxIndex,
+							LogIndex:        log.Raw.Index,
+							Removed:         log.Raw.Removed,
+						},
 						NumWorkingGroups: log.NumWorkingGroups.Uint64(),
 						NumPendingGroups: log.NumPendingGroups.Uint64(),
 					}
@@ -590,11 +726,14 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 				}
 			}
 		}()
-		return errc
+		return out, errc
 	},
-	10: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
+	10: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) (chan interface{}, chan error) {
+		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
+			defer close(out)
+			defer close(errc)
 			for {
 				select {
 				case <-ctx.Done():
@@ -620,17 +759,19 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogGrouping{
-						EventLog:        "LogGrouping",
-						Method:          tx.Method,
-						Topics:          topics,
-						BlockNumber:     log.Raw.BlockNumber,
-						BlockHash:       log.Raw.BlockHash.Hex(),
-						TransactionHash: log.Raw.TxHash.Hex(),
-						TxIndex:         log.Raw.TxIndex,
-						LogIndex:        log.Raw.Index,
-						Removed:         log.Raw.Removed,
-						GroupId:         hexutil.Encode(log.GroupId.Bytes()),
-						NodeId:          nodeIdstr,
+						Event: models.Event{
+							EventLog:        "LogGrouping",
+							Method:          tx.Method,
+							Topics:          topics,
+							BlockNumber:     log.Raw.BlockNumber,
+							BlockHash:       log.Raw.BlockHash.Hex(),
+							TransactionHash: log.Raw.TxHash.Hex(),
+							TxIndex:         log.Raw.TxIndex,
+							LogIndex:        log.Raw.Index,
+							Removed:         log.Raw.Removed,
+						},
+						GroupId: hexutil.Encode(log.GroupId.Bytes()),
+						NodeId:  nodeIdstr,
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
 						tx.LogGrouping = append(tx.LogGrouping, mLog)
@@ -639,14 +780,22 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 					} else {
 						fmt.Println("duplicate Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
 					}
+					fmt.Println("\n\n\n!!!!!!!!!!!!!!!!!!LogGrouping ", mLog.GroupId)
+					select {
+					case <-ctx.Done():
+					case out <- &mLog:
+					}
 				}
 			}
 		}()
-		return errc
+		return out, errc
 	},
-	11: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
+	11: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) (chan interface{}, chan error) {
+		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
+			defer close(out)
+			defer close(errc)
 			for {
 				select {
 				case <-ctx.Done():
@@ -668,15 +817,17 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogPublicKeyAccepted{
-						EventLog:         "LogPublicKeyAccepted",
-						Method:           tx.Method,
-						Topics:           topics,
-						BlockNumber:      log.Raw.BlockNumber,
-						BlockHash:        log.Raw.BlockHash.Hex(),
-						TransactionHash:  log.Raw.TxHash.Hex(),
-						TxIndex:          log.Raw.TxIndex,
-						LogIndex:         log.Raw.Index,
-						Removed:          log.Raw.Removed,
+						Event: models.Event{
+							EventLog:        "LogPublicKeyAccepted",
+							Method:          tx.Method,
+							Topics:          topics,
+							BlockNumber:     log.Raw.BlockNumber,
+							BlockHash:       log.Raw.BlockHash.Hex(),
+							TransactionHash: log.Raw.TxHash.Hex(),
+							TxIndex:         log.Raw.TxIndex,
+							LogIndex:        log.Raw.Index,
+							Removed:         log.Raw.Removed,
+						},
 						GroupId:          hexutil.Encode(log.GroupId.Bytes()),
 						PubKey:           []string{hexutil.Encode(log.PubKey[0].Bytes()), hexutil.Encode(log.PubKey[1].Bytes()), hexutil.Encode(log.PubKey[2].Bytes()), hexutil.Encode(log.PubKey[3].Bytes())},
 						NumWorkingGroups: log.NumWorkingGroups.Uint64(),
@@ -685,17 +836,28 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						tx.LogPublicKeyAccepted = append(tx.LogPublicKeyAccepted, mLog)
 						db.Save(&tx)
 						fmt.Println("Saved Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
+						select {
+						case <-ctx.Done():
+						case out <- &mLog:
+						}
 					} else {
 						fmt.Println("duplicate Event Log: ", log.Raw.BlockNumber, log.Raw.Index)
+					}
+					select {
+					case <-ctx.Done():
+					case out <- &mLog:
 					}
 				}
 			}
 		}()
-		return errc
+		return out, errc
 	},
-	12: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
+	12: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) (chan interface{}, chan error) {
+		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
+			defer close(out)
+			defer close(errc)
 			for {
 				select {
 				case <-ctx.Done():
@@ -717,17 +879,19 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogPublicKeySuggested{
-						EventLog:        "LogPublicKeySuggested",
-						Method:          tx.Method,
-						Topics:          topics,
-						BlockNumber:     log.Raw.BlockNumber,
-						BlockHash:       log.Raw.BlockHash.Hex(),
-						TransactionHash: log.Raw.TxHash.Hex(),
-						TxIndex:         log.Raw.TxIndex,
-						LogIndex:        log.Raw.Index,
-						Removed:         log.Raw.Removed,
-						GroupId:         hexutil.Encode(log.GroupId.Bytes()),
-						PubKeyCount:     log.PubKeyCount.Uint64(),
+						Event: models.Event{
+							EventLog:        "LogPublicKeySuggested",
+							Method:          tx.Method,
+							Topics:          topics,
+							BlockNumber:     log.Raw.BlockNumber,
+							BlockHash:       log.Raw.BlockHash.Hex(),
+							TransactionHash: log.Raw.TxHash.Hex(),
+							TxIndex:         log.Raw.TxIndex,
+							LogIndex:        log.Raw.Index,
+							Removed:         log.Raw.Removed,
+						},
+						GroupId:     hexutil.Encode(log.GroupId.Bytes()),
+						PubKeyCount: log.PubKeyCount.Uint64(),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
 						tx.LogPublicKeySuggested = append(tx.LogPublicKeySuggested, mLog)
@@ -739,11 +903,14 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 				}
 			}
 		}()
-		return errc
+		return out, errc
 	},
-	13: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
+	13: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) (chan interface{}, chan error) {
+		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
+			defer close(out)
+			defer close(errc)
 			for {
 				select {
 				case <-ctx.Done():
@@ -765,16 +932,18 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogGroupDissolve{
-						EventLog:        "LogGroupDissolve",
-						Method:          tx.Method,
-						Topics:          topics,
-						BlockNumber:     log.Raw.BlockNumber,
-						BlockHash:       log.Raw.BlockHash.Hex(),
-						TransactionHash: log.Raw.TxHash.Hex(),
-						TxIndex:         log.Raw.TxIndex,
-						LogIndex:        log.Raw.Index,
-						Removed:         log.Raw.Removed,
-						GroupId:         hexutil.Encode(log.GroupId.Bytes()),
+						Event: models.Event{
+							EventLog:        "LogGroupDissolve",
+							Method:          tx.Method,
+							Topics:          topics,
+							BlockNumber:     log.Raw.BlockNumber,
+							BlockHash:       log.Raw.BlockHash.Hex(),
+							TransactionHash: log.Raw.TxHash.Hex(),
+							TxIndex:         log.Raw.TxIndex,
+							LogIndex:        log.Raw.Index,
+							Removed:         log.Raw.Removed,
+						},
+						GroupId: hexutil.Encode(log.GroupId.Bytes()),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
 						tx.LogGroupDissolve = append(tx.LogGroupDissolve, mLog)
@@ -786,11 +955,14 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 				}
 			}
 		}()
-		return errc
+		return out, errc
 	},
-	14: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
+	14: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) (chan interface{}, chan error) {
+		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
+			defer close(out)
+			defer close(errc)
 			for {
 				select {
 				case <-ctx.Done():
@@ -812,16 +984,18 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogRegisteredNewPendingNode{
-						EventLog:        "LogRegisteredNewPendingNode",
-						Method:          tx.Method,
-						Topics:          topics,
-						BlockNumber:     log.Raw.BlockNumber,
-						BlockHash:       log.Raw.BlockHash.Hex(),
-						TransactionHash: log.Raw.TxHash.Hex(),
-						TxIndex:         log.Raw.TxIndex,
-						LogIndex:        log.Raw.Index,
-						Removed:         log.Raw.Removed,
-						Node:            log.Node.Hex(),
+						Event: models.Event{
+							EventLog:        "LogRegisteredNewPendingNode",
+							Method:          tx.Method,
+							Topics:          topics,
+							BlockNumber:     log.Raw.BlockNumber,
+							BlockHash:       log.Raw.BlockHash.Hex(),
+							TransactionHash: log.Raw.TxHash.Hex(),
+							TxIndex:         log.Raw.TxIndex,
+							LogIndex:        log.Raw.Index,
+							Removed:         log.Raw.Removed,
+						},
+						Node: log.Node.Hex(),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
 						tx.LogRegisteredNewPendingNode = append(tx.LogRegisteredNewPendingNode, mLog)
@@ -833,11 +1007,14 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 				}
 			}
 		}()
-		return errc
+		return out, errc
 	},
-	15: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
+	15: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) (chan interface{}, chan error) {
+		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
+			defer close(out)
+			defer close(errc)
 			for {
 				select {
 				case <-ctx.Done():
@@ -859,15 +1036,17 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogGroupingInitiated{
-						EventLog:          "LogGroupingInitiated",
-						Method:            tx.Method,
-						Topics:            topics,
-						BlockNumber:       log.Raw.BlockNumber,
-						BlockHash:         log.Raw.BlockHash.Hex(),
-						TransactionHash:   log.Raw.TxHash.Hex(),
-						TxIndex:           log.Raw.TxIndex,
-						LogIndex:          log.Raw.Index,
-						Removed:           log.Raw.Removed,
+						Event: models.Event{
+							EventLog:        "LogGroupingInitiated",
+							Method:          tx.Method,
+							Topics:          topics,
+							BlockNumber:     log.Raw.BlockNumber,
+							BlockHash:       log.Raw.BlockHash.Hex(),
+							TransactionHash: log.Raw.TxHash.Hex(),
+							TxIndex:         log.Raw.TxIndex,
+							LogIndex:        log.Raw.Index,
+							Removed:         log.Raw.Removed,
+						},
 						PendingNodePool:   log.PendingNodePool.Uint64(),
 						Groupsize:         log.Groupsize.Uint64(),
 						Groupingthreshold: log.Groupingthreshold.Uint64(),
@@ -882,11 +1061,14 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 				}
 			}
 		}()
-		return errc
+		return out, errc
 	},
-	16: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
+	16: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) (chan interface{}, chan error) {
+		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
+			defer close(out)
+			defer close(errc)
 			for {
 				select {
 				case <-ctx.Done():
@@ -908,16 +1090,18 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogNoPendingGroup{
-						EventLog:        "LogNoPendingGroup",
-						Method:          tx.Method,
-						Topics:          topics,
-						BlockNumber:     log.Raw.BlockNumber,
-						BlockHash:       log.Raw.BlockHash.Hex(),
-						TransactionHash: log.Raw.TxHash.Hex(),
-						TxIndex:         log.Raw.TxIndex,
-						LogIndex:        log.Raw.Index,
-						Removed:         log.Raw.Removed,
-						GroupId:         hexutil.Encode(log.GroupId.Bytes()),
+						Event: models.Event{
+							EventLog:        "LogNoPendingGroup",
+							Method:          tx.Method,
+							Topics:          topics,
+							BlockNumber:     log.Raw.BlockNumber,
+							BlockHash:       log.Raw.BlockHash.Hex(),
+							TransactionHash: log.Raw.TxHash.Hex(),
+							TxIndex:         log.Raw.TxIndex,
+							LogIndex:        log.Raw.Index,
+							Removed:         log.Raw.Removed,
+						},
+						GroupId: hexutil.Encode(log.GroupId.Bytes()),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
 						tx.LogNoPendingGroup = append(tx.LogNoPendingGroup, mLog)
@@ -929,11 +1113,14 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 				}
 			}
 		}()
-		return errc
+		return out, errc
 	},
-	17: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
+	17: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) (chan interface{}, chan error) {
+		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
+			defer close(out)
+			defer close(errc)
 			for {
 				select {
 				case <-ctx.Done():
@@ -955,16 +1142,18 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogPendingGroupRemoved{
-						EventLog:        "LogPendingGroupRemoved",
-						Method:          tx.Method,
-						Topics:          topics,
-						BlockNumber:     log.Raw.BlockNumber,
-						BlockHash:       log.Raw.BlockHash.Hex(),
-						TransactionHash: log.Raw.TxHash.Hex(),
-						TxIndex:         log.Raw.TxIndex,
-						LogIndex:        log.Raw.Index,
-						Removed:         log.Raw.Removed,
-						GroupId:         hexutil.Encode(log.GroupId.Bytes()),
+						Event: models.Event{
+							EventLog:        "LogPendingGroupRemoved",
+							Method:          tx.Method,
+							Topics:          topics,
+							BlockNumber:     log.Raw.BlockNumber,
+							BlockHash:       log.Raw.BlockHash.Hex(),
+							TransactionHash: log.Raw.TxHash.Hex(),
+							TxIndex:         log.Raw.TxIndex,
+							LogIndex:        log.Raw.Index,
+							Removed:         log.Raw.Removed,
+						},
+						GroupId: hexutil.Encode(log.GroupId.Bytes()),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
 						tx.LogPendingGroupRemoved = append(tx.LogPendingGroupRemoved, mLog)
@@ -976,11 +1165,14 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 				}
 			}
 		}()
-		return errc
+		return out, errc
 	},
-	18: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
+	18: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) (chan interface{}, chan error) {
+		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
+			defer close(out)
+			defer close(errc)
 			for {
 				select {
 				case <-ctx.Done():
@@ -1002,16 +1194,18 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.LogError{
-						EventLog:        "LogError",
-						Method:          tx.Method,
-						Topics:          topics,
-						BlockNumber:     log.Raw.BlockNumber,
-						BlockHash:       log.Raw.BlockHash.Hex(),
-						TransactionHash: log.Raw.TxHash.Hex(),
-						TxIndex:         log.Raw.TxIndex,
-						LogIndex:        log.Raw.Index,
-						Removed:         log.Raw.Removed,
-						Err:             log.Err,
+						Event: models.Event{
+							EventLog:        "LogError",
+							Method:          tx.Method,
+							Topics:          topics,
+							BlockNumber:     log.Raw.BlockNumber,
+							BlockHash:       log.Raw.BlockHash.Hex(),
+							TransactionHash: log.Raw.TxHash.Hex(),
+							TxIndex:         log.Raw.TxIndex,
+							LogIndex:        log.Raw.Index,
+							Removed:         log.Raw.Removed,
+						},
+						Err: log.Err,
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
 						tx.LogError = append(tx.LogError, mLog)
@@ -1023,11 +1217,14 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 				}
 			}
 		}()
-		return errc
+		return out, errc
 	},
-	19: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
+	19: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) (chan interface{}, chan error) {
+		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
+			defer close(out)
+			defer close(errc)
 			for {
 				select {
 				case <-ctx.Done():
@@ -1049,17 +1246,19 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.UpdateGroupToPick{
-						EventLog:        "UpdateGroupToPick",
-						Method:          tx.Method,
-						Topics:          topics,
-						BlockNumber:     log.Raw.BlockNumber,
-						BlockHash:       log.Raw.BlockHash.Hex(),
-						TransactionHash: log.Raw.TxHash.Hex(),
-						TxIndex:         log.Raw.TxIndex,
-						LogIndex:        log.Raw.Index,
-						Removed:         log.Raw.Removed,
-						OldNum:          log.OldNum.Uint64(),
-						NewNum:          log.NewNum.Uint64(),
+						Event: models.Event{
+							EventLog:        "UpdateGroupToPick",
+							Method:          tx.Method,
+							Topics:          topics,
+							BlockNumber:     log.Raw.BlockNumber,
+							BlockHash:       log.Raw.BlockHash.Hex(),
+							TransactionHash: log.Raw.TxHash.Hex(),
+							TxIndex:         log.Raw.TxIndex,
+							LogIndex:        log.Raw.Index,
+							Removed:         log.Raw.Removed,
+						},
+						OldNum: log.OldNum.Uint64(),
+						NewNum: log.NewNum.Uint64(),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
 						tx.UpdateGroupToPick = append(tx.UpdateGroupToPick, mLog)
@@ -1071,11 +1270,14 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 				}
 			}
 		}()
-		return errc
+		return out, errc
 	},
-	20: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
+	20: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) (chan interface{}, chan error) {
+		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
+			defer close(out)
+			defer close(errc)
 			for {
 				select {
 				case <-ctx.Done():
@@ -1097,17 +1299,19 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.UpdateGroupSize{
-						EventLog:        "UpdateGroupSize",
-						Method:          tx.Method,
-						Topics:          topics,
-						BlockNumber:     log.Raw.BlockNumber,
-						BlockHash:       log.Raw.BlockHash.Hex(),
-						TransactionHash: log.Raw.TxHash.Hex(),
-						TxIndex:         log.Raw.TxIndex,
-						LogIndex:        log.Raw.Index,
-						Removed:         log.Raw.Removed,
-						OldSize:         log.OldSize.Uint64(),
-						NewSize:         log.NewSize.Uint64(),
+						Event: models.Event{
+							EventLog:        "UpdateGroupSize",
+							Method:          tx.Method,
+							Topics:          topics,
+							BlockNumber:     log.Raw.BlockNumber,
+							BlockHash:       log.Raw.BlockHash.Hex(),
+							TransactionHash: log.Raw.TxHash.Hex(),
+							TxIndex:         log.Raw.TxIndex,
+							LogIndex:        log.Raw.Index,
+							Removed:         log.Raw.Removed,
+						},
+						OldSize: log.OldSize.Uint64(),
+						NewSize: log.NewSize.Uint64(),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
 						tx.UpdateGroupSize = append(tx.UpdateGroupSize, mLog)
@@ -1119,11 +1323,14 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 				}
 			}
 		}()
-		return errc
+		return out, errc
 	},
-	21: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
+	21: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) (chan interface{}, chan error) {
+		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
+			defer close(out)
+			defer close(errc)
 			for {
 				select {
 				case <-ctx.Done():
@@ -1145,17 +1352,19 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.UpdateGroupingThreshold{
-						EventLog:        "UpdateGroupingThreshold",
-						Method:          tx.Method,
-						Topics:          topics,
-						BlockNumber:     log.Raw.BlockNumber,
-						BlockHash:       log.Raw.BlockHash.Hex(),
-						TransactionHash: log.Raw.TxHash.Hex(),
-						TxIndex:         log.Raw.TxIndex,
-						LogIndex:        log.Raw.Index,
-						Removed:         log.Raw.Removed,
-						OldThreshold:    log.OldThreshold.Uint64(),
-						NewThreshold:    log.NewThreshold.Uint64(),
+						Event: models.Event{
+							EventLog:        "UpdateGroupingThreshold",
+							Method:          tx.Method,
+							Topics:          topics,
+							BlockNumber:     log.Raw.BlockNumber,
+							BlockHash:       log.Raw.BlockHash.Hex(),
+							TransactionHash: log.Raw.TxHash.Hex(),
+							TxIndex:         log.Raw.TxIndex,
+							LogIndex:        log.Raw.Index,
+							Removed:         log.Raw.Removed,
+						},
+						OldThreshold: log.OldThreshold.Uint64(),
+						NewThreshold: log.NewThreshold.Uint64(),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
 						tx.UpdateGroupingThreshold = append(tx.UpdateGroupingThreshold, mLog)
@@ -1167,11 +1376,14 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 				}
 			}
 		}()
-		return errc
+		return out, errc
 	},
-	22: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
+	22: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) (chan interface{}, chan error) {
+		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
+			defer close(out)
+			defer close(errc)
 			for {
 				select {
 				case <-ctx.Done():
@@ -1193,17 +1405,19 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.UpdateGroupMaturityPeriod{
-						EventLog:        "UpdateGroupMaturityPeriod",
-						Method:          tx.Method,
-						Topics:          topics,
-						BlockNumber:     log.Raw.BlockNumber,
-						BlockHash:       log.Raw.BlockHash.Hex(),
-						TransactionHash: log.Raw.TxHash.Hex(),
-						TxIndex:         log.Raw.TxIndex,
-						LogIndex:        log.Raw.Index,
-						Removed:         log.Raw.Removed,
-						OldPeriod:       log.OldPeriod.Uint64(),
-						NewPeriod:       log.NewPeriod.Uint64(),
+						Event: models.Event{
+							EventLog:        "UpdateGroupMaturityPeriod",
+							Method:          tx.Method,
+							Topics:          topics,
+							BlockNumber:     log.Raw.BlockNumber,
+							BlockHash:       log.Raw.BlockHash.Hex(),
+							TransactionHash: log.Raw.TxHash.Hex(),
+							TxIndex:         log.Raw.TxIndex,
+							LogIndex:        log.Raw.Index,
+							Removed:         log.Raw.Removed,
+						},
+						OldPeriod: log.OldPeriod.Uint64(),
+						NewPeriod: log.NewPeriod.Uint64(),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
 						tx.UpdateGroupMaturityPeriod = append(tx.UpdateGroupMaturityPeriod, mLog)
@@ -1215,11 +1429,14 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 				}
 			}
 		}()
-		return errc
+		return out, errc
 	},
-	23: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
+	23: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) (chan interface{}, chan error) {
+		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
+			defer close(out)
+			defer close(errc)
 			for {
 				select {
 				case <-ctx.Done():
@@ -1241,17 +1458,19 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.UpdateBootstrapCommitDuration{
-						EventLog:        "UpdateBootstrapCommitDuration",
-						Method:          tx.Method,
-						Topics:          topics,
-						BlockNumber:     log.Raw.BlockNumber,
-						BlockHash:       log.Raw.BlockHash.Hex(),
-						TransactionHash: log.Raw.TxHash.Hex(),
-						TxIndex:         log.Raw.TxIndex,
-						LogIndex:        log.Raw.Index,
-						Removed:         log.Raw.Removed,
-						OldDuration:     log.OldDuration.Uint64(),
-						NewDuration:     log.NewDuration.Uint64(),
+						Event: models.Event{
+							EventLog:        "UpdateBootstrapCommitDuration",
+							Method:          tx.Method,
+							Topics:          topics,
+							BlockNumber:     log.Raw.BlockNumber,
+							BlockHash:       log.Raw.BlockHash.Hex(),
+							TransactionHash: log.Raw.TxHash.Hex(),
+							TxIndex:         log.Raw.TxIndex,
+							LogIndex:        log.Raw.Index,
+							Removed:         log.Raw.Removed,
+						},
+						OldDuration: log.OldDuration.Uint64(),
+						NewDuration: log.NewDuration.Uint64(),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
 						tx.UpdateBootstrapCommitDuration = append(tx.UpdateBootstrapCommitDuration, mLog)
@@ -1263,11 +1482,14 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 				}
 			}
 		}()
-		return errc
+		return out, errc
 	},
-	24: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
+	24: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) (chan interface{}, chan error) {
+		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
+			defer close(out)
+			defer close(errc)
 			for {
 				select {
 				case <-ctx.Done():
@@ -1289,17 +1511,19 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.UpdateBootstrapRevealDuration{
-						EventLog:        "UpdateBootstrapRevealDuration",
-						Method:          tx.Method,
-						Topics:          topics,
-						BlockNumber:     log.Raw.BlockNumber,
-						BlockHash:       log.Raw.BlockHash.Hex(),
-						TransactionHash: log.Raw.TxHash.Hex(),
-						TxIndex:         log.Raw.TxIndex,
-						LogIndex:        log.Raw.Index,
-						Removed:         log.Raw.Removed,
-						OldDuration:     log.OldDuration.Uint64(),
-						NewDuration:     log.NewDuration.Uint64(),
+						Event: models.Event{
+							EventLog:        "UpdateBootstrapRevealDuration",
+							Method:          tx.Method,
+							Topics:          topics,
+							BlockNumber:     log.Raw.BlockNumber,
+							BlockHash:       log.Raw.BlockHash.Hex(),
+							TransactionHash: log.Raw.TxHash.Hex(),
+							TxIndex:         log.Raw.TxIndex,
+							LogIndex:        log.Raw.Index,
+							Removed:         log.Raw.Removed,
+						},
+						OldDuration: log.OldDuration.Uint64(),
+						NewDuration: log.NewDuration.Uint64(),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
 						tx.UpdateBootstrapRevealDuration = append(tx.UpdateBootstrapRevealDuration, mLog)
@@ -1311,11 +1535,14 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 				}
 			}
 		}()
-		return errc
+		return out, errc
 	},
-	25: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
+	25: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) (chan interface{}, chan error) {
+		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
+			defer close(out)
+			defer close(errc)
 			for {
 				select {
 				case <-ctx.Done():
@@ -1337,17 +1564,19 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.UpdatebootstrapStartThreshold{
-						EventLog:        "UpdatebootstrapStartThreshold",
-						Method:          tx.Method,
-						Topics:          topics,
-						BlockNumber:     log.Raw.BlockNumber,
-						BlockHash:       log.Raw.BlockHash.Hex(),
-						TransactionHash: log.Raw.TxHash.Hex(),
-						TxIndex:         log.Raw.TxIndex,
-						LogIndex:        log.Raw.Index,
-						Removed:         log.Raw.Removed,
-						OldThreshold:    log.OldThreshold.Uint64(),
-						NewThreshold:    log.NewThreshold.Uint64(),
+						Event: models.Event{
+							EventLog:        "UpdatebootstrapStartThreshold",
+							Method:          tx.Method,
+							Topics:          topics,
+							BlockNumber:     log.Raw.BlockNumber,
+							BlockHash:       log.Raw.BlockHash.Hex(),
+							TransactionHash: log.Raw.TxHash.Hex(),
+							TxIndex:         log.Raw.TxIndex,
+							LogIndex:        log.Raw.Index,
+							Removed:         log.Raw.Removed,
+						},
+						OldThreshold: log.OldThreshold.Uint64(),
+						NewThreshold: log.NewThreshold.Uint64(),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
 						tx.UpdatebootstrapStartThreshold = append(tx.UpdatebootstrapStartThreshold, mLog)
@@ -1359,11 +1588,14 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 				}
 			}
 		}()
-		return errc
+		return out, errc
 	},
-	26: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
+	26: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) (chan interface{}, chan error) {
+		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
+			defer close(out)
+			defer close(errc)
 			for {
 				select {
 				case <-ctx.Done():
@@ -1385,17 +1617,19 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.UpdatePendingGroupMaxLife{
-						EventLog:        "UpdatePendingGroupMaxLife",
-						Method:          tx.Method,
-						Topics:          topics,
-						BlockNumber:     log.Raw.BlockNumber,
-						BlockHash:       log.Raw.BlockHash.Hex(),
-						TransactionHash: log.Raw.TxHash.Hex(),
-						TxIndex:         log.Raw.TxIndex,
-						LogIndex:        log.Raw.Index,
-						Removed:         log.Raw.Removed,
-						OldLifeBlocks:   log.OldLifeBlocks.Uint64(),
-						NewLifeBlocks:   log.NewLifeBlocks.Uint64(),
+						Event: models.Event{
+							EventLog:        "UpdatePendingGroupMaxLife",
+							Method:          tx.Method,
+							Topics:          topics,
+							BlockNumber:     log.Raw.BlockNumber,
+							BlockHash:       log.Raw.BlockHash.Hex(),
+							TransactionHash: log.Raw.TxHash.Hex(),
+							TxIndex:         log.Raw.TxIndex,
+							LogIndex:        log.Raw.Index,
+							Removed:         log.Raw.Removed,
+						},
+						OldLifeBlocks: log.OldLifeBlocks.Uint64(),
+						NewLifeBlocks: log.NewLifeBlocks.Uint64(),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
 						tx.UpdatePendingGroupMaxLife = append(tx.UpdatePendingGroupMaxLife, mLog)
@@ -1407,11 +1641,14 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 				}
 			}
 		}()
-		return errc
+		return out, errc
 	},
-	27: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) chan error {
+	27: func(ctx context.Context, db *gorm.DB, eventc chan interface{}, client *ethclient.Client) (chan interface{}, chan error) {
+		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
+			defer close(out)
+			defer close(errc)
 			for {
 				select {
 				case <-ctx.Done():
@@ -1433,17 +1670,19 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 						continue
 					}
 					mLog := models.GuardianReward{
-						EventLog:        "GuardianReward",
-						Method:          tx.Method,
-						Topics:          topics,
-						BlockNumber:     log.Raw.BlockNumber,
-						BlockHash:       log.Raw.BlockHash.Hex(),
-						TransactionHash: log.Raw.TxHash.Hex(),
-						TxIndex:         log.Raw.TxIndex,
-						LogIndex:        log.Raw.Index,
-						Removed:         log.Raw.Removed,
-						BlkNum:          log.BlkNum.Uint64(),
-						Guardian:        log.Guardian.Hex(),
+						Event: models.Event{
+							EventLog:        "GuardianReward",
+							Method:          tx.Method,
+							Topics:          topics,
+							BlockNumber:     log.Raw.BlockNumber,
+							BlockHash:       log.Raw.BlockHash.Hex(),
+							TransactionHash: log.Raw.TxHash.Hex(),
+							TxIndex:         log.Raw.TxIndex,
+							LogIndex:        log.Raw.Index,
+							Removed:         log.Raw.Removed,
+						},
+						BlkNum:   log.BlkNum.Uint64(),
+						Guardian: log.Guardian.Hex(),
 					}
 					if err := db.Where("block_number = ? AND log_index = ?", log.Raw.BlockNumber, log.Raw.Index).First(&mLog).Error; gorm.IsRecordNotFoundError(err) {
 						tx.GuardianReward = append(tx.GuardianReward, mLog)
@@ -1455,6 +1694,6 @@ var ModelsTable = []func(ctx context.Context, db *gorm.DB, eventc chan interface
 				}
 			}
 		}()
-		return errc
+		return out, errc
 	},
 }

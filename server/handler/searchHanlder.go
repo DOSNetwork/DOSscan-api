@@ -18,6 +18,9 @@ import (
 
 const (
 	eventList int = iota
+	nodeInfo
+	groupInfo
+	requestInfo
 	nodeList
 )
 
@@ -35,9 +38,12 @@ type Response struct {
 }
 
 type Body struct {
-	Events     []interface{} `json:"events,omitempty"`
-	Nodelist   []interface{} `json:"nodelist,omitempty"`
-	TotalCount int           `json:"totalCount,omitempty"`
+	Events      []interface{} `json:"events,omitempty"`
+	NodeInfo    []interface{} `json:"nodeInfo,omitempty"`
+	GroupInfo   []interface{} `json:"groupInfo,omitempty"`
+	RequestInfo []interface{} `json:"requestInfo,omitempty"`
+	NodeList    []interface{} `json:"nodelist,omitempty"`
+	TotalCount  int           `json:"totalCount,omitempty"`
 }
 
 func NesSearchHandler(repo repository.EventsRepo) *SearchHandler {
@@ -196,22 +202,24 @@ func searchEventsByHex(repo repository.EventsRepo, text string, pageSize, pageIn
 func setResponse(code int, msg string, rType, totalCount int, logs []interface{}) (string, error) {
 	var resp Response
 	fmt.Println("setResponse ", len(logs))
+	resp = Response{
+		Code:    code,
+		Message: msg,
+	}
 	switch rType {
 	case eventList:
-		resp = Response{
-			Code:    code,
-			Message: msg,
-			Body:    &Body{Events: []interface{}{}, TotalCount: totalCount},
-		}
-		resp.Events = logs
+		resp.Body.Events = logs
+	case nodeInfo:
+		resp.Body = &Body{NodeInfo: logs, TotalCount: totalCount}
+	case groupInfo:
+		resp.Body = &Body{GroupInfo: logs, TotalCount: totalCount}
+	case requestInfo:
+		resp.Body = &Body{RequestInfo: logs, TotalCount: totalCount}
 	case nodeList:
-		resp = Response{
-			Code:    code,
-			Message: msg,
-			Body:    &Body{Events: []interface{}{}, TotalCount: totalCount},
-		}
-		resp.Nodelist = logs
+		resp.Body = &Body{NodeList: logs, TotalCount: totalCount}
+
 	}
+	fmt.Println("resp ", resp.Body)
 
 	var jsonData []byte
 	jsonData, err := json.MarshalIndent(resp, "", "    ")
