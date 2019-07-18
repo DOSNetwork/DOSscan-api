@@ -5,7 +5,9 @@ import (
 	"github.com/DOSNetwork/DOSscan-api/server/handler"
 	"github.com/DOSNetwork/DOSscan-api/server/middleware"
 	"github.com/DOSNetwork/DOSscan-api/server/repository"
+	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gin-gonic/contrib/static"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,7 +22,8 @@ func main() {
 	//config.Load()
 
 	db := repository.Connect(DB_USER, DB_PASSWORD, DB_NAME)
-	eventsRepo := repository.NewDBEventsRepository(db)
+	client, _ := ethclient.Dial("wss://rinkeby.infura.io/ws/v3/db19cf9028054762865cb9ce883c6ab8")
+	eventsRepo := repository.NewDBEventsRepository(db, client)
 	searchHandler := handler.NesSearchHandler(eventsRepo)
 	searchHandler.Init()
 	gin.SetMode(gin.ReleaseMode)

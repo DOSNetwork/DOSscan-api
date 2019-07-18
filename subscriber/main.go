@@ -9,6 +9,7 @@ import (
 	"github.com/DOSNetwork/DOSscan-api/subscriber/commitreveal"
 	"github.com/DOSNetwork/DOSscan-api/subscriber/dosbridge"
 	"github.com/DOSNetwork/DOSscan-api/subscriber/dosproxy"
+	"github.com/jinzhu/gorm"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -24,35 +25,37 @@ func newCR(crAddr common.Address, client *ethclient.Client) (*commitreveal.Commi
 	return &commitreveal.CommitrevealSession{Contract: p, CallOpts: bind.CallOpts{Context: context.Background()}}, nil
 }
 
-var proxyEvent = []string{
-	0:  "logurl",
-	1:  "logrequestuserrandom",
-	2:  "lognonsupportedtype",
-	3:  "lognoncontractcall",
-	4:  "logcallbacktriggeredfor",
-	5:  "logrequestfromnonexistentuc",
-	6:  "logupdaterandom",
-	7:  "logvalidationresult",
-	8:  "loginsufficientpendingnode",
-	9:  "loginsufficientworkinggroup",
-	10: "loggrouping",
-	11: "logpublickeyaccepted",
-	12: "logpublickeySuggested",
-	13: "loggroupdissolve",
-	14: "logregisterednewpendingnode",
-	15: "loggroupinginitiated",
-	16: "lognopendinggroup",
-	17: "logpendinggroupremoved",
-	18: "logerror",
-	19: "updategrouptopick",
-	20: "updategroupsize",
-	21: "updategroupingthreshold",
-	22: "updategroupmaturityperiod",
-	23: "updatebootstrapcommitduration",
-	24: "updatebootstraprevealduration",
-	25: "updatebootstrapstartthreshold",
-	26: "updatependinggroupmaxLife",
-	27: "guardianreward",
+func fetchHistoricData(proxy *dosproxy.DosproxySession, db *gorm.DB, client *ethclient.Client) error {
+	ctx := context.Background()
+	lastBlk, err := getLatestBlock(client)
+	if err != nil {
+		fmt.Println("GetLatestBlock err ", err)
+		return err
+	}
+	fmt.Println("lastBlk : ", lastBlk)
+	var errcList []chan error
+	for idx, event := range dosproxy.ProxyEvent {
+		fromBc, errc := dosproxy.FromBlockNumber(ctx, event, db)
+		errcList = append(errcList, errc)
+		outc, errc := dosproxy.FetchTable[idx](ctx, fromBc, lastBlk, 1000, &proxy.Contract.DosproxyFilterer)
+		errcList = append(errcList, errc)
+		errc = dosproxy.ModelsTable[idx](ctx, db, outc, client)
+		errcList = append(errcList, errc)
+	}
+	allErrc := mergeErrors(ctx, errcList...)
+	for {
+		select {
+		case <-ctx.Done():
+			return nil
+		case e, ok := <-allErrc:
+			if ok {
+				fmt.Println("errc event err ", e)
+				return e
+			} else {
+				return nil
+			}
+		}
+	}
 }
 
 func main() {
@@ -65,7 +68,7 @@ func main() {
 		return
 	}
 
-RECONNECT:
+	//RECONNECT:
 	d, err := dosbridge.NewDosbridge(common.HexToAddress("0xf0CEFfc4209e38EA3Cd1926DDc2bC641cbFFd1cF"), client)
 	if err != nil {
 		fmt.Println("NewDosbridge err ", err)
@@ -83,46 +86,22 @@ RECONNECT:
 		fmt.Println("newProxy err ", err)
 		return
 	}
-	lastBlk, err := getLatestBlock(client)
+
+	err = fetchHistoricData(proxy, db, client)
 	if err != nil {
-		fmt.Println("GetLatestBlock err ", err)
-		return
+		fmt.Println("fetchHistoricData err ", err)
 	}
-	var errcList []chan error
-	for idx, event := range proxyEvent {
-		fromBc, errc := dosproxy.FromBlockNumber(ctx, event, db)
-		errcList = append(errcList, errc)
-		outc, errc := dosproxy.FetchTable[idx](ctx, fromBc, lastBlk, &proxy.Contract.DosproxyFilterer)
-		errcList = append(errcList, errc)
-		outc, errc = dosproxy.ModelsTable[idx](ctx, db, outc, client)
-		errcList = append(errcList, errc)
-		dosproxy.ModelsForDashboard(ctx, db, outc, proxy, client)
+	dosproxy.BuildRelation(db)
+	/*
+		fmt.Println("!!!!!!!!!!!!!!!!!!Fetch Done")
 
-	} //0x919840ad
-	//TODO Add CommitReveal Event
-	//TODO Add Stacking Event
-	//TODO Add AddressBridge Event
-
-	allErrc := mergeErrors(ctx, errcList...)
-L:
-	for {
-		select {
-		case <-ctx.Done():
+		client, err = ethclient.Dial("wss://rinkeby.infura.io/ws/v3/db19cf9028054762865cb9ce883c6ab8")
+		if err != nil {
+			fmt.Println(":DialToEth err ", err)
 			return
-		case e, ok := <-allErrc:
-			if ok {
-				fmt.Println("errc event err ", e)
-			} else {
-				break L
-			}
 		}
-	}
-	client, err = ethclient.Dial("wss://rinkeby.infura.io/ws/v3/db19cf9028054762865cb9ce883c6ab8")
-	if err != nil {
-		fmt.Println(":DialToEth err ", err)
-		return
-	}
-	goto RECONNECT
+		goto RECONNECT
+	*/
 }
 
 func getLatestBlock(client *ethclient.Client) (blknum uint64, err error) {

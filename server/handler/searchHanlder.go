@@ -55,7 +55,7 @@ func NesSearchHandler(repo repository.EventsRepo) *SearchHandler {
 func (s *SearchHandler) Init() (err error) {
 	s.events, s.methods, err = getEventsAndMethodFromABI("../abi/DOSProxy.abi")
 	for _, event := range s.events {
-		s.sortedEvents = append(s.sortedEvents, event)
+		s.sortedEvents = append(s.sortedEvents, event+"s")
 	}
 	sort.Strings(s.sortedEvents)
 	fmt.Println(s.sortedEvents)
@@ -90,11 +90,15 @@ func (s *SearchHandler) Search(c *gin.Context) {
 		c.String(http.StatusOK, resp)
 		return
 	} else if strings.HasPrefix(text, "0x") {
-		events, err = searchEventsByHex(s.repo, text, 100, 0)
+		var respType int
+		events, respType, err = searchEventsByHex(s.repo, text)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
+		resp, err = setResponse(0, "success", respType, len(events), events)
+		c.String(http.StatusOK, resp)
+		return
 	} else {
 		events, err = searchEventsByEventName(s.repo, s.events, s.sortedEvents, text, 100, 0)
 		if err != nil {
@@ -120,35 +124,6 @@ func (s *SearchHandler) Search(c *gin.Context) {
 	return
 }
 
-func eventsByRequest(repo repository.EventsRepo, limit, offset int, text string) (resp []interface{}) {
-	resp = append(resp, repo.GetEvent(limit, offset, "logurl", "query_id ILIKE ?", text)...)
-	resp = append(resp, repo.GetEvent(limit, offset, "logrequestuserrandom", "request_id ILIKE ?", text)...)
-	resp = append(resp, repo.GetEvent(limit, offset, "logupdaterandom", "last_randomness ILIKE ?", text)...)
-	return
-}
-
-func eventsByGroup(repo repository.EventsRepo, limit, offset int, text string) (resp []interface{}) {
-	resp = append(resp, repo.GetEvent(limit, offset, "logurl", "dispatched_groupid ILIKE ?", text)...)
-	resp = append(resp, repo.GetEvent(limit, offset, "logrequestuserrandom", "dispatched_groupid ILIKE ?", text)...)
-	resp = append(resp, repo.GetEvent(limit, offset, "logupdaterandom", "dispatched_groupid ILIKE ?", text)...)
-	resp = append(resp, repo.GetEvent(limit, offset, "logvalidationresult", "traffic_id ILIKE ?", text)...)
-	resp = append(resp, repo.GetEvent(limit, offset, "loggrouping", "group_id ILIKE ?", text)...)
-	resp = append(resp, repo.GetEvent(limit, offset, "logpublickeyaccepted", "group_id ILIKE ?", text)...)
-	resp = append(resp, repo.GetEvent(limit, offset, "logpublickeysuggested", "group_id ILIKE ?", text)...)
-	resp = append(resp, repo.GetEvent(limit, offset, "loggroupdissolve", "group_id ILIKE ?", text)...)
-	resp = append(resp, repo.GetEvent(limit, offset, "lognopendinggroup", "group_id ILIKE ?", text)...)
-	resp = append(resp, repo.GetEvent(limit, offset, "logpendinggroupremoved", "group_id ILIKE ?", text)...)
-	return
-}
-
-func eventsByAddr(repo repository.EventsRepo, limit, offset int, text string) (resp []interface{}) {
-	resp = append(resp, repo.GetEvent(limit, offset, "logregisterednewpendingnode", "node = ?", text)...)
-	resp = append(resp, repo.GetEvent(limit, offset, "logcallbacktriggeredfor", "call_back_addr = ?", text)...)
-	resp = append(resp, repo.GetEvent(limit, offset, "lognoncontractcall", "call_ddr = ?", text)...)
-	resp = append(resp, repo.GetEventsByTxAttr(100, 0, "sender = ?", text)...)
-	return
-}
-
 func searchEventsByEventName(repo repository.EventsRepo, eventMap map[string]string, sortedEvent []string, text string, pageSize, pageIndex int) ([]interface{}, error) {
 	var resp []interface{}
 	limit := 100
@@ -169,34 +144,29 @@ func searchEventsByEventName(repo repository.EventsRepo, eventMap map[string]str
 	return resp, nil
 }
 
-func searchEventsByHex(repo repository.EventsRepo, text string, pageSize, pageIndex int) ([]interface{}, error) {
+func searchEventsByHex(repo repository.EventsRepo, text string) ([]interface{}, int, error) {
 	var resp []interface{}
-	limit := 100
-	offset := 0
 	fmt.Println("searchEventsByHex ", text)
-
+	respType := nodeInfo
 	// 1) text is a 66 bytes hex number that could be requestID or GroupID
 	if len(text) == 66 {
-		resp = append(resp, eventsByRequest(repo, limit, offset, text)...)
-		resp = append(resp, eventsByGroup(repo, limit, offset, text)...)
-	} else if len(text) <= 66 {
-		// 1) text is a 42 bytes hex number that could be requestID or GroupID
-		if len(text) == 42 {
-			resp = append(resp, eventsByAddr(repo, limit, offset, text)...)
-		}
+		respType = groupInfo
+		fmt.Println("searchEventsByHex GetGroup", groupInfo)
+		resp = repo.GetGroup(text)
+		fmt.Println("searchEventsByHex GetGroup", len(resp))
 		if len(resp) == 0 {
-
-			resp = append(resp, eventsByRequest(repo, limit, offset, "%"+text+"%")...)
-			resp = append(resp, eventsByGroup(repo, limit, offset, "%"+text+"%")...)
-			resp = append(resp, eventsByAddr(repo, limit, offset, "%"+text+"%")...)
-			fmt.Println("search hex case3 ", len(resp))
-		} else {
-			fmt.Println("search hex case4 ")
+			fmt.Println("searchEventsByHex ", requestInfo)
+			respType = requestInfo
+			resp = repo.GetRequest(text)
 		}
+	} else if len(text) == 42 {
+		// 1) text is a 42 bytes hex number that is an addres
+		resp = repo.GetNode(text)
+		respType = nodeInfo
 	}
 	fmt.Println("searchEventsByHex ", text, len(resp))
 
-	return resp, nil
+	return resp, respType, nil
 }
 
 func setResponse(code int, msg string, rType, totalCount int, logs []interface{}) (string, error) {
@@ -208,7 +178,7 @@ func setResponse(code int, msg string, rType, totalCount int, logs []interface{}
 	}
 	switch rType {
 	case eventList:
-		resp.Body.Events = logs
+		resp.Body = &Body{Events: logs, TotalCount: totalCount}
 	case nodeInfo:
 		resp.Body = &Body{NodeInfo: logs, TotalCount: totalCount}
 	case groupInfo:
@@ -219,13 +189,13 @@ func setResponse(code int, msg string, rType, totalCount int, logs []interface{}
 		resp.Body = &Body{NodeList: logs, TotalCount: totalCount}
 
 	}
-	fmt.Println("resp ", resp.Body)
 
 	var jsonData []byte
 	jsonData, err := json.MarshalIndent(resp, "", "    ")
 	if err != nil {
 		fmt.Println(err)
 	}
+	fmt.Println("resp ", string(jsonData))
 	return string(jsonData), err
 }
 

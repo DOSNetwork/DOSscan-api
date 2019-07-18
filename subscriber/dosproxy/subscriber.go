@@ -10,8 +10,501 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
-var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64, filter *DosproxyFilterer) (chan interface{}, chan error){
-	0: func(ctx context.Context, fromBlkc chan uint64, lastBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, blockLimit uint64, filter *DosproxyFilterer) (chan interface{}, chan error){
+	LogGrouping: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, blockLimit uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+			defer close(out)
+			defer close(errc)
+			defer fmt.Println("Done LogGrouping")
+			select {
+			case <-ctx.Done():
+				return
+			case fromBlock, ok := <-fromBlkc:
+				if !ok {
+					return
+				}
+				if toBlock <= fromBlock {
+					return
+				}
+				for fromBlock <= toBlock {
+					nextBlk := toBlock
+					if nextBlk-fromBlock > blockLimit {
+						nextBlk = fromBlock + blockLimit
+					}
+					fmt.Println("LogGrouping ", fromBlock, " - ", nextBlk)
+					//2) get the historic data from proxy that start from lastBlkNum to latest
+					logs, err := filter.FilterLogGrouping(&bind.FilterOpts{Start: fromBlock, End: &nextBlk, Context: ctx})
+					if err != nil {
+						fmt.Println("FilterLogGrouping err ", err)
+					}
+					for logs.Next() {
+						select {
+						case <-ctx.Done():
+						case out <- logs.Event:
+						}
+					}
+					fromBlock = nextBlk + 1
+				}
+				fmt.Println("LogGrouping Done fetch")
+			}
+		}()
+		return out, errc
+	},
+	LogPublicKeySuggested: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, blockLimit uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+			defer close(out)
+			defer close(errc)
+			defer fmt.Println("Done LogPublicKeySuggested")
+			select {
+			case <-ctx.Done():
+				return
+			case fromBlock, ok := <-fromBlkc:
+				if !ok {
+					return
+				}
+				if toBlock <= fromBlock {
+					return
+				}
+				for fromBlock <= toBlock {
+					nextBlk := toBlock
+					if nextBlk-fromBlock > blockLimit {
+						nextBlk = fromBlock + blockLimit
+					}
+					fmt.Println("LogPublicKeySuggested ", fromBlock, " - ", nextBlk)
+					//get the historic data from proxy that start from lastBlkNum to latest
+					logs, err := filter.FilterLogPublicKeySuggested(&bind.FilterOpts{Start: fromBlock, End: &nextBlk, Context: ctx})
+					if err != nil {
+						fmt.Println("FilterLogPublicKeySuggested err ", err)
+					}
+					for logs.Next() {
+						select {
+						case <-ctx.Done():
+							return
+						case out <- logs.Event:
+						}
+					}
+					fromBlock = nextBlk + 1
+				}
+			}
+		}()
+		return out, errc
+	},
+	LogPublicKeyAccepted: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, blockLimit uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+			defer close(out)
+			defer close(errc)
+			defer fmt.Println("Done LogPublicKeyAccepted")
+			select {
+			case <-ctx.Done():
+				return
+			case fromBlock, ok := <-fromBlkc:
+				if !ok {
+					return
+				}
+				if toBlock <= fromBlock {
+					return
+				}
+				for fromBlock <= toBlock {
+					nextBlk := toBlock
+					if nextBlk-fromBlock > blockLimit {
+						nextBlk = fromBlock + blockLimit
+					}
+					fmt.Println("LogPublicKeyAccepted ", fromBlock, " - ", nextBlk)
+					//get the historic data from proxy that start from lastBlkNum to latest
+					logs, err := filter.FilterLogPublicKeyAccepted(&bind.FilterOpts{Start: fromBlock, End: &nextBlk, Context: ctx})
+					if err != nil {
+						fmt.Println("FilterLogPublicKeyAccepted err ", err)
+					}
+					for logs.Next() {
+						select {
+						case <-ctx.Done():
+						case out <- logs.Event:
+						}
+					}
+					fromBlock = nextBlk + 1
+				}
+			}
+		}()
+		return out, errc
+	},
+	LogGroupDissolve: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, blockLimit uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+			defer close(out)
+			defer close(errc)
+			defer fmt.Println("Done LogGroupDissolve")
+			select {
+			case <-ctx.Done():
+				return
+			case fromBlock, ok := <-fromBlkc:
+				if !ok {
+					return
+				}
+				if toBlock <= fromBlock {
+					return
+				}
+				for fromBlock <= toBlock {
+					nextBlk := toBlock
+					if nextBlk-fromBlock > blockLimit {
+						nextBlk = fromBlock + blockLimit
+					}
+					fmt.Println("LogGroupDissolve ", fromBlock, " - ", nextBlk)
+					//get the historic data from proxy that start from lastBlkNum to latest
+					logs, err := filter.FilterLogGroupDissolve(&bind.FilterOpts{Start: fromBlock, End: &nextBlk, Context: ctx})
+					if err != nil {
+						fmt.Println("FilterLogGroupDissolve err ", err)
+					}
+					for logs.Next() {
+						select {
+						case <-ctx.Done():
+						case out <- logs.Event:
+						}
+					}
+					fromBlock = nextBlk + 1
+
+				}
+			}
+		}()
+		return out, errc
+	},
+	LogRegisteredNewPendingNode: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, blockLimit uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+			defer close(out)
+			defer close(errc)
+			defer fmt.Println("Done LogRegisteredNewPendingNode")
+			select {
+			case <-ctx.Done():
+				return
+			case fromBlock, ok := <-fromBlkc:
+				if !ok {
+					return
+				}
+				if toBlock <= fromBlock {
+					return
+				}
+				for fromBlock <= toBlock {
+					nextBlk := toBlock
+					if nextBlk-fromBlock > blockLimit {
+						nextBlk = fromBlock + blockLimit
+					}
+					fmt.Println("LogRegisteredNewPendingNode ", fromBlock, " - ", nextBlk)
+					//get the historic data from proxy that start from lastBlkNum to latest
+					logs, err := filter.FilterLogRegisteredNewPendingNode(&bind.FilterOpts{Start: fromBlock, End: &nextBlk, Context: ctx})
+					if err != nil {
+						fmt.Println("FilterLogRegisteredNewPendingNode err ", err)
+					}
+					for logs.Next() {
+						select {
+						case <-ctx.Done():
+						case out <- logs.Event:
+						}
+					}
+					fromBlock = nextBlk + 1
+
+				}
+			}
+		}()
+		return out, errc
+	},
+	LogUpdateRandom: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, blockLimit uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+			defer close(out)
+			defer close(errc)
+			defer fmt.Println("Done LogUpdateRandom")
+			select {
+			case <-ctx.Done():
+				return
+			case fromBlock, ok := <-fromBlkc:
+				if !ok {
+					return
+				}
+				if toBlock <= fromBlock {
+					return
+				}
+				for fromBlock <= toBlock {
+					nextBlk := toBlock
+					if nextBlk-fromBlock > blockLimit {
+						nextBlk = fromBlock + blockLimit
+					}
+					fmt.Println("LogUpdateRandom ", fromBlock, " - ", nextBlk)
+					logs, err := filter.FilterLogUpdateRandom(&bind.FilterOpts{Start: fromBlock, End: &nextBlk, Context: ctx})
+					if err != nil {
+						fmt.Println("FilterLogUpdateRandom err ", err)
+					}
+					for logs.Next() {
+						select {
+						case <-ctx.Done():
+						case out <- logs.Event:
+						}
+					}
+					fromBlock = nextBlk + 1
+
+				}
+			}
+		}()
+		return out, errc
+	},
+	LogUrl: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, blockLimit uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+			defer close(out)
+			defer close(errc)
+			defer fmt.Println("Done LogUrl")
+			select {
+			case <-ctx.Done():
+				return
+			case fromBlock, ok := <-fromBlkc:
+				if !ok {
+					return
+				}
+				if toBlock <= fromBlock {
+					return
+				}
+				for fromBlock <= toBlock {
+					nextBlk := toBlock
+					if nextBlk-fromBlock > blockLimit {
+						nextBlk = fromBlock + blockLimit
+					}
+					fmt.Println("LogUrl ", fromBlock, " - ", nextBlk)
+					//1) get the historic data from proxy that start from lastBlkNum to latest
+
+					logs, err := filter.FilterLogUrl(&bind.FilterOpts{Start: fromBlock, End: &nextBlk, Context: ctx})
+					if err != nil {
+						fmt.Println("FilterLogUrl err ", err)
+					}
+					for logs.Next() {
+						select {
+						case <-ctx.Done():
+						case out <- logs.Event:
+						}
+					}
+					fromBlock = nextBlk + 1
+
+				}
+				fmt.Println("LogUrl Done")
+			}
+		}()
+		return out, errc
+	},
+	LogRequestUserRandom: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, blockLimit uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+			defer close(out)
+			defer close(errc)
+			defer fmt.Println("Done LogRequestUserRandom")
+			select {
+			case <-ctx.Done():
+				return
+			case fromBlock, ok := <-fromBlkc:
+				if !ok {
+					return
+				}
+				if toBlock <= fromBlock {
+					return
+				}
+				for fromBlock <= toBlock {
+					nextBlk := toBlock
+					if nextBlk-fromBlock > blockLimit {
+						nextBlk = fromBlock + blockLimit
+					}
+					fmt.Println("LogRequestUserRandom ", fromBlock, " - ", nextBlk)
+					//get the historic data from proxy that start from lastBlkNum to latest
+					logs, err := filter.FilterLogRequestUserRandom(&bind.FilterOpts{Start: fromBlock, End: &nextBlk, Context: ctx})
+					if err != nil {
+						fmt.Println("FilterLogRequestUserRandom err ", err)
+					}
+					for logs.Next() {
+						select {
+						case <-ctx.Done():
+						case out <- logs.Event:
+						}
+					}
+					fromBlock = nextBlk + 1
+
+				}
+			}
+		}()
+		return out, errc
+	},
+	LogValidationResult: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, blockLimit uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+			defer close(out)
+			defer close(errc)
+			defer fmt.Println("Done LogValidationResult")
+			select {
+			case <-ctx.Done():
+				return
+			case fromBlock, ok := <-fromBlkc:
+				if !ok {
+					return
+				}
+				if toBlock <= fromBlock {
+					return
+				}
+				for fromBlock <= toBlock {
+					nextBlk := toBlock
+					if nextBlk-fromBlock > blockLimit {
+						nextBlk = fromBlock + blockLimit
+					}
+					fmt.Println("LogValidationResult ", fromBlock, " - ", nextBlk)
+					//2) get the historic data from proxy that start from lastBlkNum to latest
+					logs, err := filter.FilterLogValidationResult(&bind.FilterOpts{Start: fromBlock, End: &nextBlk, Context: ctx})
+					if err != nil {
+						fmt.Println("FilterLogValidationResult err ", err)
+					}
+					for logs.Next() {
+						select {
+						case <-ctx.Done():
+						case out <- logs.Event:
+						}
+					}
+					fromBlock = nextBlk + 1
+
+				}
+			}
+		}()
+		return out, errc
+	},
+	LogCallbackTriggeredFor: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, blockLimit uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+			defer close(out)
+			defer close(errc)
+			defer fmt.Println("Done LogCallbackTriggeredFor")
+			select {
+			case <-ctx.Done():
+				return
+			case fromBlock, ok := <-fromBlkc:
+				if !ok {
+					return
+				}
+				if toBlock <= fromBlock {
+					return
+				}
+				for fromBlock <= toBlock {
+					nextBlk := toBlock
+					if nextBlk-fromBlock > blockLimit {
+						nextBlk = fromBlock + blockLimit
+					}
+					fmt.Println("LogCallbackTriggeredFor ", fromBlock, " - ", nextBlk)
+					logs, err := filter.FilterLogCallbackTriggeredFor(&bind.FilterOpts{Start: fromBlock, End: &nextBlk, Context: ctx})
+					if err != nil {
+						fmt.Println("FilterLogCallbackTriggeredFor err ", err)
+					}
+					for logs.Next() {
+						select {
+						case <-ctx.Done():
+						case out <- logs.Event:
+						}
+					}
+					fromBlock = nextBlk + 1
+
+				}
+			}
+		}()
+		return out, errc
+	},
+	LogError: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, blockLimit uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+			defer close(out)
+			defer close(errc)
+			defer fmt.Println("Done LogError")
+			select {
+			case <-ctx.Done():
+				return
+			case fromBlock, ok := <-fromBlkc:
+				if !ok {
+					return
+				}
+				if toBlock <= fromBlock {
+					return
+				}
+				for fromBlock <= toBlock {
+					nextBlk := toBlock
+					if nextBlk-fromBlock > blockLimit {
+						nextBlk = fromBlock + blockLimit
+					}
+					fmt.Println("LogError ", fromBlock, " - ", nextBlk)
+					logs, err := filter.FilterLogError(&bind.FilterOpts{Start: fromBlock, End: &nextBlk, Context: ctx})
+					if err != nil {
+						fmt.Println("FilterLogError err ", err)
+					}
+					for logs.Next() {
+						select {
+						case <-ctx.Done():
+						case out <- logs.Event:
+						}
+					}
+					fromBlock = nextBlk + 1
+				}
+			}
+		}()
+		return out, errc
+	},
+	GuardianReward: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, blockLimit uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+		out := make(chan interface{})
+		errc := make(chan error)
+		go func() {
+			defer close(out)
+			defer close(errc)
+			defer fmt.Println("Done Guardianreward")
+
+			select {
+			case <-ctx.Done():
+				return
+			case fromBlock, ok := <-fromBlkc:
+				if !ok {
+					return
+				}
+				if toBlock <= fromBlock {
+					return
+				}
+				for fromBlock <= toBlock {
+					nextBlk := toBlock
+					if nextBlk-fromBlock > blockLimit {
+						nextBlk = fromBlock + blockLimit
+					}
+					fmt.Println("GuardianReward ", fromBlock, " - ", nextBlk)
+					logs, err := filter.FilterGuardianReward(&bind.FilterOpts{Start: fromBlock, End: &nextBlk, Context: ctx}, nil)
+					if err != nil {
+						fmt.Println("FilterGuardianReward err ", err)
+					}
+					for logs.Next() {
+						select {
+						case <-ctx.Done():
+						case out <- logs.Event:
+						}
+					}
+					fromBlock = nextBlk + 1
+
+				}
+			}
+		}()
+		return out, errc
+	},
+}
+
+/*
+var SubscriptionTable = []func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error){
+	Logurl: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
 		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
@@ -30,37 +523,33 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 
 			//2) get the historic data from proxy that start from lastBlkNum to latest
 			pageSize := uint64(1000)
-			for fromBlock+pageSize < lastBlock {
+			for fromBlock+pageSize < toBlock {
 				toBlock := fromBlock + pageSize
 				logs, err := filter.FilterLogUrl(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogUrl err ", err)
 				}
-				go func(logs *DosproxyLogUrlIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 				fromBlock = toBlock
 			}
 
-			if fromBlock+pageSize >= lastBlock {
-				logs, err := filter.FilterLogUrl(&bind.FilterOpts{Start: fromBlock, End: &lastBlock, Context: ctx})
+			if fromBlock+pageSize >= toBlock {
+				logs, err := filter.FilterLogUrl(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogUrl err ", err)
 				}
-				go func(logs *DosproxyLogUrlIterator) {
-					for logs.Next() {
-						fmt.Println("FilterLogUrl form ")
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					fmt.Println("FilterLogUrl form ")
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 			}
 
 			for {
@@ -84,7 +573,7 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 		}()
 		return out, errc
 	},
-	1: func(ctx context.Context, fromBlkc chan uint64, lastBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+	Logrequestuserrandom: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
 		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
@@ -103,37 +592,32 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 
 			//2) get the historic data from proxy that start from lastBlkNum to latest
 			pageSize := uint64(1000)
-			for fromBlock+pageSize < lastBlock {
+			for fromBlock+pageSize < toBlock {
 				toBlock := fromBlock + pageSize
 				logs, err := filter.FilterLogRequestUserRandom(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogRequestUserRandom err ", err)
 				}
-				go func(logs *DosproxyLogRequestUserRandomIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 				fromBlock = toBlock
 			}
 
-			if fromBlock+pageSize >= lastBlock {
-				logs, err := filter.FilterLogRequestUserRandom(&bind.FilterOpts{Start: fromBlock, End: &lastBlock, Context: ctx})
+			if fromBlock+pageSize >= toBlock {
+				logs, err := filter.FilterLogRequestUserRandom(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogRequestUserRandom err ", err)
 				}
-				go func(logs *DosproxyLogRequestUserRandomIterator) {
-					for logs.Next() {
-						fmt.Println("FilterLogRequestUserRandom form ")
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 			}
 
 			for {
@@ -156,7 +640,7 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 		}()
 		return out, errc
 	},
-	2: func(ctx context.Context, fromBlkc chan uint64, lastBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+	Lognonsupportedtype: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
 		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
@@ -175,36 +659,32 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 
 			//2) get the historic data from proxy that start from lastBlkNum to latest
 			pageSize := uint64(1000)
-			for fromBlock+pageSize < lastBlock {
+			for fromBlock+pageSize < toBlock {
 				toBlock := fromBlock + pageSize
 				logs, err := filter.FilterLogNonSupportedType(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogNonSupportedType err ", err)
 				}
-				go func(logs *DosproxyLogNonSupportedTypeIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 				fromBlock = toBlock
 			}
 
-			if fromBlock+pageSize >= lastBlock {
-				logs, err := filter.FilterLogNonSupportedType(&bind.FilterOpts{Start: fromBlock, End: &lastBlock, Context: ctx})
+			if fromBlock+pageSize >= toBlock {
+				logs, err := filter.FilterLogNonSupportedType(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogNonSupportedType err ", err)
 				}
-				go func(logs *DosproxyLogNonSupportedTypeIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 			}
 
 			for {
@@ -227,7 +707,7 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 		}()
 		return out, errc
 	},
-	3: func(ctx context.Context, fromBlkc chan uint64, lastBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+	Lognoncontractcall: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
 		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
@@ -246,36 +726,32 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 
 			//2) get the historic data from proxy that start from lastBlkNum to latest
 			pageSize := uint64(1000)
-			for fromBlock+pageSize < lastBlock {
+			for fromBlock+pageSize < toBlock {
 				toBlock := fromBlock + pageSize
 				logs, err := filter.FilterLogNonContractCall(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogNonContractCall err ", err)
 				}
-				go func(logs *DosproxyLogNonContractCallIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 				fromBlock = toBlock
 			}
 
-			if fromBlock+pageSize >= lastBlock {
-				logs, err := filter.FilterLogNonContractCall(&bind.FilterOpts{Start: fromBlock, End: &lastBlock, Context: ctx})
+			if fromBlock+pageSize >= toBlock {
+				logs, err := filter.FilterLogNonContractCall(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogNonContractCall err ", err)
 				}
-				go func(logs *DosproxyLogNonContractCallIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 			}
 
 			for {
@@ -298,7 +774,7 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 		}()
 		return out, errc
 	},
-	4: func(ctx context.Context, fromBlkc chan uint64, lastBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+	Logcallbacktriggeredfor: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
 		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
@@ -317,36 +793,32 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 
 			//2) get the historic data from proxy that start from lastBlkNum to latest
 			pageSize := uint64(1000)
-			for fromBlock+pageSize < lastBlock {
+			for fromBlock+pageSize < toBlock {
 				toBlock := fromBlock + pageSize
 				logs, err := filter.FilterLogCallbackTriggeredFor(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogCallbackTriggeredFor err ", err)
 				}
-				go func(logs *DosproxyLogCallbackTriggeredForIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 				fromBlock = toBlock
 			}
 
-			if fromBlock+pageSize >= lastBlock {
-				logs, err := filter.FilterLogCallbackTriggeredFor(&bind.FilterOpts{Start: fromBlock, End: &lastBlock, Context: ctx})
+			if fromBlock+pageSize >= toBlock {
+				logs, err := filter.FilterLogCallbackTriggeredFor(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogCallbackTriggeredFor err ", err)
 				}
-				go func(logs *DosproxyLogCallbackTriggeredForIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 			}
 
 			for {
@@ -369,7 +841,7 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 		}()
 		return out, errc
 	},
-	5: func(ctx context.Context, fromBlkc chan uint64, lastBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+	Logrequestfromnonexistentuc: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
 		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
@@ -388,36 +860,32 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 
 			//2) get the historic data from proxy that start from lastBlkNum to latest
 			pageSize := uint64(1000)
-			for fromBlock+pageSize < lastBlock {
+			for fromBlock+pageSize < toBlock {
 				toBlock := fromBlock + pageSize
 				logs, err := filter.FilterLogRequestFromNonExistentUC(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogRequestFromNonExistentUC err ", err)
 				}
-				go func(logs *DosproxyLogRequestFromNonExistentUCIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 				fromBlock = toBlock
 			}
 
-			if fromBlock+pageSize >= lastBlock {
-				logs, err := filter.FilterLogRequestFromNonExistentUC(&bind.FilterOpts{Start: fromBlock, End: &lastBlock, Context: ctx})
+			if fromBlock+pageSize >= toBlock {
+				logs, err := filter.FilterLogRequestFromNonExistentUC(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogRequestFromNonExistentUC err ", err)
 				}
-				go func(logs *DosproxyLogRequestFromNonExistentUCIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 			}
 
 			for {
@@ -440,7 +908,7 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 		}()
 		return out, errc
 	},
-	6: func(ctx context.Context, fromBlkc chan uint64, lastBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+	Logupdaterandom: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
 		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
@@ -459,36 +927,32 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 
 			//2) get the historic data from proxy that start from lastBlkNum to latest
 			pageSize := uint64(1000)
-			for fromBlock+pageSize < lastBlock {
+			for fromBlock+pageSize < toBlock {
 				toBlock := fromBlock + pageSize
 				logs, err := filter.FilterLogUpdateRandom(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogUpdateRandom err ", err)
 				}
-				go func(logs *DosproxyLogUpdateRandomIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 				fromBlock = toBlock
 			}
 
-			if fromBlock+pageSize >= lastBlock {
-				logs, err := filter.FilterLogUpdateRandom(&bind.FilterOpts{Start: fromBlock, End: &lastBlock, Context: ctx})
+			if fromBlock+pageSize >= toBlock {
+				logs, err := filter.FilterLogUpdateRandom(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogUpdateRandom err ", err)
 				}
-				go func(logs *DosproxyLogUpdateRandomIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 			}
 
 			for {
@@ -511,7 +975,7 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 		}()
 		return out, errc
 	},
-	7: func(ctx context.Context, fromBlkc chan uint64, lastBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+	Logvalidationresult: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
 		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
@@ -531,36 +995,32 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 
 			//2) get the historic data from proxy that start from lastBlkNum to latest
 			pageSize := uint64(1000)
-			for fromBlock+pageSize < lastBlock {
+			for fromBlock+pageSize < toBlock {
 				toBlock := fromBlock + pageSize
 				logs, err := filter.FilterLogValidationResult(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogValidationResult err ", err)
 				}
-				go func(logs *DosproxyLogValidationResultIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 				fromBlock = toBlock
 			}
 
-			if fromBlock+pageSize >= lastBlock {
-				logs, err := filter.FilterLogValidationResult(&bind.FilterOpts{Start: fromBlock, End: &lastBlock, Context: ctx})
+			if fromBlock+pageSize >= toBlock {
+				logs, err := filter.FilterLogValidationResult(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogValidationResult err ", err)
 				}
-				go func(logs *DosproxyLogValidationResultIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 			}
 
 			for {
@@ -583,7 +1043,7 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 		}()
 		return out, errc
 	},
-	8: func(ctx context.Context, fromBlkc chan uint64, lastBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+	Loginsufficientpendingnode: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
 		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
@@ -602,36 +1062,32 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 
 			//2) get the historic data from proxy that start from lastBlkNum to latest
 			pageSize := uint64(1000)
-			for fromBlock+pageSize < lastBlock {
+			for fromBlock+pageSize < toBlock {
 				toBlock := fromBlock + pageSize
 				logs, err := filter.FilterLogInsufficientPendingNode(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogInsufficientPendingNode err ", err)
 				}
-				go func(logs *DosproxyLogInsufficientPendingNodeIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 				fromBlock = toBlock
 			}
 
-			if fromBlock+pageSize >= lastBlock {
-				logs, err := filter.FilterLogInsufficientPendingNode(&bind.FilterOpts{Start: fromBlock, End: &lastBlock, Context: ctx})
+			if fromBlock+pageSize >= toBlock {
+				logs, err := filter.FilterLogInsufficientPendingNode(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogInsufficientPendingNode err ", err)
 				}
-				go func(logs *DosproxyLogInsufficientPendingNodeIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 			}
 
 			for {
@@ -654,7 +1110,7 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 		}()
 		return out, errc
 	},
-	9: func(ctx context.Context, fromBlkc chan uint64, lastBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+	Loginsufficientworkinggroup: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
 		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
@@ -673,36 +1129,32 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 
 			//2) get the historic data from proxy that start from lastBlkNum to latest
 			pageSize := uint64(1000)
-			for fromBlock+pageSize < lastBlock {
+			for fromBlock+pageSize < toBlock {
 				toBlock := fromBlock + pageSize
 				logs, err := filter.FilterLogInsufficientWorkingGroup(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogInsufficientWorkingGroup err ", err)
 				}
-				go func(logs *DosproxyLogInsufficientWorkingGroupIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 				fromBlock = toBlock
 			}
 
-			if fromBlock+pageSize >= lastBlock {
-				logs, err := filter.FilterLogInsufficientWorkingGroup(&bind.FilterOpts{Start: fromBlock, End: &lastBlock, Context: ctx})
+			if fromBlock+pageSize >= toBlock {
+				logs, err := filter.FilterLogInsufficientWorkingGroup(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogInsufficientWorkingGroup err ", err)
 				}
-				go func(logs *DosproxyLogInsufficientWorkingGroupIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 			}
 
 			for {
@@ -725,7 +1177,7 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 		}()
 		return out, errc
 	},
-	10: func(ctx context.Context, fromBlkc chan uint64, lastBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+	Loggrouping: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
 		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
@@ -744,36 +1196,32 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 
 			//2) get the historic data from proxy that start from lastBlkNum to latest
 			pageSize := uint64(1000)
-			for fromBlock+pageSize < lastBlock {
+			for fromBlock+pageSize < toBlock {
 				toBlock := fromBlock + pageSize
 				logs, err := filter.FilterLogGrouping(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogGrouping err ", err)
 				}
-				go func(logs *DosproxyLogGroupingIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 				fromBlock = toBlock
 			}
 
-			if fromBlock+pageSize >= lastBlock {
-				logs, err := filter.FilterLogGrouping(&bind.FilterOpts{Start: fromBlock, End: &lastBlock, Context: ctx})
+			if fromBlock+pageSize >= toBlock {
+				logs, err := filter.FilterLogGrouping(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogGrouping err ", err)
 				}
-				go func(logs *DosproxyLogGroupingIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 			}
 
 			for {
@@ -797,7 +1245,7 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 		}()
 		return out, errc
 	},
-	11: func(ctx context.Context, fromBlkc chan uint64, lastBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+	Logpublickeyaccepted: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
 		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
@@ -816,36 +1264,32 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 
 			//2) get the historic data from proxy that start from lastBlkNum to latest
 			pageSize := uint64(1000)
-			for fromBlock+pageSize < lastBlock {
+			for fromBlock+pageSize < toBlock {
 				toBlock := fromBlock + pageSize
 				logs, err := filter.FilterLogPublicKeyAccepted(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogPublicKeyAccepted err ", err)
 				}
-				go func(logs *DosproxyLogPublicKeyAcceptedIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 				fromBlock = toBlock
 			}
 
-			if fromBlock+pageSize >= lastBlock {
-				logs, err := filter.FilterLogPublicKeyAccepted(&bind.FilterOpts{Start: fromBlock, End: &lastBlock, Context: ctx})
+			if fromBlock+pageSize >= toBlock {
+				logs, err := filter.FilterLogPublicKeyAccepted(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogPublicKeyAccepted err ", err)
 				}
-				go func(logs *DosproxyLogPublicKeyAcceptedIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 			}
 
 			for {
@@ -868,7 +1312,7 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 		}()
 		return out, errc
 	},
-	12: func(ctx context.Context, fromBlkc chan uint64, lastBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+	Logpublickeysuggested: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
 		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
@@ -887,36 +1331,32 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 
 			//2) get the historic data from proxy that start from lastBlkNum to latest
 			pageSize := uint64(1000)
-			for fromBlock+pageSize < lastBlock {
+			for fromBlock+pageSize < toBlock {
 				toBlock := fromBlock + pageSize
 				logs, err := filter.FilterLogPublicKeySuggested(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogPublicKeySuggested err ", err)
 				}
-				go func(logs *DosproxyLogPublicKeySuggestedIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 				fromBlock = toBlock
 			}
 
-			if fromBlock+pageSize >= lastBlock {
-				logs, err := filter.FilterLogPublicKeySuggested(&bind.FilterOpts{Start: fromBlock, End: &lastBlock, Context: ctx})
+			if fromBlock+pageSize >= toBlock {
+				logs, err := filter.FilterLogPublicKeySuggested(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogPublicKeySuggested err ", err)
 				}
-				go func(logs *DosproxyLogPublicKeySuggestedIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 			}
 
 			for {
@@ -939,7 +1379,7 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 		}()
 		return out, errc
 	},
-	13: func(ctx context.Context, fromBlkc chan uint64, lastBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+	Loggroupdissolve: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
 		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
@@ -958,25 +1398,23 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 
 			//2) get the historic data from proxy that start from lastBlkNum to latest
 			pageSize := uint64(1000)
-			for fromBlock+pageSize < lastBlock {
+			for fromBlock+pageSize < toBlock {
 				toBlock := fromBlock + pageSize
 				logs, err := filter.FilterLogGroupDissolve(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogGroupDissolve err ", err)
 				}
-				go func(logs *DosproxyLogGroupDissolveIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 				fromBlock = toBlock
 			}
 
-			if fromBlock+pageSize >= lastBlock {
-				logs, err := filter.FilterLogGroupDissolve(&bind.FilterOpts{Start: fromBlock, End: &lastBlock, Context: ctx})
+			if fromBlock+pageSize >= toBlock {
+				logs, err := filter.FilterLogGroupDissolve(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogGroupDissolve err ", err)
 				}
@@ -1010,7 +1448,7 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 		}()
 		return out, errc
 	},
-	14: func(ctx context.Context, fromBlkc chan uint64, lastBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+	Logregisterednewpendingnode: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
 		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
@@ -1029,36 +1467,32 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 
 			//2) get the historic data from proxy that start from lastBlkNum to latest
 			pageSize := uint64(1000)
-			for fromBlock+pageSize < lastBlock {
+			for fromBlock+pageSize < toBlock {
 				toBlock := fromBlock + pageSize
 				logs, err := filter.FilterLogRegisteredNewPendingNode(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogRegisteredNewPendingNode err ", err)
 				}
-				go func(logs *DosproxyLogRegisteredNewPendingNodeIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 				fromBlock = toBlock
 			}
 
-			if fromBlock+pageSize >= lastBlock {
-				logs, err := filter.FilterLogRegisteredNewPendingNode(&bind.FilterOpts{Start: fromBlock, End: &lastBlock, Context: ctx})
+			if fromBlock+pageSize >= toBlock {
+				logs, err := filter.FilterLogRegisteredNewPendingNode(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogRegisteredNewPendingNode err ", err)
 				}
-				go func(logs *DosproxyLogRegisteredNewPendingNodeIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 			}
 
 			for {
@@ -1081,7 +1515,7 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 		}()
 		return out, errc
 	},
-	15: func(ctx context.Context, fromBlkc chan uint64, lastBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+	Loggroupinginitiated: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
 		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
@@ -1100,36 +1534,32 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 
 			//2) get the historic data from proxy that start from lastBlkNum to latest
 			pageSize := uint64(1000)
-			for fromBlock+pageSize < lastBlock {
+			for fromBlock+pageSize < toBlock {
 				toBlock := fromBlock + pageSize
 				logs, err := filter.FilterLogGroupingInitiated(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogGroupingInitiated err ", err)
 				}
-				go func(logs *DosproxyLogGroupingInitiatedIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 				fromBlock = toBlock
 			}
 
-			if fromBlock+pageSize >= lastBlock {
-				logs, err := filter.FilterLogGroupingInitiated(&bind.FilterOpts{Start: fromBlock, End: &lastBlock, Context: ctx})
+			if fromBlock+pageSize >= toBlock {
+				logs, err := filter.FilterLogGroupingInitiated(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogGroupingInitiated err ", err)
 				}
-				go func(logs *DosproxyLogGroupingInitiatedIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 			}
 
 			for {
@@ -1152,7 +1582,7 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 		}()
 		return out, errc
 	},
-	16: func(ctx context.Context, fromBlkc chan uint64, lastBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+	Lognopendinggroup: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
 		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
@@ -1171,36 +1601,32 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 
 			//2) get the historic data from proxy that start from lastBlkNum to latest
 			pageSize := uint64(1000)
-			for fromBlock+pageSize < lastBlock {
+			for fromBlock+pageSize < toBlock {
 				toBlock := fromBlock + pageSize
 				logs, err := filter.FilterLogNoPendingGroup(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogNoPendingGroup err ", err)
 				}
-				go func(logs *DosproxyLogNoPendingGroupIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 				fromBlock = toBlock
 			}
 
-			if fromBlock+pageSize >= lastBlock {
-				logs, err := filter.FilterLogNoPendingGroup(&bind.FilterOpts{Start: fromBlock, End: &lastBlock, Context: ctx})
+			if fromBlock+pageSize >= toBlock {
+				logs, err := filter.FilterLogNoPendingGroup(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogNoPendingGroup err ", err)
 				}
-				go func(logs *DosproxyLogNoPendingGroupIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 			}
 
 			for {
@@ -1223,7 +1649,7 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 		}()
 		return out, errc
 	},
-	17: func(ctx context.Context, fromBlkc chan uint64, lastBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+	Logpendinggroupremoved: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
 		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
@@ -1242,36 +1668,32 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 
 			//2) get the historic data from proxy that start from lastBlkNum to latest
 			pageSize := uint64(1000)
-			for fromBlock+pageSize < lastBlock {
+			for fromBlock+pageSize < toBlock {
 				toBlock := fromBlock + pageSize
 				logs, err := filter.FilterLogPendingGroupRemoved(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogPendingGroupRemoved err ", err)
 				}
-				go func(logs *DosproxyLogPendingGroupRemovedIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 				fromBlock = toBlock
 			}
 
-			if fromBlock+pageSize >= lastBlock {
-				logs, err := filter.FilterLogPendingGroupRemoved(&bind.FilterOpts{Start: fromBlock, End: &lastBlock, Context: ctx})
+			if fromBlock+pageSize >= toBlock {
+				logs, err := filter.FilterLogPendingGroupRemoved(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogPendingGroupRemoved err ", err)
 				}
-				go func(logs *DosproxyLogPendingGroupRemovedIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 			}
 
 			for {
@@ -1294,7 +1716,7 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 		}()
 		return out, errc
 	},
-	18: func(ctx context.Context, fromBlkc chan uint64, lastBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+	Logerror: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
 		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
@@ -1313,36 +1735,32 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 
 			//2) get the historic data from proxy that start from lastBlkNum to latest
 			pageSize := uint64(1000)
-			for fromBlock+pageSize < lastBlock {
+			for fromBlock+pageSize < toBlock {
 				toBlock := fromBlock + pageSize
 				logs, err := filter.FilterLogError(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogError err ", err)
 				}
-				go func(logs *DosproxyLogErrorIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 				fromBlock = toBlock
 			}
 
-			if fromBlock+pageSize >= lastBlock {
-				logs, err := filter.FilterLogError(&bind.FilterOpts{Start: fromBlock, End: &lastBlock, Context: ctx})
+			if fromBlock+pageSize >= toBlock {
+				logs, err := filter.FilterLogError(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterLogError err ", err)
 				}
-				go func(logs *DosproxyLogErrorIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 			}
 
 			for {
@@ -1365,7 +1783,7 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 		}()
 		return out, errc
 	},
-	19: func(ctx context.Context, fromBlkc chan uint64, lastBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+	Updategrouptopick: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
 		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
@@ -1384,36 +1802,32 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 
 			//2) get the historic data from proxy that start from lastBlkNum to latest
 			pageSize := uint64(1000)
-			for fromBlock+pageSize < lastBlock {
+			for fromBlock+pageSize < toBlock {
 				toBlock := fromBlock + pageSize
 				logs, err := filter.FilterUpdateGroupToPick(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterUpdateGroupToPick err ", err)
 				}
-				go func(logs *DosproxyUpdateGroupToPickIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 				fromBlock = toBlock
 			}
 
-			if fromBlock+pageSize >= lastBlock {
-				logs, err := filter.FilterUpdateGroupToPick(&bind.FilterOpts{Start: fromBlock, End: &lastBlock, Context: ctx})
+			if fromBlock+pageSize >= toBlock {
+				logs, err := filter.FilterUpdateGroupToPick(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterUpdateGroupToPick err ", err)
 				}
-				go func(logs *DosproxyUpdateGroupToPickIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 			}
 
 			for {
@@ -1436,7 +1850,7 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 		}()
 		return out, errc
 	},
-	20: func(ctx context.Context, fromBlkc chan uint64, lastBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+	Updategroupsize: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
 		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
@@ -1455,36 +1869,32 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 
 			//2) get the historic data from proxy that start from lastBlkNum to latest
 			pageSize := uint64(1000)
-			for fromBlock+pageSize < lastBlock {
+			for fromBlock+pageSize < toBlock {
 				toBlock := fromBlock + pageSize
 				logs, err := filter.FilterUpdateGroupSize(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterUpdateGroupSize err ", err)
 				}
-				go func(logs *DosproxyUpdateGroupSizeIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 				fromBlock = toBlock
 			}
 
-			if fromBlock+pageSize >= lastBlock {
-				logs, err := filter.FilterUpdateGroupSize(&bind.FilterOpts{Start: fromBlock, End: &lastBlock, Context: ctx})
+			if fromBlock+pageSize >= toBlock {
+				logs, err := filter.FilterUpdateGroupSize(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterUpdateGroupSize err ", err)
 				}
-				go func(logs *DosproxyUpdateGroupSizeIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 			}
 
 			for {
@@ -1507,7 +1917,7 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 		}()
 		return out, errc
 	},
-	21: func(ctx context.Context, fromBlkc chan uint64, lastBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+	Updategroupingthreshold: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
 		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
@@ -1526,36 +1936,32 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 
 			//2) get the historic data from proxy that start from lastBlkNum to latest
 			pageSize := uint64(1000)
-			for fromBlock+pageSize < lastBlock {
+			for fromBlock+pageSize < toBlock {
 				toBlock := fromBlock + pageSize
 				logs, err := filter.FilterUpdateGroupingThreshold(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterUpdateGroupingThreshold err ", err)
 				}
-				go func(logs *DosproxyUpdateGroupingThresholdIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 				fromBlock = toBlock
 			}
 
-			if fromBlock+pageSize >= lastBlock {
-				logs, err := filter.FilterUpdateGroupingThreshold(&bind.FilterOpts{Start: fromBlock, End: &lastBlock, Context: ctx})
+			if fromBlock+pageSize >= toBlock {
+				logs, err := filter.FilterUpdateGroupingThreshold(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterUpdateGroupingThreshold err ", err)
 				}
-				go func(logs *DosproxyUpdateGroupingThresholdIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 			}
 
 			for {
@@ -1578,7 +1984,7 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 		}()
 		return out, errc
 	},
-	22: func(ctx context.Context, fromBlkc chan uint64, lastBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+	Updategroupmaturityperiod: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
 		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
@@ -1597,36 +2003,32 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 
 			//2) get the historic data from proxy that start from lastBlkNum to latest
 			pageSize := uint64(1000)
-			for fromBlock+pageSize < lastBlock {
+			for fromBlock+pageSize < toBlock {
 				toBlock := fromBlock + pageSize
 				logs, err := filter.FilterUpdateGroupMaturityPeriod(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterUpdateGroupMaturityPeriod err ", err)
 				}
-				go func(logs *DosproxyUpdateGroupMaturityPeriodIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 				fromBlock = toBlock
 			}
 
-			if fromBlock+pageSize >= lastBlock {
-				logs, err := filter.FilterUpdateGroupMaturityPeriod(&bind.FilterOpts{Start: fromBlock, End: &lastBlock, Context: ctx})
+			if fromBlock+pageSize >= toBlock {
+				logs, err := filter.FilterUpdateGroupMaturityPeriod(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterUpdateGroupMaturityPeriod err ", err)
 				}
-				go func(logs *DosproxyUpdateGroupMaturityPeriodIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 			}
 
 			for {
@@ -1649,7 +2051,7 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 		}()
 		return out, errc
 	},
-	23: func(ctx context.Context, fromBlkc chan uint64, lastBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+	Updatebootstrapcommitduration: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
 		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
@@ -1668,25 +2070,23 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 
 			//2) get the historic data from proxy that start from lastBlkNum to latest
 			pageSize := uint64(1000)
-			for fromBlock+pageSize < lastBlock {
+			for fromBlock+pageSize < toBlock {
 				toBlock := fromBlock + pageSize
 				logs, err := filter.FilterUpdateBootstrapCommitDuration(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterUpdateBootstrapCommitDuration err ", err)
 				}
-				go func(logs *DosproxyUpdateBootstrapCommitDurationIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 				fromBlock = toBlock
 			}
 
-			if fromBlock+pageSize >= lastBlock {
-				logs, err := filter.FilterUpdateBootstrapCommitDuration(&bind.FilterOpts{Start: fromBlock, End: &lastBlock, Context: ctx})
+			if fromBlock+pageSize >= toBlock {
+				logs, err := filter.FilterUpdateBootstrapCommitDuration(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterUpdateBootstrapCommitDuration err ", err)
 				}
@@ -1720,7 +2120,7 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 		}()
 		return out, errc
 	},
-	24: func(ctx context.Context, fromBlkc chan uint64, lastBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+	Updatebootstraprevealduration: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
 		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
@@ -1739,36 +2139,32 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 
 			//2) get the historic data from proxy that start from lastBlkNum to latest
 			pageSize := uint64(1000)
-			for fromBlock+pageSize < lastBlock {
+			for fromBlock+pageSize < toBlock {
 				toBlock := fromBlock + pageSize
 				logs, err := filter.FilterUpdateBootstrapRevealDuration(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterUpdateBootstrapRevealDuration err ", err)
 				}
-				go func(logs *DosproxyUpdateBootstrapRevealDurationIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 				fromBlock = toBlock
 			}
 
-			if fromBlock+pageSize >= lastBlock {
-				logs, err := filter.FilterUpdateBootstrapRevealDuration(&bind.FilterOpts{Start: fromBlock, End: &lastBlock, Context: ctx})
+			if fromBlock+pageSize >= toBlock {
+				logs, err := filter.FilterUpdateBootstrapRevealDuration(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterUpdateBootstrapRevealDuration err ", err)
 				}
-				go func(logs *DosproxyUpdateBootstrapRevealDurationIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 			}
 
 			for {
@@ -1791,7 +2187,7 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 		}()
 		return out, errc
 	},
-	25: func(ctx context.Context, fromBlkc chan uint64, lastBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+	Updatebootstrapstartthreshold: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
 		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
@@ -1810,36 +2206,32 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 
 			//2) get the historic data from proxy that start from lastBlkNum to latest
 			pageSize := uint64(1000)
-			for fromBlock+pageSize < lastBlock {
+			for fromBlock+pageSize < toBlock {
 				toBlock := fromBlock + pageSize
 				logs, err := filter.FilterUpdatebootstrapStartThreshold(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterUpdatebootstrapStartThreshold err ", err)
 				}
-				go func(logs *DosproxyUpdatebootstrapStartThresholdIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 				fromBlock = toBlock
 			}
 
-			if fromBlock+pageSize >= lastBlock {
-				logs, err := filter.FilterUpdatebootstrapStartThreshold(&bind.FilterOpts{Start: fromBlock, End: &lastBlock, Context: ctx})
+			if fromBlock+pageSize >= toBlock {
+				logs, err := filter.FilterUpdatebootstrapStartThreshold(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterUpdatebootstrapStartThreshold err ", err)
 				}
-				go func(logs *DosproxyUpdatebootstrapStartThresholdIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 			}
 
 			for {
@@ -1862,7 +2254,7 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 		}()
 		return out, errc
 	},
-	26: func(ctx context.Context, fromBlkc chan uint64, lastBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+	UpdatependinggroupmaxLife: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
 		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
@@ -1881,36 +2273,32 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 
 			//2) get the historic data from proxy that start from lastBlkNum to latest
 			pageSize := uint64(1000)
-			for fromBlock+pageSize < lastBlock {
+			for fromBlock+pageSize < toBlock {
 				toBlock := fromBlock + pageSize
 				logs, err := filter.FilterUpdatePendingGroupMaxLife(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterUpdatePendingGroupMaxLife err ", err)
 				}
-				go func(logs *DosproxyUpdatePendingGroupMaxLifeIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 				fromBlock = toBlock
 			}
 
-			if fromBlock+pageSize >= lastBlock {
-				logs, err := filter.FilterUpdatePendingGroupMaxLife(&bind.FilterOpts{Start: fromBlock, End: &lastBlock, Context: ctx})
+			if fromBlock+pageSize >= toBlock {
+				logs, err := filter.FilterUpdatePendingGroupMaxLife(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx})
 				if err != nil {
 					fmt.Println("FilterUpdatePendingGroupMaxLife err ", err)
 				}
-				go func(logs *DosproxyUpdatePendingGroupMaxLifeIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 			}
 
 			for {
@@ -1933,7 +2321,7 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 		}()
 		return out, errc
 	},
-	27: func(ctx context.Context, fromBlkc chan uint64, lastBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
+	Guardianreward: func(ctx context.Context, fromBlkc chan uint64, toBlock uint64, filter *DosproxyFilterer) (chan interface{}, chan error) {
 		out := make(chan interface{})
 		errc := make(chan error)
 		go func() {
@@ -1952,36 +2340,32 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 
 			//2) get the historic data from proxy that start from lastBlkNum to latest
 			pageSize := uint64(1000)
-			for fromBlock+pageSize < lastBlock {
+			for fromBlock+pageSize < toBlock {
 				toBlock := fromBlock + pageSize
 				logs, err := filter.FilterGuardianReward(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx}, nil)
 				if err != nil {
 					fmt.Println("FilterGuardianReward err ", err)
 				}
-				go func(logs *DosproxyGuardianRewardIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 				fromBlock = toBlock
 			}
 
-			if fromBlock+pageSize >= lastBlock {
-				logs, err := filter.FilterGuardianReward(&bind.FilterOpts{Start: fromBlock, End: &lastBlock, Context: ctx}, nil)
+			if fromBlock+pageSize >= toBlock {
+				logs, err := filter.FilterGuardianReward(&bind.FilterOpts{Start: fromBlock, End: &toBlock, Context: ctx}, nil)
 				if err != nil {
 					fmt.Println("FilterGuardianReward err ", err)
 				}
-				go func(logs *DosproxyGuardianRewardIterator) {
-					for logs.Next() {
-						select {
-						case <-ctx.Done():
-						case out <- logs.Event:
-						}
+				for logs.Next() {
+					select {
+					case <-ctx.Done():
+					case out <- logs.Event:
 					}
-				}(logs)
+				}
 			}
 
 			for {
@@ -2004,8 +2388,7 @@ var FetchTable = []func(ctx context.Context, fromBlkc chan uint64, toBlk uint64,
 		}()
 		return out, errc
 	},
-}
-
+}*/
 func NewProxy(proxyAddr common.Address, client *ethclient.Client) (*DosproxySession, error) {
 	p, err := NewDosproxy(proxyAddr, client)
 	if err != nil {
@@ -2013,14 +2396,3 @@ func NewProxy(proxyAddr common.Address, client *ethclient.Client) (*DosproxySess
 	}
 	return &DosproxySession{Contract: p, CallOpts: bind.CallOpts{Context: context.Background()}}, nil
 }
-
-/*
-func TopicToSignature(topic []byte) string {
-	hash := crypto.Keccak256Hash(eventSignature)
-}
-
-func SignatureToTopic(string) topic[]byte {
-	map := map[string]string{"getLastHandledGroup": "getLastHandledGroup(uint,uint[4],uint,address[])"}
-	hash := crypto.Keccak256Hash(eventSignature)
-}
-*/

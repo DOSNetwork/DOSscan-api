@@ -9,53 +9,47 @@ import (
 
 type Transaction struct {
 	gorm.Model
-	Hash                          string                          `gorm:"column:hash;index"`
-	GasPrice                      uint64                          `gorm:"column:gas_price" json:"gasPrice"`
-	Value                         uint64                          `gorm:"column:value" json:"value"`
-	GasLimit                      uint64                          `gorm:"column:gas_limit" json:"gasLimit"`
-	Nonce                         uint64                          `gorm:"column:nonce" json:"nonce"`
-	Sender                        string                          `gorm:"column:sender" json:"sender"`
-	To                            string                          `gorm:"column:to" json:"to"`
-	BlockNumber                   uint64                          `gorm:"column:block_number" json:"blockNumber"`
-	Data                          []byte                          `gorm:"column:data;type:bytea" json:"data"`
-	Method                        string                          `gorm:"column:method;index" json:"method"`
-	LogUrl                        []LogUrl                        `gorm:"foreignkey:transactionHash;association_foreignkey:hash"`
-	LogRequestUserRandom          []LogRequestUserRandom          `gorm:"foreignkey:transactionHash;association_foreignkey:hash"`
-	LogUpdateRandom               []LogUpdateRandom               `gorm:"foreignkey:transactionHash;association_foreignkey:hash"`
-	LogValidationResult           []LogValidationResult           `gorm:"foreignkey:transactionHash;association_foreignkey:hash"`
-	LogNonSupportedType           []LogNonSupportedType           `gorm:"foreignkey:transactionHash;association_foreignkey:hash"`
-	LogNonContractCall            []LogNonContractCall            `gorm:"foreignkey:transactionHash;association_foreignkey:hash"`
-	LogCallbackTriggeredFor       []LogCallbackTriggeredFor       `gorm:"foreignkey:transactionHash;association_foreignkey:hash"`
-	LogRequestFromNonExistentUC   []LogRequestFromNonExistentUC   `gorm:"foreignkey:transactionHash;association_foreignkey:hash"`
-	LogInsufficientPendingNode    []LogInsufficientPendingNode    `gorm:"foreignkey:transactionHash;association_foreignkey:hash"`
-	LogInsufficientWorkingGroup   []LogInsufficientWorkingGroup   `gorm:"foreignkey:transactionHash;association_foreignkey:hash"`
-	LogGrouping                   []LogGrouping                   `gorm:"foreignkey:transactionHash;association_foreignkey:hash"`
-	LogPublicKeyAccepted          []LogPublicKeyAccepted          `gorm:"foreignkey:transactionHash;association_foreignkey:hash"`
-	LogPublicKeySuggested         []LogPublicKeySuggested         `gorm:"foreignkey:transactionHash;association_foreignkey:hash"`
-	LogGroupDissolve              []LogGroupDissolve              `gorm:"foreignkey:transactionHash;association_foreignkey:hash"`
-	LogRegisteredNewPendingNode   []LogRegisteredNewPendingNode   `gorm:"foreignkey:transactionHash;association_foreignkey:hash"`
-	LogGroupingInitiated          []LogGroupingInitiated          `gorm:"foreignkey:transactionHash;association_foreignkey:hash"`
-	LogNoPendingGroup             []LogNoPendingGroup             `gorm:"foreignkey:transactionHash;association_foreignkey:hash"`
-	LogPendingGroupRemoved        []LogPendingGroupRemoved        `gorm:"foreignkey:transactionHash;association_foreignkey:hash"`
-	LogError                      []LogError                      `gorm:"foreignkey:transactionHash;association_foreignkey:hash"`
-	UpdateGroupToPick             []UpdateGroupToPick             `gorm:"foreignkey:transactionHash;association_foreignkey:hash"`
-	UpdateGroupSize               []UpdateGroupSize               `gorm:"foreignkey:transactionHash;association_foreignkey:hash"`
-	UpdateGroupingThreshold       []UpdateGroupingThreshold       `gorm:"foreignkey:transactionHash;association_foreignkey:hash"`
-	UpdateGroupMaturityPeriod     []UpdateGroupMaturityPeriod     `gorm:"foreignkey:transactionHash;association_foreignkey:hash"`
-	UpdateBootstrapCommitDuration []UpdateBootstrapCommitDuration `gorm:"foreignkey:transactionHash;association_foreignkey:hash"`
-	UpdateBootstrapRevealDuration []UpdateBootstrapRevealDuration `gorm:"foreignkey:transactionHash;association_foreignkey:hash"`
-	UpdatebootstrapStartThreshold []UpdatebootstrapStartThreshold `gorm:"foreignkey:transactionHash;association_foreignkey:hash"`
-	UpdatePendingGroupMaxLife     []UpdatePendingGroupMaxLife     `gorm:"foreignkey:transactionHash;association_foreignkey:hash"`
-	GuardianReward                []GuardianReward                `gorm:"foreignkey:transactionHash;association_foreignkey:hash"`
-}
-
-// Set User's table name to be `transaction`
-func (Transaction) TableName() string {
-	return "transaction"
+	Hash                           string `gorm:"unique;not null"`
+	GasPrice                       uint64 `json:"gasPrice"`
+	Value                          uint64 `json:"value"`
+	GasLimit                       uint64 `json:"gasLimit"`
+	Nonce                          uint64 `gorm:"primary_key" json:"nonce"`
+	Sender                         string `gorm:"primary_key" json:"sender"`
+	To                             string `json:"to"`
+	BlockNumber                    uint64 `gorm:"primary_key" json:"blockNumber"`
+	Data                           []byte `gorm:"type:bytea" json:"data"`
+	Method                         string `gorm:"index" json:"method"`
+	LogUrls                        []LogUrl
+	LogRequestUserRandoms          []LogRequestUserRandom
+	LogUpdateRandoms               []LogUpdateRandom
+	LogValidationResults           []LogValidationResult
+	LogNonSupportedTypes           []LogNonSupportedType
+	LogNonContractCalls            []LogNonContractCall
+	LogCallbackTriggeredFors       []LogCallbackTriggeredFor
+	LogRequestFromNonExistentUCs   []LogRequestFromNonExistentUC
+	LogInsufficientPendingNodes    []LogInsufficientPendingNode
+	LogInsufficientWorkingGroups   []LogInsufficientWorkingGroup
+	LogGroupings                   []LogGrouping
+	LogPublicKeyAccepteds          []LogPublicKeyAccepted
+	LogPublicKeySuggesteds         []LogPublicKeySuggested
+	LogGroupDissolves              []LogGroupDissolve
+	LogRegisteredNewPendingNodes   []LogRegisteredNewPendingNode
+	LogGroupingInitiateds          []LogGroupingInitiated
+	LogNoPendingGroups             []LogNoPendingGroup
+	LogPendingGroupRemoveds        []LogPendingGroupRemoved
+	LogErrors                      []LogError
+	UpdateGroupToPicks             []UpdateGroupToPick
+	UpdateGroupSizes               []UpdateGroupSize
+	UpdateGroupingThresholds       []UpdateGroupingThreshold
+	UpdateGroupMaturityPeriods     []UpdateGroupMaturityPeriod
+	UpdateBootstrapCommitDurations []UpdateBootstrapCommitDuration
+	UpdateBootstrapRevealDurations []UpdateBootstrapRevealDuration
+	UpdatebootstrapStartThresholds []UpdatebootstrapStartThreshold
+	UpdatePendingGroupMaxLifes     []UpdatePendingGroupMaxLife
+	GuardianRewards                []GuardianReward
 }
 
 type Event struct {
-	gorm.Model
 	Method          string         `gorm:"column:method" json:"method"`
 	EventLog        string         `gorm:"column:event_log" json:"eventLog"`
 	Transaction     Transaction    `gorm:"association_foreignkey:Hash" json:"-"`
@@ -69,378 +63,293 @@ type Event struct {
 	Date            time.Time      `gorm:"column:date;" json:"-"`
 }
 
-// `LogURL` belongs to `Transaction`, `TransactionID` is the foreign key
-type LogUrl struct {
-	Event
-	QueryId             string              `gorm:"column:query_id" json:"queryId"`
-	Timeout             string              `gorm:"column:time_out" json:"timeOut"`
-	DataSource          string              `gorm:"column:data_source" json:"dataSource"`
-	Selector            string              `gorm:"column:selector" json:"selector"`
-	Randomness          string              `gorm:"column:randomness" json:"randomness"`
-	DispatchedGroupId   string              `gorm:"column:dispatched_groupid" json:"dispatchedGroupId"`
-	LogValidationResult LogValidationResult `gorm:"foreignkey:traffic_id;association_foreignkey:query_id"`
-}
-
-// Set User's table name to be `logurl`
-func (LogUrl) TableName() string {
-	return "logurl"
-}
-
-type LogRequestUserRandom struct {
-	Event
-	RequestId            string              `gorm:"column:request_id" json:"requestId"`
-	LastSystemRandomness string              `gorm:"column:last_system_randomness" json:"lastSystemRandomness"`
-	UserSeed             string              `gorm:"column:user_seed" json:"userSeed"`
-	DispatchedGroupId    string              `gorm:"column:dispatched_groupid" json:"dispatchedGroupId"`
-	LogValidationResult  LogValidationResult `gorm:"foreignkey:traffic_id;association_foreignkey:request_id"`
-}
-
-// Set User's table name to be `profiles`
-func (LogRequestUserRandom) TableName() string {
-	return "logrequestuserrandom"
-}
-
 type LogNonSupportedType struct {
+	gorm.Model
 	Event
+	TransactionID   uint
 	InvalidSelector string `gorm:"column:invalid_selector" json:"invalidSelector"`
 }
 
-// Set User's table name to be `profiles`
-func (LogNonSupportedType) TableName() string {
-	return "lognonsupportedtype"
-}
-
 type LogNonContractCall struct {
+	gorm.Model
 	Event
-	CallAddr string `gorm:"column:call_ddr" json:"callAddr"`
-}
-
-// Set User's table name to be `profiles`
-func (LogNonContractCall) TableName() string {
-	return "lognoncontractcall"
+	TransactionID uint
+	CallAddr      string `gorm:"column:call_ddr" json:"callAddr"`
 }
 
 type LogCallbackTriggeredFor struct {
+	gorm.Model
 	Event
-	CallbackAddr string `gorm:"column:call_back_addr" json:"callbackAddr"`
-}
-
-// Set User's table name to be `profiles`
-func (LogCallbackTriggeredFor) TableName() string {
-	return "logcallbacktriggeredfor"
+	TransactionID uint
+	CallbackAddr  string `gorm:"column:call_back_addr" json:"callbackAddr"`
 }
 
 type LogRequestFromNonExistentUC struct {
+	gorm.Model
 	Event
-}
-
-// Set User's table name to be `profiles`
-func (LogRequestFromNonExistentUC) TableName() string {
-	return "logrequestfromnonexistentuc"
-}
-
-type LogUpdateRandom struct {
-	Event
-	LastRandomness    string `gorm:"column:last_randomness" json:"lastRandomness"`
-	DispatchedGroupId string `gorm:"column:dispatched_groupid" json:"dispatchedGroupId"`
-}
-
-// Set User's table name to be `profiles`
-func (LogUpdateRandom) TableName() string {
-	return "logupdaterandom"
-}
-
-type LogValidationResult struct {
-	Event
-	TrafficId   string         `gorm:"column:traffic_id" json:"trafficId"`
-	TrafficType uint8          `gorm:"column:traffic_type" json:"trafficType"`
-	Message     string         `gorm:"column:message;type:bytea" json:"message"`
-	Signature   pq.StringArray `gorm:"column:signature;type:varchar(100)[]" json:"signature"`
-	PubKey      pq.StringArray `gorm:"column:pub_key;type:varchar(100)[]" json:"pubKey"`
-	Pass        bool           `gorm:"column:pass" json:"pass"`
-}
-
-// Set User's table name to be `profiles`
-func (LogValidationResult) TableName() string {
-	return "logvalidationresult"
+	TransactionID uint
 }
 
 type LogInsufficientPendingNode struct {
 	Event
-	NumPendingNodes uint64 `gorm:"column:num_pending_nodes" json:"numPendingNodes"`
-}
-
-// Set User's table name to be `profiles`
-func (LogInsufficientPendingNode) TableName() string {
-	return "loginsufficientpendingnode"
+	NumPendingNodes uint64 `gjson:"numPendingNodes"`
 }
 
 type LogInsufficientWorkingGroup struct {
+	gorm.Model
 	Event
-	NumWorkingGroups uint64 `gorm:"column:num_working_groups" json:"numWorkingGroups"`
-	NumPendingGroups uint64 `gorm:"column:num_pending_groups" json:"numPendingGroups"`
-}
-
-// Set User's table name to be `profiles`
-func (LogInsufficientWorkingGroup) TableName() string {
-	return "loginsufficientworkinggroup"
-}
-
-type LogGrouping struct {
-	Event
-	GroupId string         `gorm:"column:group_id" json:"groupId"`
-	NodeId  pq.StringArray `gorm:"column:node_id;type:varchar(100)[]" json:"nodeId"`
-}
-
-// Set User's table name to be `profiles`
-func (LogGrouping) TableName() string {
-	return "loggrouping"
-}
-
-type LogPublicKeyAccepted struct {
-	Event
-	GroupId          string         `gorm:"column:group_id" json:"groupId"`
-	PubKey           pq.StringArray `gorm:"column:pub_key;type:varchar(100)[]" json:"pubKey"`
-	NumWorkingGroups uint64         `gorm:"column:num_working_groups;" json:"numWorkingGroups"`
-}
-
-// Set User's table name to be `profiles`
-func (LogPublicKeyAccepted) TableName() string {
-	return "logpublickeyaccepted"
-}
-
-type LogPublicKeySuggested struct {
-	Event
-	GroupId     string `gorm:"column:group_id" json:"groupId"`
-	PubKeyCount uint64 `gorm:"column:pub_key_count" json:"pubKeyCount"`
-}
-
-// Set User's table name to be `profiles`
-func (LogPublicKeySuggested) TableName() string {
-	return "logpublickeysuggested"
-}
-
-type LogGroupDissolve struct {
-	Event
-	GroupId string `gorm:"column:group_id" json:"groupId"`
-}
-
-// Set User's table name to be `profiles`
-func (LogGroupDissolve) TableName() string {
-	return "loggroupdissolve"
+	TransactionID    uint
+	NumWorkingGroups uint64 `json:"numWorkingGroups"`
+	NumPendingGroups uint64 `json:"numPendingGroups"`
 }
 
 type LogRegisteredNewPendingNode struct {
+	gorm.Model
 	Event
-	Node string `gorm:"column:node" json:"node"`
-}
-
-// Set User's table name to be `profiles`
-func (LogRegisteredNewPendingNode) TableName() string {
-	return "logregisterednewpendingnode"
+	TransactionID uint
+	Node          string `json:"node"`
 }
 
 type LogGroupingInitiated struct {
+	gorm.Model
 	Event
-	PendingNodePool   uint64 `gorm:"column:pending_node_pool" json:"pendingNodePool"`
-	Groupsize         uint64 `gorm:"column:group_size" json:"groupSize"`
-	Groupingthreshold uint64 `gorm:"column:grouping_threshold" json:"groupingThreshold"`
-}
-
-// Set User's table name to be `profiles`
-func (LogGroupingInitiated) TableName() string {
-	return "loggroupinginitiated"
+	TransactionID     uint
+	PendingNodePool   uint64 `json:"pendingNodePool"`
+	GroupSize         uint64 `json:"groupSize"`
+	GroupingThreshold uint64 `json:"groupingThreshold"`
 }
 
 type LogNoPendingGroup struct {
+	gorm.Model
 	Event
-	GroupId string `gorm:"column:group_id" json:"groupId"`
-}
-
-// Set User's table name to be `profiles`
-func (LogNoPendingGroup) TableName() string {
-	return "lognopendinggroup"
+	TransactionID uint
+	GroupId       string `json:"groupId"`
 }
 
 type LogPendingGroupRemoved struct {
+	gorm.Model
 	Event
-	GroupId string `gorm:"column:group_id" json:"groupId"`
-}
-
-// Set User's table name to be `profiles`
-func (LogPendingGroupRemoved) TableName() string {
-	return "logpendinggroupremoved"
+	TransactionID uint
+	GroupId       string `json:"groupId"`
 }
 
 type LogError struct {
+	gorm.Model
 	Event
-	Err string `gorm:"column:err" json:"err"`
-}
-
-func (LogError) TableName() string {
-	return "logerror"
+	TransactionID uint
+	Err           string `json:"err"`
 }
 
 type UpdateGroupToPick struct {
+	gorm.Model
 	Event
-	OldNum uint64 `gorm:"column:old_num" json:"oldNum"`
-	NewNum uint64 `gorm:"column:new_num" json:"newNum"`
-}
-
-func (UpdateGroupToPick) TableName() string {
-	return "updategrouptopick"
+	TransactionID uint
+	OldNum        uint64 `json:"oldNum"`
+	NewNum        uint64 `json:"newNum"`
 }
 
 type UpdateGroupSize struct {
+	gorm.Model
 	Event
-	OldSize uint64 `gorm:"column:old_size" json:"oldSize"`
-	NewSize uint64 `gorm:"column:new_size" json:"newSize"`
-}
-
-func (UpdateGroupSize) TableName() string {
-	return "updategroupsize"
+	TransactionID uint
+	OldSize       uint64 `json:"oldSize"`
+	NewSize       uint64 `json:"newSize"`
 }
 
 type UpdateGroupingThreshold struct {
+	gorm.Model
 	Event
-	OldThreshold uint64 `gorm:"column:old_threshold" json:"oldThreshold"`
-	NewThreshold uint64 `gorm:"column:new_threshold" json:"newThreshold"`
-}
-
-func (UpdateGroupingThreshold) TableName() string {
-	return "updategroupingthreshold"
+	TransactionID uint
+	OldThreshold  uint64 `json:"oldThreshold"`
+	NewThreshold  uint64 `json:"newThreshold"`
 }
 
 type UpdateGroupMaturityPeriod struct {
+	gorm.Model
 	Event
-	OldPeriod uint64 `gorm:"column:old_period" json:"oldPeriod"`
-	NewPeriod uint64 `gorm:"column:new_period" json:"newPeriod"`
-}
-
-func (UpdateGroupMaturityPeriod) TableName() string {
-	return "updategroupmaturityperiod"
+	TransactionID uint
+	OldPeriod     uint64 `json:"oldPeriod"`
+	NewPeriod     uint64 `json:"newPeriod"`
 }
 
 type UpdateBootstrapCommitDuration struct {
+	gorm.Model
 	Event
-	OldDuration uint64 `gorm:"column:old_duration" json:"oldDuration"`
-	NewDuration uint64 `gorm:"column:new_duration" json:"newDuration"`
-}
-
-func (UpdateBootstrapCommitDuration) TableName() string {
-	return "updatebootstrapcommitduration"
+	TransactionID uint
+	OldDuration   uint64 `json:"oldDuration"`
+	NewDuration   uint64 `json:"newDuration"`
 }
 
 type UpdateBootstrapRevealDuration struct {
+	gorm.Model
 	Event
-	OldDuration uint64 `gorm:"column:old_duration" json:"oldDuration"`
-	NewDuration uint64 `gorm:"column:new_duration" json:"newDuration"`
-}
-
-func (UpdateBootstrapRevealDuration) TableName() string {
-	return "updatebootstraprevealduration"
+	TransactionID uint
+	OldDuration   uint64 `json:"oldDuration"`
+	NewDuration   uint64 `json:"newDuration"`
 }
 
 type UpdatebootstrapStartThreshold struct {
+	gorm.Model
 	Event
-	OldThreshold uint64 `gorm:"column:old_threshold" json:"oldThreshold"`
-	NewThreshold uint64 `gorm:"column:new_threshold" json:"newThreshold"`
-}
-
-func (UpdatebootstrapStartThreshold) TableName() string {
-	return "updatebootstrapstartthreshold"
+	TransactionID uint
+	OldThreshold  uint64 `json:"oldThreshold"`
+	NewThreshold  uint64 `json:"newThreshold"`
 }
 
 type UpdatePendingGroupMaxLife struct {
+	gorm.Model
 	Event
-	OldLifeBlocks uint64 `gorm:"column:old_life_blocks" json:"oldLifeBlocks"`
-	NewLifeBlocks uint64 `gorm:"column:new_life_blocks" json:"newLifeBlock"`
-}
-
-func (UpdatePendingGroupMaxLife) TableName() string {
-	return "updatependinggroupmaxlife"
+	TransactionID uint
+	OldLifeBlocks uint64 `json:"oldLifeBlocks"`
+	NewLifeBlocks uint64 `json:"newLifeBlock"`
 }
 
 type GuardianReward struct {
+	gorm.Model
 	Event
-	BlkNum   uint64 `gorm:"column:blk_num" json:"blkNum"`
-	Guardian string `gorm:"column:guardian" json:"guardian"`
+	TransactionID uint
+	BlkNum        uint64 `json:"blkNum"`
+	Guardian      string `json:"guardian"`
 }
 
-func (GuardianReward) TableName() string {
-	return "guardianreward"
+type LogGrouping struct {
+	gorm.Model
+	Event
+	TransactionID uint
+	GroupId       string         `json:"groupId"`
+	NodeId        pq.StringArray `gorm:"type:varchar(100)[]" json:"nodeId"`
 }
 
-type NodeInfo struct {
-	NodeAddr      string         `gorm:"column:node_addr;primary_key" json:"nodeAddr"`
-	Balance       string         `json:"balance"`
-	RegisterState bool           `json:"registerState"`
-	GroupingIds   pq.StringArray `gorm:"column:all_group_ids;type:varchar(100)[]"`
-	DissolveIds   pq.StringArray `gorm:"column:all_dissolve_ids;type:varchar(100)[]"`
+type LogPublicKeyAccepted struct {
+	gorm.Model
+	Event
+	TransactionID    uint
+	GroupId          string         `json:"groupId"`
+	AcceptedBlkNum   uint64         `json:"acceptedBlknum"`
+	PubKey           pq.StringArray `gorm:"type:varchar(100)[]" json:"pubKey"`
+	NumWorkingGroups uint64         `json:"numWorkingGroups"`
 }
 
-func (NodeInfo) TableName() string {
-	return "nodeinfo"
+type LogPublicKeySuggested struct {
+	gorm.Model
+	Event
+	TransactionID uint
+	GroupId       string `json:"groupId"`
+	PubKeyCount   uint64 `json:"pubKeyCount"`
 }
 
-type GroupInfo struct {
-	GroupId              string                 `gorm:"column:group_id;primary_key" json:"groupId"`
-	GroupMembers         pq.StringArray         `gorm:"column:group_members;type:varchar(100)[]" json:"groupMembers"`
-	GroupPubKey          pq.StringArray         `gorm:"column:group_pubkey;type:varchar(100)[]" json:"groupPubkey"`
-	LogUrl               []LogUrl               `gorm:"foreignkey:dispatchedGroupId;association_foreignkey:group_id"`
-	LogRequestUserRandom []LogRequestUserRandom `gorm:"foreignkey:dispatchedGroupId;association_foreignkey:group_id"`
-	LogUpdateRandom      []LogUpdateRandom      `gorm:"foreignkey:dispatchedGroupId;association_foreignkey:group_id"`
+type LogGroupDissolve struct {
+	gorm.Model
+	Event
+	TransactionID   uint
+	GroupId         string `json:"groupId"`
+	DissolvedBlkNum uint64 `json:"dissolvedBlknum"`
 }
 
-func (GroupInfo) TableName() string {
-	return "groupinfo"
+type Node struct {
+	gorm.Model    `json:"-"`
+	Addr          string   `gorm:"unique;not null" json:"addr"`
+	Balance       string   `json:"balance"`
+	RegisterState bool     `json:"registerState"`
+	ActiveGroup   []string `gorm:"-" json:"activeGroup"`
+	Groups        []Group  `gorm:"many2many:nodes_groups;" json:"-"`
 }
 
-type RequestInfo struct {
-	RequestId       string `gorm:"column:request_id;primary_key" json:"requestId"`
-	GroupId         string `gorm:"column:group_id" json:"groupId"`
-	Submitter       string `gorm:"column:submitter;type:varchar(100)[]" json:"submitter"`
-	SubmittedBlk    uint64 `gorm:"column:blk_num" json:"submittedBlkNum"`
-	SubmittedTxHash string `gorm:"column:transaction_hash" json:"submittedTxHash"`
+type Group struct {
+	gorm.Model         `json:"-"`
+	GroupId            string              `gorm:"unique;not null" json:"groupId"`
+	AcceptedBlkNum     uint64              `json:"acceptedBlknum"`
+	DissolvedBlkNum    uint64              `json:"dissolvedBlknum"`
+	NodeId             pq.StringArray      `gorm:"type:varchar(100)[]" json:"nodeId"`
+	PubKey             pq.StringArray      `gorm:"type:varchar(100)[]" json:"pubKey"`
+	Nodes              []Node              `gorm:"many2many:nodes_groups;" json:"-"`
+	UrlRequests        []UrlRequest        `json:"-"`
+	UserRandomRequests []UserRandomRequest `json:"-"`
+}
+
+type LogRequestUserRandom struct {
+	gorm.Model           `json:"-"`
+	Event                `json:"-"`
+	TransactionID        uint   `json:"-"`
+	RequestId            string `gorm:"unique;not null" json:"requestId"`
+	LastSystemRandomness string `json:"lastSystemRandomness"`
+	UserSeed             string `json:"userSeed"`
+	DispatchedGroupId    string `json:"dispatchedGroupId"`
+}
+
+type LogUpdateRandom struct {
+	gorm.Model        `json:"-"`
+	Event             `json:"-"`
+	TransactionID     uint   `json:"-"`
+	LastRandomness    string `json:"lastRandomness"`
+	DispatchedGroupId string `json:"dispatchedGroupId"`
+}
+
+type LogUrl struct {
+	gorm.Model        `json:"-"`
+	Event             `json:"-"`
+	TransactionID     uint   `json:"-"`
+	RequestId         string `gorm:"unique;not null" json:"queryId"`
+	Timeout           string `json:"timeOut"`
+	DataSource        string `json:"dataSource"`
+	Selector          string `json:"selector"`
+	Randomness        string `json:"randomness"`
+	DispatchedGroupId string `json:"dispatchedGroupId"`
+}
+
+type LogValidationResult struct {
+	gorm.Model             `json:"-"`
+	Event                  `json:"-"`
+	TransactionID          uint           `json:"-"`
+	LogUrlID               uint           `json:"-"`
+	LogRequestUserRandomID uint           `json:"-"`
+	LogUpdateRandomID      uint           `json:"-"`
+	RequestId              string         `json:"requestId"`
+	RequestType            uint8          `json:"requestType"`
+	Message                string         `gorm:"type:bytea" json:"message"`
+	Signature              pq.StringArray `gorm:"type:varchar(100)[]" json:"signature"`
+	PubKey                 pq.StringArray `gorm:"type:varchar(100)[]" json:"pubKey"`
+	Pass                   bool           `json:"pass"`
+}
+
+type Request struct {
+	RequestId         string `json:"requestId"`
+	DispatchedGroupId string `json:"dispatchedGroupId"`
+	Sender            string `json:"submitter"`
+	BlockNumber       uint64 `json:"submittedBlkNum"`
+	Hash              string `json:"submittedTxHash"`
 }
 
 type RequestResult struct {
-	Message   string         `gorm:"column:message;type:bytea" json:"message"`
-	Signature pq.StringArray `gorm:"column:signature;type:varchar(100)[]" json:"signature"`
-	PubKey    pq.StringArray `gorm:"column:pub_key;type:varchar(100)[]" json:"pubKey"`
-	Pass      bool           `gorm:"column:pass" json:"pass"`
+	Message   string         `gorm:"type:bytea" json:"message"`
+	Signature pq.StringArray `gorm:"type:varchar(100)[]" json:"signature"`
+	PubKey    pq.StringArray `gorm:"type:varchar(100)[]" json:"pubKey"`
+	Pass      bool           `json:"pass"`
 }
 
-type RequestUrlInfo struct {
-	RequestInfo
-	Timeout    string `gorm:"column:time_out" json:"timeOut"`
-	DataSource string `gorm:"column:data_source" json:"dataSource"`
-	Selector   string `gorm:"column:selector" json:"selector"`
-	Randomness string `gorm:"column:randomness" json:"randomness"`
+type UrlRequest struct {
+	gorm.Model `json:"-"`
+	Request
 	RequestResult
+	GroupID    uint   `json:"-"`
+	Timeout    string `json:"timeOut"`
+	DataSource string `json:"dataSource"`
+	Selector   string `json:"selector"`
+	Randomness string `json:"randomness"`
 }
 
-func (RequestUrlInfo) TableName() string {
-	return "requesturlinfo"
-}
-
-type RequestURandomInfo struct {
-	RequestInfo
-	LastSystemRandomness string `gorm:"column:last_system_randomness" json:"lastSystemRandomness"`
-	UserSeed             string `gorm:"column:user_seed" json:"userSeed"`
+type UserRandomRequest struct {
+	gorm.Model `json:"-"`
+	Request
 	RequestResult
+	GroupID              uint   `json:"-"`
+	LastSystemRandomness string `json:"lastSystemRandomness"`
+	UserSeed             string `json:"userSeed"`
 }
 
-func (RequestURandomInfo) TableName() string {
-	return "requesturandominfo"
-}
-
-type RequestSRandomInfo struct {
-	RequestInfo
-	LastSystemRandomness string `gorm:"column:last_system_randomness" json:"lastSystemRandomness"`
+type SysRandomRequest struct {
+	gorm.Model
+	Request
 	RequestResult
-}
-
-func (RequestSRandomInfo) TableName() string {
-	return "requestsrandominfo"
+	GroupID uint
 }
