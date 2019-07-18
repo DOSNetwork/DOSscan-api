@@ -97,14 +97,16 @@ func (d *dbEventsRepo) GetNode(addr string) []interface{} {
 		d.db.Model(&node).Related(&node.Groups, "Groups")
 		for _, group := range node.Groups {
 			if group.DissolvedBlkNum == 0 && group.AcceptedBlkNum != 0 {
-				node.ActiveGroup = append(node.ActiveGroup, group.GroupId)
-				fmt.Println("Node ActiveGroup ", node.ActiveGroup, group.AcceptedBlkNum)
+				node.ActiveGroups = append(node.ActiveGroups, group.GroupId)
+				fmt.Println("Node ActiveGroup ", node.ActiveGroups, group.AcceptedBlkNum)
+			} else if group.DissolvedBlkNum != 0 && group.AcceptedBlkNum != 0 {
+				node.ExpiredGroups++
 			}
 		}
 		resp = append(resp, node)
 	}
 	fmt.Println("Node balance ", node.Balance)
-	fmt.Println("Node ActiveGroup ", node.ActiveGroup)
+	fmt.Println("Node ActiveGroup ", node.ActiveGroups)
 	return resp
 }
 
@@ -112,29 +114,40 @@ func (d *dbEventsRepo) GetGroup(groupId string) []interface{} {
 	var group models.Group
 	var resp []interface{}
 	if err := d.db.Where(models.Group{GroupId: groupId}).First(&group).Error; !gorm.IsRecordNotFoundError(err) {
+
 		fmt.Println("Group Id ", group.GroupId)
 		fmt.Println("Group AcceptedBlkNum ", group.AcceptedBlkNum)
 		fmt.Println("Group DissolvedBlkNum ", group.DissolvedBlkNum)
 		fmt.Println("Group NodeId ", group.NodeId)
+		d.db.Model(&group).Related(&group.UrlRequests, "UrlRequests")
+		group.NumUrl = len(group.UrlRequests)
+		d.db.Model(&group).Related(&group.UserRandomRequests, "UserRandomRequests")
+		group.NumRandom = len(group.UserRandomRequests)
+
 		resp = append(resp, group)
 	}
 	return resp
 }
 
 func (d *dbEventsRepo) GetRequest(requestId string) []interface{} {
-	randomRequest := models.UserRandomRequest{}
-	randomRequest.RequestId = requestId
 	urlRequest := models.UrlRequest{}
 	urlRequest.RequestId = requestId
 	var resp []interface{}
-	if err := d.db.Where(randomRequest).First(&randomRequest).Error; !gorm.IsRecordNotFoundError(err) {
-		fmt.Println("randomRequest Id ", randomRequest.RequestId)
-		resp = append(resp, randomRequest)
-	} else if err := d.db.Where(urlRequest).First(&urlRequest).Error; !gorm.IsRecordNotFoundError(err) {
+	if err := d.db.Where(urlRequest).First(&urlRequest).Error; !gorm.IsRecordNotFoundError(err) {
 		fmt.Println("urlRequest Id ", urlRequest.RequestId)
 		resp = append(resp, urlRequest)
 	}
 
+	return resp
+}
+func (d *dbEventsRepo) GetRandomRequest(requestId string) []interface{} {
+	randomRequest := models.UserRandomRequest{}
+	randomRequest.RequestId = requestId
+	var resp []interface{}
+	if err := d.db.Where(randomRequest).First(&randomRequest).Error; !gorm.IsRecordNotFoundError(err) {
+		fmt.Println("randomRequest Id ", randomRequest.RequestId)
+		resp = append(resp, randomRequest)
+	}
 	return resp
 }
 

@@ -18,9 +18,10 @@ import (
 
 const (
 	eventList int = iota
-	nodeInfo
-	groupInfo
-	requestInfo
+	addressType
+	groupType
+	urlType
+	randomType
 	nodeList
 )
 
@@ -38,12 +39,13 @@ type Response struct {
 }
 
 type Body struct {
-	Events      []interface{} `json:"events,omitempty"`
-	NodeInfo    []interface{} `json:"nodeInfo,omitempty"`
-	GroupInfo   []interface{} `json:"groupInfo,omitempty"`
-	RequestInfo []interface{} `json:"requestInfo,omitempty"`
-	NodeList    []interface{} `json:"nodelist,omitempty"`
-	TotalCount  int           `json:"totalCount,omitempty"`
+	Events     []interface{} `json:"events,omitempty"`
+	Address    []interface{} `json:"address,omitempty"`
+	Group      []interface{} `json:"group,omitempty"`
+	Url        []interface{} `json:"url,omitempty"`
+	Random     []interface{} `json:"random,omitempty"`
+	NodeList   []interface{} `json:"nodelist,omitempty"`
+	TotalCount int           `json:"totalCount,omitempty"`
 }
 
 func NesSearchHandler(repo repository.EventsRepo) *SearchHandler {
@@ -147,31 +149,33 @@ func searchEventsByEventName(repo repository.EventsRepo, eventMap map[string]str
 func searchEventsByHex(repo repository.EventsRepo, text string) ([]interface{}, int, error) {
 	var resp []interface{}
 	fmt.Println("searchEventsByHex ", text)
-	respType := nodeInfo
+	respType := addressType
 	// 1) text is a 66 bytes hex number that could be requestID or GroupID
 	if len(text) == 66 {
-		respType = groupInfo
-		fmt.Println("searchEventsByHex GetGroup", groupInfo)
+		respType = groupType
 		resp = repo.GetGroup(text)
-		fmt.Println("searchEventsByHex GetGroup", len(resp))
 		if len(resp) == 0 {
-			fmt.Println("searchEventsByHex ", requestInfo)
-			respType = requestInfo
+			respType = urlType
 			resp = repo.GetRequest(text)
+			if len(resp) == 0 {
+				respType = randomType
+				resp = repo.GetRandomRequest(text)
+			}
 		}
+
 	} else if len(text) == 42 {
 		// 1) text is a 42 bytes hex number that is an addres
 		resp = repo.GetNode(text)
-		respType = nodeInfo
+		respType = addressType
 	}
-	fmt.Println("searchEventsByHex ", text, len(resp))
+	fmt.Println("searchEventsByHex ", text, respType)
 
 	return resp, respType, nil
 }
 
 func setResponse(code int, msg string, rType, totalCount int, logs []interface{}) (string, error) {
 	var resp Response
-	fmt.Println("setResponse ", len(logs))
+	fmt.Println("setResponse type = ", rType, len(logs))
 	resp = Response{
 		Code:    code,
 		Message: msg,
@@ -179,12 +183,14 @@ func setResponse(code int, msg string, rType, totalCount int, logs []interface{}
 	switch rType {
 	case eventList:
 		resp.Body = &Body{Events: logs, TotalCount: totalCount}
-	case nodeInfo:
-		resp.Body = &Body{NodeInfo: logs, TotalCount: totalCount}
-	case groupInfo:
-		resp.Body = &Body{GroupInfo: logs, TotalCount: totalCount}
-	case requestInfo:
-		resp.Body = &Body{RequestInfo: logs, TotalCount: totalCount}
+	case addressType:
+		resp.Body = &Body{Address: logs, TotalCount: totalCount}
+	case groupType:
+		resp.Body = &Body{Group: logs, TotalCount: totalCount}
+	case urlType:
+		resp.Body = &Body{Url: logs, TotalCount: totalCount}
+	case randomType:
+		resp.Body = &Body{Random: logs, TotalCount: totalCount}
 	case nodeList:
 		resp.Body = &Body{NodeList: logs, TotalCount: totalCount}
 

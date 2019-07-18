@@ -31,6 +31,7 @@ type EventsRepo interface {
 	GetNode(string) []interface{}
 	GetGroup(string) []interface{}
 	GetRequest(string) []interface{}
+	GetRandomRequest(string) []interface{}
 	GetLatestTxEvents(order string, limit int) []interface{}
 	GetEventsByTxAttr(limit, offset int, query interface{}, args ...interface{}) []interface{}
 }

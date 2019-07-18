@@ -251,7 +251,8 @@ type Node struct {
 	Addr          string   `gorm:"unique;not null" json:"addr"`
 	Balance       string   `json:"balance"`
 	RegisterState bool     `json:"registerState"`
-	ActiveGroup   []string `gorm:"-" json:"activeGroup"`
+	ActiveGroups  []string `gorm:"-" json:"activeGroups"`
+	ExpiredGroups int      `gorm:"-" json:"expiredGroups"`
 	Groups        []Group  `gorm:"many2many:nodes_groups;" json:"-"`
 }
 
@@ -263,6 +264,8 @@ type Group struct {
 	NodeId             pq.StringArray      `gorm:"type:varchar(100)[]" json:"nodeId"`
 	PubKey             pq.StringArray      `gorm:"type:varchar(100)[]" json:"pubKey"`
 	Nodes              []Node              `gorm:"many2many:nodes_groups;" json:"-"`
+	NumUrl             int                 `gorm:"-" json:"urlRequests"`
+	NumRandom          int                 `gorm:"-" json:"randomRequests"`
 	UrlRequests        []UrlRequest        `json:"-"`
 	UserRandomRequests []UserRandomRequest `json:"-"`
 }
