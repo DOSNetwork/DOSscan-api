@@ -49,6 +49,7 @@ func TestSave(t *testing.T) {
 	},
 		Node: "0x3E268ECB08CF59B5c2aDBf98651ccD8041C60f67",
 	}
+
 	eventc := make(chan []interface{})
 	var input []interface{}
 	input = append(input, tx)
@@ -75,4 +76,11 @@ func TestSave(t *testing.T) {
 
 	db.Unscoped().Delete(&log)
 	db.Unscoped().Delete(&tx)
+}
+func TestGetEvent(t *testing.T) {
+	db := initDB("postgres", "postgres", "postgres")
+	r := NewGethRepo(db)
+
+	log := models.LogRegisteredNewPendingNode{}
+	r.GetEventsByModel(context.Background(), log)
 }

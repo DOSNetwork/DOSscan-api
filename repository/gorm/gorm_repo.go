@@ -107,8 +107,11 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 func (g *gormRepo) SaveModel(ctx context.Context, modelType int, eventc chan []interface{}) chan error {
 	return saveTable[modelType](ctx, g.db, eventc)
 }
-func (g *gormRepo) GetEventsByName(ctx context.Context, name string) []interface{} {
+
+func (g *gormRepo) GetEventsByModel(ctx context.Context, model interface{}) []interface{} {
 	var result []interface{}
+	tableName := g.db.NewScope(model).GetModelStruct().TableName(g.db)
+	fmt.Println("table name :", tableName)
 	return result
 }
 
