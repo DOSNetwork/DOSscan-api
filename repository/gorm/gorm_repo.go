@@ -84,10 +84,15 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 					if !ok {
 						continue
 					}
-
-					if err := db.Where("block_number = ? AND log_index = ?", tx.Hash, log.Event.LogIndex).First(&log).Error; gorm.IsRecordNotFoundError(err) {
+					if tx.Hash != log.TransactionHash || tx.BlockNumber != log.Event.BlockNumber {
+						continue
+					}
+					if err := db.Where("hash = ?", tx.Hash).First(&tx).Error; gorm.IsRecordNotFoundError(err) {
+						db.Create(&tx)
+					}
+					if err := db.Where("transaction_hash = ? AND log_index = ?", tx.Hash, log.Event.LogIndex).First(&log).Error; gorm.IsRecordNotFoundError(err) {
 						db.Create(&log)
-						res := db.Model(&tx).Association("LogGrouping").Append(&log)
+						res := db.Model(&tx).Association("LogGroupings").Append(&log)
 						if res.Error != nil {
 							fmt.Println("res ", res.Error)
 						}
