@@ -2,6 +2,7 @@ package gorm
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/DOSNetwork/DOSscan-api/models"
@@ -104,15 +105,37 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 	},
 }
 
-func (g *gormRepo) SaveModel(ctx context.Context, modelType int, eventc chan []interface{}) chan error {
-	return saveTable[modelType](ctx, g.db, eventc)
+var getTable = []func(ctx context.Context, db *gorm.DB, limit, offset int) []interface{}{
+	models.TypeNewPendingNode: func(ctx context.Context, db *gorm.DB, limit, offset int) (results []interface{}) {
+		var models []models.LogRegisteredNewPendingNode
+		db.Limit(limit).Offset(offset).Find(&models)
+		for _, model := range models {
+			results = append(results, model)
+		}
+		return
+	},
+	models.TypeGrouping: func(ctx context.Context, db *gorm.DB, limit, offset int) (results []interface{}) {
+		var models []models.LogGrouping
+		db.Limit(limit).Offset(offset).Find(&models)
+		for _, model := range models {
+			results = append(results, model)
+		}
+		return
+	},
 }
 
-func (g *gormRepo) GetEventsByModel(ctx context.Context, model interface{}) []interface{} {
-	var result []interface{}
-	tableName := g.db.NewScope(model).GetModelStruct().TableName(g.db)
-	fmt.Println("table name :", tableName)
-	return result
+func (g *gormRepo) SaveModel(ctx context.Context, modelType int, eventc chan []interface{}) (err error, errc chan error) {
+	if modelType >= len(saveTable) {
+		return errors.New("Not support model type"), nil
+	}
+	return nil, saveTable[modelType](ctx, g.db, eventc)
+}
+
+func (g *gormRepo) GetEventsByModelType(ctx context.Context, modelType int, limit, offset int) (result []interface{}) {
+	if modelType >= len(getTable) {
+		return
+	}
+	return getTable[modelType](ctx, g.db, limit, offset)
 }
 
 func (g *gormRepo) GetGroupByID(ctx context.Context, id string) interface{} {
