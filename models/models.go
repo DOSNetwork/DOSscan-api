@@ -7,18 +7,37 @@ import (
 	"github.com/lib/pq"
 )
 
+const (
+	TypeNewPendingNode int = iota
+	TypeGrouping
+	TypePublicKeySuggested
+	TypePublicKeyAccepted
+	TypeGroupDissolve
+
+	TypeUpdateRandom
+	TypeUrl
+	TypeRequestUserRandom
+	TypeValidationResult
+	TypeCallbackTriggeredFor
+	TypeGuardianReward
+
+	TypeError
+)
+
 type Transaction struct {
 	gorm.Model
-	Hash                           string `gorm:"unique;not null"`
+	Hash                           string `gorm:"primary_key;unique;not null"`
 	GasPrice                       uint64 `json:"gasPrice"`
 	Value                          uint64 `json:"value"`
 	GasLimit                       uint64 `json:"gasLimit"`
-	Nonce                          uint64 `gorm:"primary_key" json:"nonce"`
-	Sender                         string `gorm:"primary_key" json:"sender"`
+	Nonce                          uint64 `json:"nonce"`
+	Sender                         string `json:"sender"`
 	To                             string `json:"to"`
 	BlockNumber                    uint64 `gorm:"primary_key" json:"blockNumber"`
 	Data                           []byte `gorm:"type:bytea" json:"data"`
 	Method                         string `gorm:"index" json:"method"`
+	LogRegisteredNewPendingNodes   []LogRegisteredNewPendingNode
+	LogGroupings                   []LogGrouping
 	LogUrls                        []LogUrl
 	LogRequestUserRandoms          []LogRequestUserRandom
 	LogUpdateRandoms               []LogUpdateRandom
@@ -29,11 +48,9 @@ type Transaction struct {
 	LogRequestFromNonExistentUCs   []LogRequestFromNonExistentUC
 	LogInsufficientPendingNodes    []LogInsufficientPendingNode
 	LogInsufficientWorkingGroups   []LogInsufficientWorkingGroup
-	LogGroupings                   []LogGrouping
 	LogPublicKeyAccepteds          []LogPublicKeyAccepted
 	LogPublicKeySuggesteds         []LogPublicKeySuggested
 	LogGroupDissolves              []LogGroupDissolve
-	LogRegisteredNewPendingNodes   []LogRegisteredNewPendingNode
 	LogGroupingInitiateds          []LogGroupingInitiated
 	LogNoPendingGroups             []LogNoPendingGroup
 	LogPendingGroupRemoveds        []LogPendingGroupRemoved
@@ -50,17 +67,30 @@ type Transaction struct {
 }
 
 type Event struct {
-	Method          string         `gorm:"column:method" json:"method"`
-	EventLog        string         `gorm:"column:event_log" json:"eventLog"`
-	Transaction     Transaction    `gorm:"association_foreignkey:Hash" json:"-"`
-	TransactionHash string         `gorm:"column:transaction_hash" json:"txHash"`
-	TxIndex         uint           `gorm:"column:transaction_index" json:"-"`
+	Method          string         `json:"method"`
+	EventLog        string         `json:"eventLog"`
+	TransactionHash string         `json:"txHash"`
+	TxIndex         uint           `json:"-"`
 	Topics          pq.StringArray `gorm:"column:topics;type:varchar(100)[]" json:"-"`
-	BlockNumber     uint64         `gorm:"column:block_number" json:"blockNumber"`
-	BlockHash       string         `gorm:"column:block_hash" json:"-"`
-	LogIndex        uint           `gorm:"column:log_index;" json:"-"`
-	Removed         bool           `gorm:"column:removed;" json:"-"`
-	Date            time.Time      `gorm:"column:date;" json:"-"`
+	BlockNumber     uint64         `json:"blockNumber"`
+	BlockHash       string         `json:"-"`
+	LogIndex        uint           `json:"-"`
+	Removed         bool           `json:"-"`
+	Date            time.Time      `json:"-"`
+	TransactionID   uint
+}
+
+type LogRegisteredNewPendingNode struct {
+	gorm.Model
+	Event
+	Node string `json:"node"`
+}
+
+type LogGrouping struct {
+	gorm.Model
+	Event
+	GroupId string         `json:"groupId"`
+	NodeId  pq.StringArray `gorm:"type:varchar(100)[]" json:"nodeId"`
 }
 
 type LogNonSupportedType struct {
@@ -101,13 +131,6 @@ type LogInsufficientWorkingGroup struct {
 	TransactionID    uint
 	NumWorkingGroups uint64 `json:"numWorkingGroups"`
 	NumPendingGroups uint64 `json:"numPendingGroups"`
-}
-
-type LogRegisteredNewPendingNode struct {
-	gorm.Model
-	Event
-	TransactionID uint
-	Node          string `json:"node"`
 }
 
 type LogGroupingInitiated struct {
@@ -210,14 +233,6 @@ type GuardianReward struct {
 	TransactionID uint
 	BlkNum        uint64 `json:"blkNum"`
 	Guardian      string `json:"guardian"`
-}
-
-type LogGrouping struct {
-	gorm.Model
-	Event
-	TransactionID uint
-	GroupId       string         `json:"groupId"`
-	NodeId        pq.StringArray `gorm:"type:varchar(100)[]" json:"nodeId"`
 }
 
 type LogPublicKeyAccepted struct {
