@@ -19,11 +19,13 @@ func initDB(user, password, dbName string) *gorm.DB {
 	if err != nil {
 		fmt.Println(err)
 	}
-	db.AutoMigrate(&models.Transaction{}, &models.LogRegisteredNewPendingNode{}, &models.LogGrouping{}, &models.LogPublicKeyAccepted{}, &models.LogGroupDissolve{}, &models.Group{})
+	db.AutoMigrate(&models.Transaction{}, &models.LogRegisteredNewPendingNode{},
+		&models.LogGrouping{}, &models.LogPublicKeyAccepted{}, &models.LogGroupDissolve{},
+		&models.Group{}, &models.Node{})
 	return db
 }
 
-func mockGrouping(r repository.DB, t *testing.T, sender string, nonce uint64, hash string, blknum uint64, groupid string) {
+func mockGrouping(r repository.DB, t *testing.T, sender string, nonce uint64, hash string, blknum uint64, groupid string, nodes []string) {
 	tx := models.Transaction{
 		Hash:        hash,
 		GasPrice:    2000000000,
@@ -46,7 +48,7 @@ func mockGrouping(r repository.DB, t *testing.T, sender string, nonce uint64, ha
 		Removed:         false,
 	},
 		GroupId: groupid,
-		NodeId:  pq.StringArray([]string{"1", "2"}),
+		NodeId:  pq.StringArray(nodes),
 	}
 
 	eventc := make(chan []interface{})
@@ -231,6 +233,7 @@ func TestBuildGroup(t *testing.T) {
 	acceptedHashTemplate := "0xaccepted0000000000000000000000000000000000000000000000000000000"
 	dissolvHashTemplate := "0xdissolv00000000000000000000000000000000000000000000000000000000"
 	senderTemplate := "0xnode00000000000000000000000000000000000"
+	nodes1 := []string{"0xnode000000000000000000000000000000000001", "0xnode000000000000000000000000000000000002"}
 	var nonce, blknum uint64
 	nonce = 18927
 	blknum = 4468430
@@ -244,7 +247,7 @@ func TestBuildGroup(t *testing.T) {
 		acceptedHash := acceptedHashTemplate + strconv.Itoa(i)
 		dissolvHash := dissolvHashTemplate + strconv.Itoa(i)
 		sender := senderTemplate + strconv.Itoa(i)
-		mockGrouping(r, t, sender+strconv.Itoa(i), nonce, groupHash, blknum, groupId)
+		mockGrouping(r, t, sender+strconv.Itoa(i), nonce, groupHash, blknum, groupId, nodes1)
 		mockAccepted(r, t, sender+strconv.Itoa(i), nonce+1, acceptedHash, blknum+5, groupId)
 		mockDissolve(r, t, sender+strconv.Itoa(i), nonce+2, dissolvHash, blknum+10, groupId)
 		blknum++
@@ -265,5 +268,47 @@ func TestBuildGroup(t *testing.T) {
 		}
 		blknum++
 	}
+}
 
+func TestBuildNode(t *testing.T) {
+	//sender string,nonce uint64, hash string ,blknum uint64,groupid string) {
+	groupIdTemplate := "0xgroup000000000000000000000id00000000000000000000000000000000000"
+	groupHashTemplate := "0xgrouping0000000000000000000000000000000000000000000000000000000"
+	acceptedHashTemplate := "0xaccepted0000000000000000000000000000000000000000000000000000000"
+	dissolvHashTemplate := "0xdissolv00000000000000000000000000000000000000000000000000000000"
+	senderTemplate := "0xnode00000000000000000000000000000000000"
+	nodes1 := []string{"0xnode000000000000000000000000000000000001", "0xnode000000000000000000000000000000000002"}
+	var nonce, blknum uint64
+	nonce = 18927
+	blknum = 4468430
+
+	db := initDB("postgres", "postgres", "test")
+	r := NewGethRepo(db)
+	buildNode(db, "0xnode000000000000000000000000000000000001")
+	buildNode(db, "0xnode000000000000000000000000000000000002")
+
+	for i := 1; i <= 3; i++ {
+		groupId := groupIdTemplate + strconv.Itoa(i)
+		groupHash := groupHashTemplate + strconv.Itoa(i)
+		acceptedHash := acceptedHashTemplate + strconv.Itoa(i)
+		dissolvHash := dissolvHashTemplate + strconv.Itoa(i)
+		sender := senderTemplate + strconv.Itoa(i)
+		mockGrouping(r, t, sender+strconv.Itoa(i), nonce, groupHash, blknum, groupId, nodes1)
+		mockAccepted(r, t, sender+strconv.Itoa(i), nonce+1, acceptedHash, blknum+5, groupId)
+		mockDissolve(r, t, sender+strconv.Itoa(i), nonce+2, dissolvHash, blknum+10, groupId)
+		blknum++
+	}
+	buildGroup(db, "")
+
+	node, err := r.NodeByAddr(context.Background(), "0xnode000000000000000000000000000000000002")
+	if err != nil {
+		t.Errorf("TestBuildNode Error : %s", err.Error())
+	}
+	fmt.Println(node.Addr)
+
+	var groups []models.Group
+	db.Model(&node).Related(&groups, "Groups")
+	if len(groups) != 3 {
+		t.Errorf("TestBuildGroup Error : Expected %d Actual %d ", 3, len(groups))
+	}
 }
