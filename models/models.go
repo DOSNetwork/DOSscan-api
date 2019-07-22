@@ -96,28 +96,24 @@ type LogGrouping struct {
 type LogNonSupportedType struct {
 	gorm.Model
 	Event
-	TransactionID   uint
 	InvalidSelector string `gorm:"column:invalid_selector" json:"invalidSelector"`
 }
 
 type LogNonContractCall struct {
 	gorm.Model
 	Event
-	TransactionID uint
-	CallAddr      string `gorm:"column:call_ddr" json:"callAddr"`
+	CallAddr string `gorm:"column:call_ddr" json:"callAddr"`
 }
 
 type LogCallbackTriggeredFor struct {
 	gorm.Model
 	Event
-	TransactionID uint
-	CallbackAddr  string `gorm:"column:call_back_addr" json:"callbackAddr"`
+	CallbackAddr string `gorm:"column:call_back_addr" json:"callbackAddr"`
 }
 
 type LogRequestFromNonExistentUC struct {
 	gorm.Model
 	Event
-	TransactionID uint
 }
 
 type LogInsufficientPendingNode struct {
@@ -128,7 +124,6 @@ type LogInsufficientPendingNode struct {
 type LogInsufficientWorkingGroup struct {
 	gorm.Model
 	Event
-	TransactionID    uint
 	NumWorkingGroups uint64 `json:"numWorkingGroups"`
 	NumPendingGroups uint64 `json:"numPendingGroups"`
 }
@@ -136,7 +131,6 @@ type LogInsufficientWorkingGroup struct {
 type LogGroupingInitiated struct {
 	gorm.Model
 	Event
-	TransactionID     uint
 	PendingNodePool   uint64 `json:"pendingNodePool"`
 	GroupSize         uint64 `json:"groupSize"`
 	GroupingThreshold uint64 `json:"groupingThreshold"`
@@ -145,84 +139,73 @@ type LogGroupingInitiated struct {
 type LogNoPendingGroup struct {
 	gorm.Model
 	Event
-	TransactionID uint
-	GroupId       string `json:"groupId"`
+	GroupId string `json:"groupId"`
 }
 
 type LogPendingGroupRemoved struct {
 	gorm.Model
 	Event
-	TransactionID uint
-	GroupId       string `json:"groupId"`
+	GroupId string `json:"groupId"`
 }
 
 type LogError struct {
 	gorm.Model
 	Event
-	TransactionID uint
-	Err           string `json:"err"`
+	Err string `json:"err"`
 }
 
 type UpdateGroupToPick struct {
 	gorm.Model
 	Event
-	TransactionID uint
-	OldNum        uint64 `json:"oldNum"`
-	NewNum        uint64 `json:"newNum"`
+	OldNum uint64 `json:"oldNum"`
+	NewNum uint64 `json:"newNum"`
 }
 
 type UpdateGroupSize struct {
 	gorm.Model
 	Event
-	TransactionID uint
-	OldSize       uint64 `json:"oldSize"`
-	NewSize       uint64 `json:"newSize"`
+	OldSize uint64 `json:"oldSize"`
+	NewSize uint64 `json:"newSize"`
 }
 
 type UpdateGroupingThreshold struct {
 	gorm.Model
 	Event
-	TransactionID uint
-	OldThreshold  uint64 `json:"oldThreshold"`
-	NewThreshold  uint64 `json:"newThreshold"`
+	OldThreshold uint64 `json:"oldThreshold"`
+	NewThreshold uint64 `json:"newThreshold"`
 }
 
 type UpdateGroupMaturityPeriod struct {
 	gorm.Model
 	Event
-	TransactionID uint
-	OldPeriod     uint64 `json:"oldPeriod"`
-	NewPeriod     uint64 `json:"newPeriod"`
+	OldPeriod uint64 `json:"oldPeriod"`
+	NewPeriod uint64 `json:"newPeriod"`
 }
 
 type UpdateBootstrapCommitDuration struct {
 	gorm.Model
 	Event
-	TransactionID uint
-	OldDuration   uint64 `json:"oldDuration"`
-	NewDuration   uint64 `json:"newDuration"`
+	OldDuration uint64 `json:"oldDuration"`
+	NewDuration uint64 `json:"newDuration"`
 }
 
 type UpdateBootstrapRevealDuration struct {
 	gorm.Model
 	Event
-	TransactionID uint
-	OldDuration   uint64 `json:"oldDuration"`
-	NewDuration   uint64 `json:"newDuration"`
+	OldDuration uint64 `json:"oldDuration"`
+	NewDuration uint64 `json:"newDuration"`
 }
 
 type UpdatebootstrapStartThreshold struct {
 	gorm.Model
 	Event
-	TransactionID uint
-	OldThreshold  uint64 `json:"oldThreshold"`
-	NewThreshold  uint64 `json:"newThreshold"`
+	OldThreshold uint64 `json:"oldThreshold"`
+	NewThreshold uint64 `json:"newThreshold"`
 }
 
 type UpdatePendingGroupMaxLife struct {
 	gorm.Model
 	Event
-	TransactionID uint
 	OldLifeBlocks uint64 `json:"oldLifeBlocks"`
 	NewLifeBlocks uint64 `json:"newLifeBlock"`
 }
@@ -230,9 +213,8 @@ type UpdatePendingGroupMaxLife struct {
 type GuardianReward struct {
 	gorm.Model
 	Event
-	TransactionID uint
-	BlkNum        uint64 `json:"blkNum"`
-	Guardian      string `json:"guardian"`
+	BlkNum   uint64 `json:"blkNum"`
+	Guardian string `json:"guardian"`
 }
 
 type LogPublicKeyAccepted struct {
@@ -247,9 +229,8 @@ type LogPublicKeyAccepted struct {
 type LogPublicKeySuggested struct {
 	gorm.Model
 	Event
-	TransactionID uint
-	GroupId       string `json:"groupId"`
-	PubKeyCount   uint64 `json:"pubKeyCount"`
+	GroupId     string `json:"groupId"`
+	PubKeyCount uint64 `json:"pubKeyCount"`
 }
 
 type LogGroupDissolve struct {
@@ -286,7 +267,6 @@ type Group struct {
 type LogRequestUserRandom struct {
 	gorm.Model           `json:"-"`
 	Event                `json:"-"`
-	TransactionID        uint   `json:"-"`
 	RequestId            string `gorm:"unique;not null" json:"requestId"`
 	LastSystemRandomness string `json:"lastSystemRandomness"`
 	UserSeed             string `json:"userSeed"`
@@ -296,7 +276,6 @@ type LogRequestUserRandom struct {
 type LogUpdateRandom struct {
 	gorm.Model        `json:"-"`
 	Event             `json:"-"`
-	TransactionID     uint   `json:"-"`
 	LastRandomness    string `json:"lastRandomness"`
 	DispatchedGroupId string `json:"dispatchedGroupId"`
 }
@@ -304,7 +283,6 @@ type LogUpdateRandom struct {
 type LogUrl struct {
 	gorm.Model        `json:"-"`
 	Event             `json:"-"`
-	TransactionID     uint   `json:"-"`
 	RequestId         string `gorm:"unique;not null" json:"queryId"`
 	Timeout           string `json:"timeOut"`
 	DataSource        string `json:"dataSource"`
@@ -316,11 +294,10 @@ type LogUrl struct {
 type LogValidationResult struct {
 	gorm.Model             `json:"-"`
 	Event                  `json:"-"`
-	TransactionID          uint           `json:"-"`
 	LogUrlID               uint           `json:"-"`
 	LogRequestUserRandomID uint           `json:"-"`
 	LogUpdateRandomID      uint           `json:"-"`
-	RequestId              string         `json:"requestId"`
+	RequestId              string         `gorm:"not null" json:"requestId"`
 	RequestType            uint8          `json:"requestType"`
 	Message                string         `gorm:"type:bytea" json:"message"`
 	Signature              pq.StringArray `gorm:"type:varchar(100)[]" json:"signature"`

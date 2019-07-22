@@ -186,6 +186,129 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 		}()
 		return errc
 	},
+	models.TypeRequestUserRandom: func(ctx context.Context, db *gorm.DB, eventc chan []interface{}) chan error {
+		errc := make(chan error)
+		go func() {
+			defer close(errc)
+			for {
+				select {
+				case <-ctx.Done():
+					return
+				case event, ok := <-eventc:
+					if !ok {
+						return
+					}
+					if len(event) != 2 {
+						continue
+					}
+					tx, ok := event[0].(models.Transaction)
+					if !ok {
+						continue
+					}
+					log, ok := event[1].(models.LogRequestUserRandom)
+					if !ok {
+						continue
+					}
+					if tx.Hash != log.TransactionHash || tx.BlockNumber != log.Event.BlockNumber {
+						continue
+					}
+					if err := db.Where("hash = ?", tx.Hash).First(&tx).Error; gorm.IsRecordNotFoundError(err) {
+						db.Create(&tx)
+					}
+					if err := db.Where("transaction_hash = ? AND log_index = ?", tx.Hash, log.Event.LogIndex).First(&log).Error; gorm.IsRecordNotFoundError(err) {
+						db.Create(&log)
+						res := db.Model(&tx).Association("LogRequestUserRandoms").Append(&log)
+						if res.Error != nil {
+							fmt.Println("res ", res.Error)
+						}
+					}
+				}
+			}
+		}()
+		return errc
+	},
+	models.TypeUrl: func(ctx context.Context, db *gorm.DB, eventc chan []interface{}) chan error {
+		errc := make(chan error)
+		go func() {
+			defer close(errc)
+			for {
+				select {
+				case <-ctx.Done():
+					return
+				case event, ok := <-eventc:
+					if !ok {
+						return
+					}
+					if len(event) != 2 {
+						continue
+					}
+					tx, ok := event[0].(models.Transaction)
+					if !ok {
+						continue
+					}
+					log, ok := event[1].(models.LogUrl)
+					if !ok {
+						continue
+					}
+					if tx.Hash != log.TransactionHash || tx.BlockNumber != log.Event.BlockNumber {
+						continue
+					}
+					if err := db.Where("hash = ?", tx.Hash).First(&tx).Error; gorm.IsRecordNotFoundError(err) {
+						db.Create(&tx)
+					}
+					if err := db.Where("transaction_hash = ? AND log_index = ?", tx.Hash, log.Event.LogIndex).First(&log).Error; gorm.IsRecordNotFoundError(err) {
+						db.Create(&log)
+						res := db.Model(&tx).Association("LogUrls").Append(&log)
+						if res.Error != nil {
+							fmt.Println("res ", res.Error)
+						}
+					}
+				}
+			}
+		}()
+		return errc
+	},
+	models.TypeValidationResult: func(ctx context.Context, db *gorm.DB, eventc chan []interface{}) chan error {
+		errc := make(chan error)
+		go func() {
+			defer close(errc)
+			for {
+				select {
+				case <-ctx.Done():
+					return
+				case event, ok := <-eventc:
+					if !ok {
+						return
+					}
+					if len(event) != 2 {
+						continue
+					}
+					tx, ok := event[0].(models.Transaction)
+					if !ok {
+						continue
+					}
+					log, ok := event[1].(models.LogValidationResult)
+					if !ok {
+						continue
+					}
+					if tx.Hash != log.TransactionHash || tx.BlockNumber != log.Event.BlockNumber {
+						continue
+					}
+					if err := db.Where("hash = ?", tx.Hash).First(&tx).Error; gorm.IsRecordNotFoundError(err) {
+						db.Create(&tx)
+					}
+					if err := db.Where("transaction_hash = ? AND log_index = ?", tx.Hash, log.Event.LogIndex).First(&log).Error; gorm.IsRecordNotFoundError(err) {
+						db.Create(&log)
+						res := db.Model(&tx).Association("LogValidationResults").Append(&log)
+						if res.Error != nil {
+							fmt.Println("res ", res.Error)
+						}
+					}
+				}
+			}
+		}()
+		return errc
+	},
 }
 
 var getTable = []func(ctx context.Context, db *gorm.DB, limit, offset int) (results []interface{}, err error){
@@ -215,6 +338,30 @@ var getTable = []func(ctx context.Context, db *gorm.DB, limit, offset int) (resu
 	},
 	models.TypeGroupDissolve: func(ctx context.Context, db *gorm.DB, limit, offset int) (results []interface{}, err error) {
 		var models []models.LogGroupDissolve
+		db.Limit(limit).Offset(offset).Find(&models)
+		for _, model := range models {
+			results = append(results, model)
+		}
+		return
+	},
+	models.TypeUrl: func(ctx context.Context, db *gorm.DB, limit, offset int) (results []interface{}, err error) {
+		var models []models.LogUrl
+		db.Limit(limit).Offset(offset).Find(&models)
+		for _, model := range models {
+			results = append(results, model)
+		}
+		return
+	},
+	models.TypeRequestUserRandom: func(ctx context.Context, db *gorm.DB, limit, offset int) (results []interface{}, err error) {
+		var models []models.LogRequestUserRandom
+		db.Limit(limit).Offset(offset).Find(&models)
+		for _, model := range models {
+			results = append(results, model)
+		}
+		return
+	},
+	models.TypeValidationResult: func(ctx context.Context, db *gorm.DB, limit, offset int) (results []interface{}, err error) {
+		var models []models.LogValidationResult
 		db.Limit(limit).Offset(offset).Find(&models)
 		for _, model := range models {
 			results = append(results, model)
@@ -328,5 +475,53 @@ func buildGroup(db *gorm.DB, grouId string) {
 			db.Model(&existGroup).Omit("group_id").Updates(&group)
 			fmt.Println("Update group ", existGroup.GroupId, group.DissolvedBlkNum, group.AcceptedBlkNum)
 		}
+	}
+}
+
+func buildUrlRequest(db *gorm.DB, requestId string) {
+	var results []models.UrlRequest
+	tempDb := db.Table("log_urls").Select("log_urls.request_id, log_urls.dispatched_group_id,transactions.sender, transactions.block_number,transactions.hash,log_validation_results.message,log_validation_results.signature,log_validation_results.pub_key,log_validation_results.pass,log_urls.timeout,log_urls.data_source,log_urls.selector,log_urls.randomness")
+	tempDb = tempDb.Joins("inner join log_validation_results on log_validation_results.request_id = log_urls.request_id")
+	tempDb = tempDb.Joins("inner join transactions on log_validation_results.transaction_id = transactions.id")
+	if requestId == "" {
+		tempDb.Find(&results)
+	} else {
+		tempDb.Where("log_urls.request_id = ? ", requestId).Find(&results)
+	}
+
+	for _, request := range results {
+		db.Where(request).FirstOrCreate(&request)
+		var group models.Group
+		db.Where(&models.Group{GroupId: request.DispatchedGroupId}).First(&group)
+		res := db.Model(&group).Association("UrlRequests").Append(&request)
+		if res.Error != nil {
+			fmt.Println("res ", res.Error)
+		}
+		fmt.Println(group.GroupId, "-", " len ", db.Model(&group).Association("UrlRequests").Count())
+	}
+}
+
+func buildRandomRequest(db *gorm.DB, requestId string) {
+
+	var results []models.UserRandomRequest
+	tempDb := db.Table("log_request_user_randoms").Select("log_request_user_randoms.request_id, log_request_user_randoms.dispatched_group_id,transactions.sender, transactions.block_number,transactions.hash,log_validation_results.message,log_validation_results.signature,log_validation_results.pub_key,log_validation_results.pass")
+	tempDb = tempDb.Joins("inner join log_validation_results on log_validation_results.request_id = log_request_user_randoms.request_id")
+	tempDb = tempDb.Joins("inner join transactions on log_validation_results.transaction_id = transactions.id")
+	if requestId == "" {
+		tempDb.Find(&results)
+	} else {
+		tempDb.Where("log_request_user_randoms.request_id = ? ", requestId).Find(&results)
+	}
+	fmt.Println("-", " len buildRandomRequest", len(results))
+
+	for _, request := range results {
+		db.Where(request).FirstOrCreate(&request)
+		var group models.Group
+		db.Where(&models.Group{GroupId: request.DispatchedGroupId}).First(&group)
+		res := db.Model(&group).Association("UserRandomRequests").Append(&request)
+		if res.Error != nil {
+			fmt.Println("res ", res.Error)
+		}
+		fmt.Println(group.GroupId, "-", " len buildRandomRequest", db.Model(&group).Association("UserRandomRequests").Count())
 	}
 }
