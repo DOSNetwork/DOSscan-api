@@ -238,7 +238,6 @@ type GuardianReward struct {
 type LogPublicKeyAccepted struct {
 	gorm.Model
 	Event
-	TransactionID    uint
 	GroupId          string         `json:"groupId"`
 	AcceptedBlkNum   uint64         `json:"acceptedBlknum"`
 	PubKey           pq.StringArray `gorm:"type:varchar(100)[]" json:"pubKey"`
@@ -256,7 +255,6 @@ type LogPublicKeySuggested struct {
 type LogGroupDissolve struct {
 	gorm.Model
 	Event
-	TransactionID   uint
 	GroupId         string `json:"groupId"`
 	DissolvedBlkNum uint64 `json:"dissolvedBlknum"`
 }

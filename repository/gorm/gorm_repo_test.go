@@ -3,13 +3,13 @@ package gorm
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"testing"
-
 	//"database/sql"
-
 	"github.com/DOSNetwork/DOSscan-api/models"
+	"github.com/DOSNetwork/DOSscan-api/repository"
 	"github.com/jinzhu/gorm"
-	//"github.com/lib/pq"
+	"github.com/lib/pq"
 )
 
 func initDB(user, password, dbName string) *gorm.DB {
@@ -19,68 +19,251 @@ func initDB(user, password, dbName string) *gorm.DB {
 	if err != nil {
 		fmt.Println(err)
 	}
-	db.AutoMigrate(&models.Transaction{}, &models.LogRegisteredNewPendingNode{}, &models.LogGrouping{})
+	db.AutoMigrate(&models.Transaction{}, &models.LogRegisteredNewPendingNode{}, &models.LogGrouping{}, &models.LogPublicKeyAccepted{}, &models.LogGroupDissolve{}, &models.Group{})
 	return db
 }
 
-func TestSave(t *testing.T) {
-	db := initDB("postgres", "postgres", "postgres")
-	r := NewGethRepo(db)
+func mockGrouping(r repository.DB, t *testing.T, sender string, nonce uint64, hash string, blknum uint64, groupid string) {
 	tx := models.Transaction{
-		Hash:        "0xa3ac8994c0c5a97e7206f073c4ce050405e6b03a2d041c464cce9e9c6d228b87",
+		Hash:        hash,
 		GasPrice:    2000000000,
 		Value:       0,
 		GasLimit:    6000000,
-		Nonce:       18927,
-		Sender:      "0x3E268ECB08CF59B5c2aDBf98651ccD8041C60f67",
-		To:          "0x7fD667a87E2ef724f19315124755558cAA18836E",
-		BlockNumber: 4468429,
-		Method:      "registerNewNode",
+		Nonce:       nonce,
+		Sender:      sender,
+		To:          "0xproxyadd00000000000000000000000000000000",
+		BlockNumber: blknum,
+		Method:      "triggetCallbcak",
 	}
-	log := models.LogRegisteredNewPendingNode{Event: models.Event{
-		Method:          "registerNewNode",
+	log := models.LogGrouping{Event: models.Event{
+		Method:          "triggetCallbcak",
 		EventLog:        "LogRegisteredNewPendingNode",
-		TransactionHash: "0xa3ac8994c0c5a97e7206f073c4ce050405e6b03a2d041c464cce9e9c6d228b87",
+		TransactionHash: hash,
 		TxIndex:         8,
-		BlockNumber:     4468429,
-		BlockHash:       "0x878a44fde8051b5deb917ca8e13a2cecf90ce5d5f4d56fda45f43c5bd540bde3",
+		BlockNumber:     blknum,
+		BlockHash:       "0xblockhashgrouping00000000000000000000000000000000000000000000000",
 		LogIndex:        11,
 		Removed:         false,
 	},
-		Node: "0x3E268ECB08CF59B5c2aDBf98651ccD8041C60f67",
+		GroupId: groupid,
+		NodeId:  pq.StringArray([]string{"1", "2"}),
 	}
 
 	eventc := make(chan []interface{})
 	var input []interface{}
 	input = append(input, tx)
 	input = append(input, log)
-	errc := r.SaveModel(context.Background(), models.TypeNewPendingNode, eventc)
+
+	err, errc := r.SaveModel(context.Background(), models.TypeGrouping, eventc)
+	if err != nil {
+		t.Errorf("TestSave SaveModel Error : %s", err.Error())
+	}
 	eventc <- input
 	close(eventc)
-	err := <-errc
+	err = <-errc
 	if err != nil {
 		fmt.Println(err)
 	}
+}
 
-	var logFromDB models.LogRegisteredNewPendingNode
-	db.Model(&tx).First(&tx).Related(&logFromDB, "LogRegisteredNewPendingNodes")
-	if tx.Hash != logFromDB.TransactionHash || logFromDB.TransactionHash == "" {
-		t.Errorf("TestSave Error : Expect %s Acctual %s", tx.Hash, logFromDB.TransactionHash)
+func mockAccepted(r repository.DB, t *testing.T, sender string, nonce uint64, hash string, blknum uint64, groupid string) {
+	tx := models.Transaction{
+		Hash:        hash,
+		GasPrice:    2000000000,
+		Value:       0,
+		GasLimit:    6000000,
+		Nonce:       nonce,
+		Sender:      sender,
+		To:          "0xproxyadd00000000000000000000000000000000",
+		BlockNumber: blknum,
+		Method:      "methdoFormockAccepted",
 	}
+	log := models.LogPublicKeyAccepted{Event: models.Event{
+		Method:          "methdoFormockAccepted",
+		EventLog:        "LogPublicKeyAccepted",
+		TransactionHash: hash,
+		TxIndex:         8,
+		BlockNumber:     blknum,
+		BlockHash:       "0xblockhashgrouping00000000000000000000000000000000000000000000000",
+		LogIndex:        11,
+		Removed:         false,
+	},
+		GroupId:          groupid,
+		AcceptedBlkNum:   blknum,
+		PubKey:           pq.StringArray([]string{"PubKey1", "PubKey2"}),
+		NumWorkingGroups: 1,
+	}
+
+	eventc := make(chan []interface{})
+	var input []interface{}
+	input = append(input, tx)
+	input = append(input, log)
+
+	err, errc := r.SaveModel(context.Background(), models.TypePublicKeyAccepted, eventc)
+	if err != nil {
+		t.Errorf("TestSave SaveModel Error : %s", err.Error())
+	}
+	eventc <- input
+	close(eventc)
+	err = <-errc
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+func mockDissolve(r repository.DB, t *testing.T, sender string, nonce uint64, hash string, blknum uint64, groupid string) {
+	tx := models.Transaction{
+		Hash:        hash,
+		GasPrice:    2000000000,
+		Value:       0,
+		GasLimit:    6000000,
+		Nonce:       nonce,
+		Sender:      sender,
+		To:          "0xproxyadd00000000000000000000000000000000",
+		BlockNumber: blknum,
+		Method:      "methdoForLogGroupDissolve",
+	}
+	log := models.LogGroupDissolve{Event: models.Event{
+		Method:          "methdoForLogGroupDissolve",
+		EventLog:        "LogGroupDissolve",
+		TransactionHash: hash,
+		TxIndex:         8,
+		BlockNumber:     blknum,
+		BlockHash:       "0xblockhashgrouping00000000000000000000000000000000000000000000000",
+		LogIndex:        10,
+		Removed:         false,
+	},
+		GroupId:         groupid,
+		DissolvedBlkNum: blknum,
+	}
+
+	eventc := make(chan []interface{})
+	var input []interface{}
+	input = append(input, tx)
+	input = append(input, log)
+
+	err, errc := r.SaveModel(context.Background(), models.TypeGroupDissolve, eventc)
+	if err != nil {
+		t.Errorf("TestSave SaveModel Error : %s", err.Error())
+	}
+	eventc <- input
+	close(eventc)
+	err = <-errc
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+func mockNewPendingNode(r repository.DB, t *testing.T) {
+	tx := models.Transaction{
+		Hash:        "0xtxhashLogRegisteredNewPendingNode0000000000000000000000000000001",
+		GasPrice:    2000000000,
+		Value:       0,
+		GasLimit:    6000000,
+		Nonce:       18927,
+		Sender:      "0xnode000000000000000000000000000000000001",
+		To:          "0xproxyaddrproxyaddrproxyaddrproxyaddr0000",
+		BlockNumber: 4468429,
+		Method:      "registerNewNode",
+	}
+	log := models.LogRegisteredNewPendingNode{Event: models.Event{
+		Method:          "registerNewNode",
+		EventLog:        "LogRegisteredNewPendingNode",
+		TransactionHash: "0xtxhashLogRegisteredNewPendingNode0000000000000000000000000000001",
+		TxIndex:         8,
+		BlockNumber:     4468429,
+		BlockHash:       "0xblockhashgrouping00000000000000000000000000000000000000000000000",
+		LogIndex:        11,
+		Removed:         false,
+	},
+		Node: "0xnode000000000000000000000000000000000001",
+	}
+
+	eventc := make(chan []interface{})
+	var input []interface{}
+	input = append(input, tx)
+	input = append(input, log)
+
+	err, errc := r.SaveModel(context.Background(), models.TypeNewPendingNode, eventc)
+	if err != nil {
+		t.Errorf("TestSave SaveModel Error : %s", err.Error())
+	}
+	eventc <- input
+	close(eventc)
+	err = <-errc
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+func TestSave(t *testing.T) {
+	db := initDB("postgres", "postgres", "test")
+	r := NewGethRepo(db)
+	mockNewPendingNode(r, t)
 
 	var txFromDB models.Transaction
-	db.Model(&log).First(&log).Related(&txFromDB)
-	if log.TransactionHash != txFromDB.Hash || txFromDB.Hash == "" {
-		t.Errorf("TestSave Error : Expect %s Acctual %s", log.TransactionHash, txFromDB.Hash)
-	}
+	var pendingNodeFromDB models.LogRegisteredNewPendingNode
 
-	db.Unscoped().Delete(&log)
-	db.Unscoped().Delete(&tx)
+	db.Model(&pendingNodeFromDB).First(&pendingNodeFromDB).Related(&txFromDB)
+	if pendingNodeFromDB.TransactionHash != txFromDB.Hash ||
+		pendingNodeFromDB.TransactionHash == "" || txFromDB.Hash == "" {
+		t.Errorf("TestSave Error : Expect %s Acctual %s", pendingNodeFromDB.TransactionHash, txFromDB.Hash)
+	}
+	db.Unscoped().Delete(&pendingNodeFromDB)
+	db.Unscoped().Delete(&txFromDB)
 }
-func TestGetEvent(t *testing.T) {
-	db := initDB("postgres", "postgres", "postgres")
+
+func TestEventsByType(t *testing.T) {
+	db := initDB("postgres", "postgres", "test")
+	r := NewGethRepo(db)
+	mockNewPendingNode(r, t)
+	results, err := r.EventsByModelType(context.Background(), models.TypeNewPendingNode, -1, -1)
+	if err != nil {
+		t.Errorf("TestEventsByType Error : %s", err.Error())
+	}
+	fmt.Println(len(results))
+}
+
+func TestBuildGroup(t *testing.T) {
+	//sender string,nonce uint64, hash string ,blknum uint64,groupid string) {
+	groupIdTemplate := "0xgroup000000000000000000000id00000000000000000000000000000000000"
+	groupHashTemplate := "0xgrouping0000000000000000000000000000000000000000000000000000000"
+	acceptedHashTemplate := "0xaccepted0000000000000000000000000000000000000000000000000000000"
+	dissolvHashTemplate := "0xdissolv00000000000000000000000000000000000000000000000000000000"
+	senderTemplate := "0xnode00000000000000000000000000000000000"
+	var nonce, blknum uint64
+	nonce = 18927
+	blknum = 4468430
+
+	db := initDB("postgres", "postgres", "test")
 	r := NewGethRepo(db)
 
-	log := models.LogRegisteredNewPendingNode{}
-	r.GetEventsByModel(context.Background(), log)
+	for i := 1; i <= 3; i++ {
+		groupId := groupIdTemplate + strconv.Itoa(i)
+		groupHash := groupHashTemplate + strconv.Itoa(i)
+		acceptedHash := acceptedHashTemplate + strconv.Itoa(i)
+		dissolvHash := dissolvHashTemplate + strconv.Itoa(i)
+		sender := senderTemplate + strconv.Itoa(i)
+		mockGrouping(r, t, sender+strconv.Itoa(i), nonce, groupHash, blknum, groupId)
+		mockAccepted(r, t, sender+strconv.Itoa(i), nonce+1, acceptedHash, blknum+5, groupId)
+		mockDissolve(r, t, sender+strconv.Itoa(i), nonce+2, dissolvHash, blknum+10, groupId)
+		blknum++
+	}
+	buildGroup(db, "")
+	blknum = 4468430
+	for i := 1; i <= 3; i++ {
+		groupId := groupIdTemplate + strconv.Itoa(i)
+		group, err := r.GroupByID(context.Background(), groupId)
+		if err != nil {
+			t.Errorf("TestBuildGroup Error : %s", err.Error())
+		}
+		if group.AcceptedBlkNum != blknum+5 {
+			t.Errorf("TestBuildGroup Error : Expected %d Actual %d ", blknum+5, group.AcceptedBlkNum)
+		}
+		if group.DissolvedBlkNum != blknum+10 {
+			t.Errorf("TestBuildGroup Error : Expected %d Actual %d ", blknum+10, group.DissolvedBlkNum)
+		}
+		blknum++
+	}
+
 }
