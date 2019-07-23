@@ -7,7 +7,9 @@ import (
 )
 
 type Onchain interface {
-	GetBalance(ctx context.Context) string
+	GetBalance(ctx context.Context, hexAddr string) (string, error)
+	FetchLogs(ctx context.Context, logType int, fromBlock, toBlock uint64, blockLimit uint64) (err error, eventc chan interface{}, errc chan error)
+	SubscribeLogs(ctx context.Context, logType int) (err error, eventc chan interface{}, errc <-chan error)
 }
 
 type DB interface {
