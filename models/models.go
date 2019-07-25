@@ -1,6 +1,7 @@
 package models
 
 import (
+	"strings"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -8,7 +9,8 @@ import (
 )
 
 const (
-	TypeNewPendingNode int = iota
+	_ int = iota
+	TypeNewPendingNode
 	TypeGrouping
 	TypePublicKeySuggested
 	TypePublicKeyAccepted
@@ -22,48 +24,96 @@ const (
 	TypeGuardianReward
 
 	TypeError
+	TypeNode
+	TypeGroup
+	TypeUrlRequest
+	TypeRandomRequest
 )
+
+var supportedEvents []string
+var stringToType map[string]int
+
+func init() {
+	supportedEvents = append(supportedEvents, "LogRegisteredNewPendingNode")
+	supportedEvents = append(supportedEvents, "LogGrouping")
+	supportedEvents = append(supportedEvents, "LogPublicKeySuggested")
+	supportedEvents = append(supportedEvents, "LogPublicKeyAccepted")
+	supportedEvents = append(supportedEvents, "LogGroupDissolve")
+	supportedEvents = append(supportedEvents, "LogUpdateRandom")
+	supportedEvents = append(supportedEvents, "LogUrl")
+	supportedEvents = append(supportedEvents, "LogRequestUserRandom")
+	supportedEvents = append(supportedEvents, "LogValidationResult")
+	supportedEvents = append(supportedEvents, "LogCallbackTriggeredFor")
+	supportedEvents = append(supportedEvents, "GuardianReward")
+	supportedEvents = append(supportedEvents, "LogError")
+
+	stringToType = make(map[string]int)
+	stringToType["logregisterednewpendingnode"] = TypeNewPendingNode
+	stringToType["loggrouping"] = TypeGrouping
+	stringToType["logpublickeysuggested"] = TypePublicKeySuggested
+	stringToType["logpublickeyaccepted"] = TypePublicKeyAccepted
+	stringToType["loggroupdissolve"] = TypeGroupDissolve
+	stringToType["logupdaterandom"] = TypeUpdateRandom
+	stringToType["logrrl"] = TypeUrl
+	stringToType["logrequestuserrandom"] = TypeRequestUserRandom
+	stringToType["logvalidationresult"] = TypeValidationResult
+	stringToType["logcallbacktriggeredfor"] = TypeCallbackTriggeredFor
+	stringToType["guardianreward"] = TypeGuardianReward
+	stringToType["logerror"] = TypeError
+	stringToType["node"] = TypeNode
+	stringToType["group"] = TypeGroup
+	stringToType["urlrequest"] = TypeUrlRequest
+	stringToType["randomreques"] = TypeRandomRequest
+}
+
+func SupportedEvents() []string {
+	return supportedEvents
+}
+
+func StringToType(s string) int {
+	return stringToType[strings.ToLower(s)]
+}
 
 type Transaction struct {
 	gorm.Model
-	Hash                           string `gorm:"primary_key;unique;not null"`
-	GasPrice                       uint64 `json:"gasPrice"`
-	Value                          uint64 `json:"value"`
-	GasLimit                       uint64 `json:"gasLimit"`
-	Nonce                          uint64 `json:"nonce"`
-	Sender                         string `json:"sender"`
-	To                             string `json:"to"`
-	BlockNumber                    uint64 `gorm:"primary_key" json:"blockNumber"`
-	Data                           []byte `gorm:"type:bytea" json:"data"`
-	Method                         string `gorm:"index" json:"method"`
-	LogRegisteredNewPendingNodes   []LogRegisteredNewPendingNode
-	LogGroupings                   []LogGrouping
-	LogUrls                        []LogUrl
-	LogRequestUserRandoms          []LogRequestUserRandom
-	LogUpdateRandoms               []LogUpdateRandom
-	LogValidationResults           []LogValidationResult
-	LogNonSupportedTypes           []LogNonSupportedType
-	LogNonContractCalls            []LogNonContractCall
-	LogCallbackTriggeredFors       []LogCallbackTriggeredFor
-	LogRequestFromNonExistentUCs   []LogRequestFromNonExistentUC
-	LogInsufficientPendingNodes    []LogInsufficientPendingNode
-	LogInsufficientWorkingGroups   []LogInsufficientWorkingGroup
-	LogPublicKeyAccepteds          []LogPublicKeyAccepted
-	LogPublicKeySuggesteds         []LogPublicKeySuggested
-	LogGroupDissolves              []LogGroupDissolve
-	LogGroupingInitiateds          []LogGroupingInitiated
-	LogNoPendingGroups             []LogNoPendingGroup
-	LogPendingGroupRemoveds        []LogPendingGroupRemoved
-	LogErrors                      []LogError
-	UpdateGroupToPicks             []UpdateGroupToPick
-	UpdateGroupSizes               []UpdateGroupSize
-	UpdateGroupingThresholds       []UpdateGroupingThreshold
-	UpdateGroupMaturityPeriods     []UpdateGroupMaturityPeriod
-	UpdateBootstrapCommitDurations []UpdateBootstrapCommitDuration
-	UpdateBootstrapRevealDurations []UpdateBootstrapRevealDuration
-	UpdatebootstrapStartThresholds []UpdatebootstrapStartThreshold
-	UpdatePendingGroupMaxLifes     []UpdatePendingGroupMaxLife
-	GuardianRewards                []GuardianReward
+	Hash                           string                          `gorm:"primary_key;unique;not null"`
+	GasPrice                       uint64                          `json:"gasPrice"`
+	Value                          uint64                          `json:"value"`
+	GasLimit                       uint64                          `json:"gasLimit"`
+	Nonce                          uint64                          `json:"nonce"`
+	Sender                         string                          `json:"sender"`
+	To                             string                          `json:"to"`
+	BlockNumber                    uint64                          `gorm:"primary_key" json:"blockNumber"`
+	Data                           []byte                          `gorm:"type:bytea" json:"data"`
+	Method                         string                          `gorm:"index" json:"method"`
+	LogRegisteredNewPendingNodes   []LogRegisteredNewPendingNode   `gorm:"auto_preload"`
+	LogGroupings                   []LogGrouping                   `gorm:"auto_preload"`
+	LogUrls                        []LogUrl                        `gorm:"auto_preload"`
+	LogRequestUserRandoms          []LogRequestUserRandom          `gorm:"auto_preload"`
+	LogUpdateRandoms               []LogUpdateRandom               `gorm:"auto_preload"`
+	LogValidationResults           []LogValidationResult           `gorm:"auto_preload"`
+	LogNonSupportedTypes           []LogNonSupportedType           `gorm:"auto_preload"`
+	LogNonContractCalls            []LogNonContractCall            `gorm:"auto_preload"`
+	LogCallbackTriggeredFors       []LogCallbackTriggeredFor       `gorm:"auto_preload"`
+	LogRequestFromNonExistentUCs   []LogRequestFromNonExistentUC   `gorm:"auto_preload"`
+	LogInsufficientPendingNodes    []LogInsufficientPendingNode    `gorm:"auto_preload"`
+	LogInsufficientWorkingGroups   []LogInsufficientWorkingGroup   `gorm:"auto_preload"`
+	LogPublicKeyAccepteds          []LogPublicKeyAccepted          `gorm:"auto_preload"`
+	LogPublicKeySuggesteds         []LogPublicKeySuggested         `gorm:"auto_preload"`
+	LogGroupDissolves              []LogGroupDissolve              `gorm:"auto_preload"`
+	LogGroupingInitiateds          []LogGroupingInitiated          `gorm:"auto_preload"`
+	LogNoPendingGroups             []LogNoPendingGroup             `gorm:"auto_preload"`
+	LogPendingGroupRemoveds        []LogPendingGroupRemoved        `gorm:"auto_preload"`
+	LogErrors                      []LogError                      `gorm:"auto_preload"`
+	UpdateGroupToPicks             []UpdateGroupToPick             `gorm:"auto_preload"`
+	UpdateGroupSizes               []UpdateGroupSize               `gorm:"auto_preload"`
+	UpdateGroupingThresholds       []UpdateGroupingThreshold       `gorm:"auto_preload"`
+	UpdateGroupMaturityPeriods     []UpdateGroupMaturityPeriod     `gorm:"auto_preload"`
+	UpdateBootstrapCommitDurations []UpdateBootstrapCommitDuration `gorm:"auto_preload"`
+	UpdateBootstrapRevealDurations []UpdateBootstrapRevealDuration `gorm:"auto_preload"`
+	UpdatebootstrapStartThresholds []UpdatebootstrapStartThreshold `gorm:"auto_preload"`
+	UpdatePendingGroupMaxLifes     []UpdatePendingGroupMaxLife     `gorm:"auto_preload"`
+	GuardianRewards                []GuardianReward                `gorm:"auto_preload"`
 }
 
 type Event struct {

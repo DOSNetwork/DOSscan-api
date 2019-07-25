@@ -3,6 +3,7 @@ package gorm
 import (
 	"context"
 	"fmt"
+	"log"
 	"strconv"
 	"testing"
 	//"database/sql"
@@ -12,22 +13,27 @@ import (
 	"github.com/lib/pq"
 )
 
-func initDB(user, password, dbName string) *gorm.DB {
-	postgres_url := fmt.Sprintf("postgres://%s:%s@localhost:5432/%s?sslmode=disable", user, password, dbName)
-	var db *gorm.DB
-	db, err := gorm.Open("postgres", postgres_url)
-	if err != nil {
-		fmt.Println(err)
-	}
-	db.AutoMigrate(&models.Transaction{}, &models.LogRegisteredNewPendingNode{},
-		&models.LogGrouping{}, &models.LogPublicKeyAccepted{}, &models.LogGroupDissolve{},
-		&models.Group{}, &models.Node{}, &models.LogRequestUserRandom{}, &models.LogUrl{},
-		&models.LogValidationResult{}, &models.UrlRequest{}, &models.UserRandomRequest{})
-	return db
-}
+const (
+	DB_IP       = "localhost"
+	DB_PORT     = "5432"
+	DB_USER     = "postgres"
+	DB_PASSWORD = "postgres"
+	DB_NAME     = "postgres"
+	ETH_URL     = "wss://rinkeby.infura.io/ws/v3/3a3e5d776961418e93a8b33fef2f6642"
+)
 
+func initDB() (db *gorm.DB) {
+
+	var err error
+	postgres_url := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		DB_USER, DB_PASSWORD, DB_IP, DB_PORT, DB_NAME)
+	if db, err = gorm.Open("postgres", postgres_url); err != nil {
+		log.Fatal(err)
+	}
+	return
+}
 func mockLogUrl(r repository.DB, t *testing.T, sender string, nonce uint64, hash string, blknum uint64, requestId, groupId string) {
-	tx := models.Transaction{
+	tx := &models.Transaction{
 		Hash:        hash,
 		GasPrice:    2000000000,
 		Value:       0,
@@ -38,7 +44,7 @@ func mockLogUrl(r repository.DB, t *testing.T, sender string, nonce uint64, hash
 		BlockNumber: blknum,
 		Method:      "External",
 	}
-	log := models.LogUrl{Event: models.Event{
+	log := &models.LogUrl{Event: models.Event{
 		Method:          "External",
 		EventLog:        "LogUrl",
 		TransactionHash: hash,
@@ -68,7 +74,7 @@ func mockLogUrl(r repository.DB, t *testing.T, sender string, nonce uint64, hash
 }
 
 func mockLogUserRandom(r repository.DB, t *testing.T, sender string, nonce uint64, hash string, blknum uint64, requestId, groupId string) {
-	tx := models.Transaction{
+	tx := &models.Transaction{
 		Hash:        hash,
 		GasPrice:    2000000000,
 		Value:       0,
@@ -79,7 +85,7 @@ func mockLogUserRandom(r repository.DB, t *testing.T, sender string, nonce uint6
 		BlockNumber: blknum,
 		Method:      "External",
 	}
-	log := models.LogRequestUserRandom{Event: models.Event{
+	log := &models.LogRequestUserRandom{Event: models.Event{
 		Method:          "External",
 		EventLog:        "LogRequestUserRandom",
 		TransactionHash: hash,
@@ -108,7 +114,7 @@ func mockLogUserRandom(r repository.DB, t *testing.T, sender string, nonce uint6
 }
 
 func mockValidationResult(r repository.DB, t *testing.T, sender string, nonce uint64, hash string, blknum uint64, requestId string) {
-	tx := models.Transaction{
+	tx := &models.Transaction{
 		Hash:        hash,
 		GasPrice:    2000000000,
 		Value:       0,
@@ -119,7 +125,7 @@ func mockValidationResult(r repository.DB, t *testing.T, sender string, nonce ui
 		BlockNumber: blknum,
 		Method:      "External",
 	}
-	log := models.LogValidationResult{Event: models.Event{
+	log := &models.LogValidationResult{Event: models.Event{
 		Method:          "External",
 		EventLog:        "ValidationResult",
 		TransactionHash: hash,
@@ -148,7 +154,7 @@ func mockValidationResult(r repository.DB, t *testing.T, sender string, nonce ui
 	}
 }
 func mockGrouping(r repository.DB, t *testing.T, sender string, nonce uint64, hash string, blknum uint64, groupid string, nodes []string) {
-	tx := models.Transaction{
+	tx := &models.Transaction{
 		Hash:        hash,
 		GasPrice:    2000000000,
 		Value:       0,
@@ -159,7 +165,7 @@ func mockGrouping(r repository.DB, t *testing.T, sender string, nonce uint64, ha
 		BlockNumber: blknum,
 		Method:      "triggetCallbcak",
 	}
-	log := models.LogGrouping{Event: models.Event{
+	log := &models.LogGrouping{Event: models.Event{
 		Method:          "triggetCallbcak",
 		EventLog:        "LogRegisteredNewPendingNode",
 		TransactionHash: hash,
@@ -191,7 +197,7 @@ func mockGrouping(r repository.DB, t *testing.T, sender string, nonce uint64, ha
 }
 
 func mockAccepted(r repository.DB, t *testing.T, sender string, nonce uint64, hash string, blknum uint64, groupid string) {
-	tx := models.Transaction{
+	tx := &models.Transaction{
 		Hash:        hash,
 		GasPrice:    2000000000,
 		Value:       0,
@@ -202,7 +208,7 @@ func mockAccepted(r repository.DB, t *testing.T, sender string, nonce uint64, ha
 		BlockNumber: blknum,
 		Method:      "methdoFormockAccepted",
 	}
-	log := models.LogPublicKeyAccepted{Event: models.Event{
+	log := &models.LogPublicKeyAccepted{Event: models.Event{
 		Method:          "methdoFormockAccepted",
 		EventLog:        "LogPublicKeyAccepted",
 		TransactionHash: hash,
@@ -236,7 +242,7 @@ func mockAccepted(r repository.DB, t *testing.T, sender string, nonce uint64, ha
 }
 
 func mockDissolve(r repository.DB, t *testing.T, sender string, nonce uint64, hash string, blknum uint64, groupid string) {
-	tx := models.Transaction{
+	tx := &models.Transaction{
 		Hash:        hash,
 		GasPrice:    2000000000,
 		Value:       0,
@@ -247,7 +253,7 @@ func mockDissolve(r repository.DB, t *testing.T, sender string, nonce uint64, ha
 		BlockNumber: blknum,
 		Method:      "methdoForLogGroupDissolve",
 	}
-	log := models.LogGroupDissolve{Event: models.Event{
+	log := &models.LogGroupDissolve{Event: models.Event{
 		Method:          "methdoForLogGroupDissolve",
 		EventLog:        "LogGroupDissolve",
 		TransactionHash: hash,
@@ -279,7 +285,7 @@ func mockDissolve(r repository.DB, t *testing.T, sender string, nonce uint64, ha
 }
 
 func mockNewPendingNode(r repository.DB, t *testing.T) {
-	tx := models.Transaction{
+	tx := &models.Transaction{
 		Hash:        "0xtxhashLogRegisteredNewPendingNode0000000000000000000000000000001",
 		GasPrice:    2000000000,
 		Value:       0,
@@ -290,7 +296,7 @@ func mockNewPendingNode(r repository.DB, t *testing.T) {
 		BlockNumber: 4468429,
 		Method:      "registerNewNode",
 	}
-	log := models.LogRegisteredNewPendingNode{Event: models.Event{
+	log := &models.LogRegisteredNewPendingNode{Event: models.Event{
 		Method:          "registerNewNode",
 		EventLog:        "LogRegisteredNewPendingNode",
 		TransactionHash: "0xtxhashLogRegisteredNewPendingNode0000000000000000000000000000001",
@@ -321,8 +327,8 @@ func mockNewPendingNode(r repository.DB, t *testing.T) {
 }
 
 func TestSave(t *testing.T) {
-	db := initDB("postgres", "postgres", "test")
-	r := NewGethRepo(db)
+	db := initDB()
+	r := NewGormRepo(db)
 	mockNewPendingNode(r, t)
 
 	var txFromDB models.Transaction
@@ -337,11 +343,21 @@ func TestSave(t *testing.T) {
 	db.Unscoped().Delete(&txFromDB)
 }
 
+func TestLatestEvents(t *testing.T) {
+	db := initDB()
+	r := NewGormRepo(db)
+	results, err := r.LatestEvents(context.Background(), 20)
+	if err != nil {
+		t.Errorf("TestLatestEvents Error : %s", err.Error())
+	}
+	fmt.Println(len(results))
+}
+
 func TestEventsByType(t *testing.T) {
-	db := initDB("postgres", "postgres", "test")
-	r := NewGethRepo(db)
+	db := initDB()
+	r := NewGormRepo(db)
 	mockNewPendingNode(r, t)
-	results, err := r.EventsByModelType(context.Background(), models.TypeNewPendingNode, -1, -1)
+	results, err := r.ModelsByType(context.Background(), models.TypeNewPendingNode, -1, -1)
 	if err != nil {
 		t.Errorf("TestEventsByType Error : %s", err.Error())
 	}
@@ -360,8 +376,8 @@ func TestBuildGroup(t *testing.T) {
 	nonce = 18927
 	blknum = 4468430
 
-	db := initDB("postgres", "postgres", "test")
-	r := NewGethRepo(db)
+	db := initDB()
+	r := NewGormRepo(db)
 
 	for i := 1; i <= 3; i++ {
 		groupId := groupIdTemplate + strconv.Itoa(i)
@@ -404,8 +420,8 @@ func TestBuildNode(t *testing.T) {
 	nonce = 18927
 	blknum = 4468430
 
-	db := initDB("postgres", "postgres", "test")
-	r := NewGethRepo(db)
+	db := initDB()
+	r := NewGormRepo(db)
 	buildNode(db, "0xnode000000000000000000000000000000000001")
 	buildNode(db, "0xnode000000000000000000000000000000000002")
 
@@ -454,8 +470,8 @@ func TestBuildRequest(t *testing.T) {
 	nonce = 18927
 	blknum = 4468430
 
-	db := initDB("postgres", "postgres", "test")
-	r := NewGethRepo(db)
+	db := initDB()
+	r := NewGormRepo(db)
 
 	for i := 1; i <= 3; i++ {
 		groupId := groupIdTemplate + strconv.Itoa(i)
@@ -511,4 +527,14 @@ func TestBuildRequest(t *testing.T) {
 		fmt.Println(len(urls))
 		fmt.Println(len(randoms))
 	}
+}
+
+func TestCount(t *testing.T) {
+	db := initDB()
+
+	r := NewGormRepo(db)
+	total, err := r.CountModel(context.Background(), models.TypeUrl)
+
+	fmt.Println(total, err)
+
 }

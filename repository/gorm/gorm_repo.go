@@ -12,13 +12,42 @@ import (
 )
 
 type gormRepo struct {
-	db *gorm.DB
+	db             *gorm.DB
+	supportedEvent []string
+	nameToType     map[string]int
 }
 
-func NewGethRepo(db *gorm.DB) repository.DB {
+func NewGormRepo(db *gorm.DB) repository.DB {
+	var supportedEvent []string
+	supportedEvent = append(supportedEvent, "LogRegisteredNewPendingNode")
+	supportedEvent = append(supportedEvent, "LogGrouping")
+	nameToType := make(map[string]int)
+	nameToType["logregisterednewpendingnode"] = models.TypeNewPendingNode
+	nameToType["loggrouping"] = models.TypeGrouping
+	nameToType["logpublickeyaccepted"] = models.TypePublicKeyAccepted
+	nameToType["loggroupdissolve"] = models.TypeGroupDissolve
+	nameToType["logurl"] = models.TypeUrl
+	nameToType["logrequestuserrandom"] = models.TypeRequestUserRandom
+	nameToType["logvalidationresult"] = models.TypeValidationResult
+
+	db.AutoMigrate(&models.Transaction{}, &models.LogRegisteredNewPendingNode{},
+		&models.LogGrouping{}, &models.LogPublicKeyAccepted{}, &models.LogGroupDissolve{},
+		&models.Group{}, &models.Node{}, &models.LogRequestUserRandom{}, &models.LogUrl{},
+		&models.LogValidationResult{}, &models.UrlRequest{}, &models.UserRandomRequest{})
+
 	return &gormRepo{
 		db: db,
 	}
+}
+
+var typeToStruct = []interface{}{
+	models.TypeNewPendingNode:    &models.LogRegisteredNewPendingNode{},
+	models.TypeGrouping:          &models.LogGrouping{},
+	models.TypePublicKeyAccepted: &models.LogPublicKeyAccepted{},
+	models.TypeGroupDissolve:     &models.LogGroupDissolve{},
+	models.TypeRequestUserRandom: &models.LogRequestUserRandom{},
+	models.TypeUrl:               &models.LogUrl{},
+	models.TypeValidationResult:  &models.LogValidationResult{},
 }
 
 var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface{}) chan error{
@@ -37,23 +66,23 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 					if len(event) != 2 {
 						continue
 					}
-					tx, ok := event[0].(models.Transaction)
+					tx, ok := event[0].(*models.Transaction)
 					if !ok {
 						continue
 					}
-					log, ok := event[1].(models.LogRegisteredNewPendingNode)
+					log, ok := event[1].(*models.LogRegisteredNewPendingNode)
 					if !ok {
 						continue
 					}
 					if tx.Hash != log.TransactionHash || tx.BlockNumber != log.Event.BlockNumber {
 						continue
 					}
-					if err := db.Where("hash = ?", tx.Hash).First(&tx).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&tx)
+					if err := db.Where("hash = ?", tx.Hash).First(tx).Error; gorm.IsRecordNotFoundError(err) {
+						db.Create(tx)
 					}
-					if err := db.Where("transaction_hash = ? AND log_index = ?", tx.Hash, log.Event.LogIndex).First(&log).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&log)
-						res := db.Model(&tx).Association("LogRegisteredNewPendingNodes").Append(&log)
+					if err := db.Where("transaction_hash = ? AND log_index = ?", tx.Hash, log.Event.LogIndex).First(log).Error; gorm.IsRecordNotFoundError(err) {
+						db.Create(log)
+						res := db.Model(tx).Association("LogRegisteredNewPendingNodes").Append(log)
 						if res.Error != nil {
 							fmt.Println("res ", res.Error)
 						}
@@ -78,23 +107,27 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 					if len(event) != 2 {
 						continue
 					}
-					tx, ok := event[0].(models.Transaction)
+					tx, ok := event[0].(*models.Transaction)
 					if !ok {
+						fmt.Println("tx !ok")
+
 						continue
 					}
-					log, ok := event[1].(models.LogGrouping)
+					log, ok := event[1].(*models.LogGrouping)
 					if !ok {
+						fmt.Println("log !ok")
 						continue
 					}
+					fmt.Println("tx.Hash ", tx.Hash, " tx.BlockNumber ", tx.BlockNumber)
 					if tx.Hash != log.TransactionHash || tx.BlockNumber != log.Event.BlockNumber {
 						continue
 					}
-					if err := db.Where("hash = ?", tx.Hash).First(&tx).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&tx)
+					if err := db.Where("hash = ?", tx.Hash).First(tx).Error; gorm.IsRecordNotFoundError(err) {
+						db.Create(tx)
 					}
-					if err := db.Where("transaction_hash = ? AND log_index = ?", tx.Hash, log.Event.LogIndex).First(&log).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&log)
-						res := db.Model(&tx).Association("LogGroupings").Append(&log)
+					if err := db.Where("transaction_hash = ? AND log_index = ?", tx.Hash, log.Event.LogIndex).First(log).Error; gorm.IsRecordNotFoundError(err) {
+						db.Create(log)
+						res := db.Model(tx).Association("LogGroupings").Append(log)
 						if res.Error != nil {
 							fmt.Println("res ", res.Error)
 						}
@@ -119,23 +152,23 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 					if len(event) != 2 {
 						continue
 					}
-					tx, ok := event[0].(models.Transaction)
+					tx, ok := event[0].(*models.Transaction)
 					if !ok {
 						continue
 					}
-					log, ok := event[1].(models.LogPublicKeyAccepted)
+					log, ok := event[1].(*models.LogPublicKeyAccepted)
 					if !ok {
 						continue
 					}
 					if tx.Hash != log.TransactionHash || tx.BlockNumber != log.Event.BlockNumber {
 						continue
 					}
-					if err := db.Where("hash = ?", tx.Hash).First(&tx).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&tx)
+					if err := db.Where("hash = ?", tx.Hash).First(tx).Error; gorm.IsRecordNotFoundError(err) {
+						db.Create(tx)
 					}
-					if err := db.Where("transaction_hash = ? AND log_index = ?", tx.Hash, log.Event.LogIndex).First(&log).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&log)
-						res := db.Model(&tx).Association("LogPublicKeyAccepteds").Append(&log)
+					if err := db.Where("transaction_hash = ? AND log_index = ?", tx.Hash, log.Event.LogIndex).First(log).Error; gorm.IsRecordNotFoundError(err) {
+						db.Create(log)
+						res := db.Model(tx).Association("LogPublicKeyAccepteds").Append(log)
 						if res.Error != nil {
 							fmt.Println("res ", res.Error)
 						}
@@ -160,23 +193,23 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 					if len(event) != 2 {
 						continue
 					}
-					tx, ok := event[0].(models.Transaction)
+					tx, ok := event[0].(*models.Transaction)
 					if !ok {
 						continue
 					}
-					log, ok := event[1].(models.LogGroupDissolve)
+					log, ok := event[1].(*models.LogGroupDissolve)
 					if !ok {
 						continue
 					}
 					if tx.Hash != log.TransactionHash || tx.BlockNumber != log.Event.BlockNumber {
 						continue
 					}
-					if err := db.Where("hash = ?", tx.Hash).First(&tx).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&tx)
+					if err := db.Where("hash = ?", tx.Hash).First(tx).Error; gorm.IsRecordNotFoundError(err) {
+						db.Create(tx)
 					}
-					if err := db.Where("transaction_hash = ? AND log_index = ?", tx.Hash, log.Event.LogIndex).First(&log).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&log)
-						res := db.Model(&tx).Association("LogGroupDissolves").Append(&log)
+					if err := db.Where("transaction_hash = ? AND log_index = ?", tx.Hash, log.Event.LogIndex).First(log).Error; gorm.IsRecordNotFoundError(err) {
+						db.Create(log)
+						res := db.Model(tx).Association("LogGroupDissolves").Append(log)
 						if res.Error != nil {
 							fmt.Println("res ", res.Error)
 						}
@@ -201,23 +234,23 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 					if len(event) != 2 {
 						continue
 					}
-					tx, ok := event[0].(models.Transaction)
+					tx, ok := event[0].(*models.Transaction)
 					if !ok {
 						continue
 					}
-					log, ok := event[1].(models.LogRequestUserRandom)
+					log, ok := event[1].(*models.LogRequestUserRandom)
 					if !ok {
 						continue
 					}
 					if tx.Hash != log.TransactionHash || tx.BlockNumber != log.Event.BlockNumber {
 						continue
 					}
-					if err := db.Where("hash = ?", tx.Hash).First(&tx).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&tx)
+					if err := db.Where("hash = ?", tx.Hash).First(tx).Error; gorm.IsRecordNotFoundError(err) {
+						db.Create(tx)
 					}
-					if err := db.Where("transaction_hash = ? AND log_index = ?", tx.Hash, log.Event.LogIndex).First(&log).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&log)
-						res := db.Model(&tx).Association("LogRequestUserRandoms").Append(&log)
+					if err := db.Where("transaction_hash = ? AND log_index = ?", tx.Hash, log.Event.LogIndex).First(log).Error; gorm.IsRecordNotFoundError(err) {
+						db.Create(log)
+						res := db.Model(tx).Association("LogRequestUserRandoms").Append(log)
 						if res.Error != nil {
 							fmt.Println("res ", res.Error)
 						}
@@ -242,23 +275,23 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 					if len(event) != 2 {
 						continue
 					}
-					tx, ok := event[0].(models.Transaction)
+					tx, ok := event[0].(*models.Transaction)
 					if !ok {
 						continue
 					}
-					log, ok := event[1].(models.LogUrl)
+					log, ok := event[1].(*models.LogUrl)
 					if !ok {
 						continue
 					}
 					if tx.Hash != log.TransactionHash || tx.BlockNumber != log.Event.BlockNumber {
 						continue
 					}
-					if err := db.Where("hash = ?", tx.Hash).First(&tx).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&tx)
+					if err := db.Where("hash = ?", tx.Hash).First(tx).Error; gorm.IsRecordNotFoundError(err) {
+						db.Create(tx)
 					}
-					if err := db.Where("transaction_hash = ? AND log_index = ?", tx.Hash, log.Event.LogIndex).First(&log).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&log)
-						res := db.Model(&tx).Association("LogUrls").Append(&log)
+					if err := db.Where("transaction_hash = ? AND log_index = ?", tx.Hash, log.Event.LogIndex).First(log).Error; gorm.IsRecordNotFoundError(err) {
+						db.Create(log)
+						res := db.Model(tx).Association("LogUrls").Append(log)
 						if res.Error != nil {
 							fmt.Println("res ", res.Error)
 						}
@@ -283,23 +316,23 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 					if len(event) != 2 {
 						continue
 					}
-					tx, ok := event[0].(models.Transaction)
+					tx, ok := event[0].(*models.Transaction)
 					if !ok {
 						continue
 					}
-					log, ok := event[1].(models.LogValidationResult)
+					log, ok := event[1].(*models.LogValidationResult)
 					if !ok {
 						continue
 					}
 					if tx.Hash != log.TransactionHash || tx.BlockNumber != log.Event.BlockNumber {
 						continue
 					}
-					if err := db.Where("hash = ?", tx.Hash).First(&tx).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&tx)
+					if err := db.Where("hash = ?", tx.Hash).First(tx).Error; gorm.IsRecordNotFoundError(err) {
+						db.Create(tx)
 					}
-					if err := db.Where("transaction_hash = ? AND log_index = ?", tx.Hash, log.Event.LogIndex).First(&log).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(&log)
-						res := db.Model(&tx).Association("LogValidationResults").Append(&log)
+					if err := db.Where("transaction_hash = ? AND log_index = ?", tx.Hash, log.Event.LogIndex).First(log).Error; gorm.IsRecordNotFoundError(err) {
+						db.Create(log)
+						res := db.Model(tx).Association("LogValidationResults").Append(log)
 						if res.Error != nil {
 							fmt.Println("res ", res.Error)
 						}
@@ -370,12 +403,32 @@ var getTable = []func(ctx context.Context, db *gorm.DB, limit, offset int) (resu
 	},
 }
 
-func (g *gormRepo) EventsByModelType(ctx context.Context, modelType int, limit, offset int) (result []interface{}, err error) {
-	if modelType >= len(getTable) {
-		err = errors.New("Not support")
+func (g *gormRepo) ModelsByType(ctx context.Context, modelType int, limit, offset int) (results []interface{}, err error) {
+	if modelType == 0 || modelType >= len(getTable) {
+		err = errors.New("Unsupported Type ")
 		return
 	}
-	result, err = getTable[modelType](ctx, g.db, limit, offset)
+	results, err = getTable[modelType](ctx, g.db, limit, offset)
+	return
+}
+
+func (g *gormRepo) CountModel(ctx context.Context, modelType int) (total int, err error) {
+	if modelType == 0 || modelType >= len(typeToStruct) {
+		err = errors.New("Unsupported Type ")
+		return
+	}
+	err = g.db.Model(typeToStruct[modelType]).Count(&total).Error
+	return
+}
+
+func (g *gormRepo) LastBlockNum(ctx context.Context, modelType int) (lastBlkNum uint64, err error) {
+	var blkNums []uint64
+	err = g.db.Limit(1).Order("block_number desc").Find(typeToStruct[modelType]).Pluck("block_number", &blkNums).Error
+	if len(blkNums) == 0 {
+		lastBlkNum = 4468402
+	} else {
+		lastBlkNum = blkNums[0]
+	}
 	return
 }
 
@@ -386,15 +439,35 @@ func (g *gormRepo) SaveModel(ctx context.Context, modelType int, eventc chan []i
 	return nil, saveTable[modelType](ctx, g.db, eventc)
 }
 
+func (g *gormRepo) LatestEvents(ctx context.Context, limit int) (resp []interface{}, err error) {
+	//block_number desc
+	logs := []models.Transaction{}
+
+	if err := g.db.Order("block_number desc").Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
+		resp = relatedEvents(g.db, logs)
+	}
+	if limit < len(resp) {
+		resp = resp[:limit]
+	}
+	return
+}
+
 func (g *gormRepo) NodeByAddr(ctx context.Context, addr string) (node models.Node, err error) {
 	node.Addr = addr
 	err = g.db.Where(node).First(&node).Error
+	if err != nil {
+		return
+	}
+	g.db.Model(&node).Related(&node.Groups, "Groups")
 	return
 }
 
 func (g *gormRepo) GroupByID(ctx context.Context, id string) (group models.Group, err error) {
 	group.GroupId = id
 	err = g.db.Where(group).First(&group).Error
+	if err != nil {
+		fmt.Println("GroupByID err", err)
+	}
 	return
 }
 
@@ -524,4 +597,40 @@ func buildRandomRequest(db *gorm.DB, requestId string) {
 		}
 		fmt.Println(group.GroupId, "-", " len buildRandomRequest", db.Model(&group).Association("UserRandomRequests").Count())
 	}
+}
+
+func relatedEvents(db *gorm.DB, txs []models.Transaction) []interface{} {
+	var resp []interface{}
+	for _, tx := range txs {
+		fmt.Println("blockNum ", tx.BlockNumber, tx.Method)
+		db.Model(&tx).Related(&tx.LogUrls, "LogUrls")
+		for _, event := range tx.LogUrls {
+			resp = append(resp, event)
+		}
+		db.Model(&tx).Related(&tx.LogRequestUserRandoms, "LogRequestUserRandoms")
+		for _, event := range tx.LogRequestUserRandoms {
+			resp = append(resp, event)
+		}
+		db.Model(&tx).Related(&tx.LogValidationResults, "LogValidationResults")
+		for _, event := range tx.LogValidationResults {
+			resp = append(resp, event)
+		}
+		db.Model(&tx).Related(&tx.LogGroupings, "LogGroupings")
+		for _, event := range tx.LogGroupings {
+			resp = append(resp, event)
+		}
+		db.Model(&tx).Related(&tx.LogPublicKeyAccepteds, "LogPublicKeyAccepteds")
+		for _, event := range tx.LogPublicKeyAccepteds {
+			resp = append(resp, event)
+		}
+		db.Model(&tx).Related(&tx.LogGroupDissolves, "LogGroupDissolves")
+		for _, event := range tx.LogGroupDissolves {
+			resp = append(resp, event)
+		}
+		db.Model(&tx).Related(&tx.LogRegisteredNewPendingNodes, "LogRegisteredNewPendingNodes")
+		for _, event := range tx.LogRegisteredNewPendingNodes {
+			resp = append(resp, event)
+		}
+	}
+	return resp
 }
