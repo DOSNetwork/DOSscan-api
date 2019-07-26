@@ -51,6 +51,16 @@ func NesSearchHandler(search *_service.Search) *SearchHandler {
 	}
 }
 
+func (s *SearchHandler) SupportedEvents(c *gin.Context) {
+	fmt.Println("SupportedEvents")
+	jsonData, err := json.MarshalIndent(_models.SupportedEvents(), "", "    ")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(string(jsonData))
+	c.String(http.StatusOK, string(jsonData))
+}
+
 func (s *SearchHandler) Search(c *gin.Context) {
 	var err error
 	var resp string

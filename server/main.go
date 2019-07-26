@@ -70,6 +70,7 @@ func main() {
 	api := r.Group("/api")
 	v1 := api.Group("/explorer")
 	v1.GET("/search", searchHandler.Search)
+	v1.GET("/eventNames", searchHandler.SupportedEvents)
 
 	server := &http.Server{
 		Addr:           ":8080",
