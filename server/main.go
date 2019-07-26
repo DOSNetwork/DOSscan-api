@@ -11,6 +11,7 @@ import (
 	"syscall"
 	"time"
 
+	_cache "github.com/DOSNetwork/DOSscan-api/repository/cache"
 	_gorm "github.com/DOSNetwork/DOSscan-api/repository/gorm"
 	_onchain "github.com/DOSNetwork/DOSscan-api/repository/onchain"
 	_handler "github.com/DOSNetwork/DOSscan-api/server/handler"
@@ -19,6 +20,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
+	"github.com/gomodule/redigo/redis"
 	"github.com/jinzhu/gorm"
 )
 
@@ -35,8 +37,15 @@ func main() {
 	//TODO : Add configuration
 
 	//1)Init repositorys abd service
+	c, err := redis.Dial("tcp", "localhost:6379")
+	if err != nil {
+		fmt.Println("conn redis failed,", err)
+		return
+	}
+	defer c.Close()
+	cacheRepo := _cache.NewCacheRepo(c)
+
 	var db *gorm.DB
-	var err error
 	postgres_url := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
 		DB_USER, DB_PASSWORD, DB_IP, DB_PORT, DB_NAME)
 	if db, err = gorm.Open("postgres", postgres_url); err != nil {
@@ -66,7 +75,7 @@ func main() {
 	r.Use(static.Serve("/nodelist", static.LocalFile("./view", true)))
 
 	// Setup route group for the API
-	searchHandler := _handler.NesSearchHandler(search)
+	searchHandler := _handler.NesSearchHandler(search, cacheRepo)
 	api := r.Group("/api")
 	v1 := api.Group("/explorer")
 	v1.GET("/search", searchHandler.Search)

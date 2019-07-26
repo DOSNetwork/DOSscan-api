@@ -18,8 +18,7 @@ type Search struct {
 func NewSearch(onchainRepo _repository.Onchain, dbRepo _repository.DB) *Search {
 	return &Search{
 		onchainRepo: onchainRepo,
-		//memdbRepo:
-		dbRepo: dbRepo,
+		dbRepo:      dbRepo,
 	}
 }
 

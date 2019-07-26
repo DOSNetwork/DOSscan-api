@@ -4,15 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	//	"io/ioutil"
 	"net/http"
-	//	"os"
-	//	"sort"
 	"strconv"
-	//	"strings"
 
 	_models "github.com/DOSNetwork/DOSscan-api/models"
+	_repository "github.com/DOSNetwork/DOSscan-api/repository"
 	_service "github.com/DOSNetwork/DOSscan-api/service"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -27,6 +25,7 @@ const (
 
 type SearchHandler struct {
 	search *_service.Search
+	cache  _repository.Cache
 }
 
 type Response struct {
@@ -45,9 +44,10 @@ type Body struct {
 	TotalCount int           `json:"totalCount,omitempty"`
 }
 
-func NesSearchHandler(search *_service.Search) *SearchHandler {
+func NesSearchHandler(search *_service.Search, cache _repository.Cache) *SearchHandler {
 	return &SearchHandler{
 		search: search,
+		cache:  cache,
 	}
 }
 
@@ -75,13 +75,23 @@ func (s *SearchHandler) Search(c *gin.Context) {
 		return
 	}
 	fmt.Println("Search ", query, " ", pageSize, " ", pageIndex)
+	key := query + c.Query("pageSize") + c.Query("pageIndex")
+	ctx := context.Background()
 
-	if total, results, resultType, err := s.search.Search(context.Background(), query, pageSize, pageIndex); err != nil {
+	if resp, err := s.cache.Get(ctx, key); err == nil {
+		fmt.Println("Get result from server")
+		fmt.Println(resp)
+		c.String(http.StatusOK, resp)
+		return
+	}
+
+	if total, results, resultType, err := s.search.Search(ctx, query, pageSize, pageIndex); err != nil {
 		//TODO Add error code
 		resp, err = setResponse(0, "fail", resultType, total, results)
 	} else {
 		resp, err = setResponse(0, "success", resultType, total, results)
 	}
+	s.cache.Set(ctx, key, resp)
 	c.String(http.StatusOK, resp)
 	return
 }

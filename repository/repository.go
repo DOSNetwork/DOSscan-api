@@ -13,6 +13,11 @@ type Onchain interface {
 	SubscribeLogs(ctx context.Context, logType int) (err error, eventc chan []interface{}, errc <-chan error)
 }
 
+type Cache interface {
+	Set(ctx context.Context, key string, value string) (err error)
+	Get(ctx context.Context, key string) (value string, err error)
+}
+
 type DB interface {
 	LastBlockNum(ctx context.Context, modelType int) (lastBlkNum uint64, err error)
 	CountModel(ctx context.Context, modelType int) (total int, err error)
