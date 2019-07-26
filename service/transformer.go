@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	logsLimit = 10000
+	logsLimit = 1000
 )
 
 type Transformer struct {

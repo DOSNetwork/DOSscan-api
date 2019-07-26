@@ -52,7 +52,7 @@ func NewGethRepo(client *ethclient.Client) repository.Onchain {
 	}
 	proxy := &models.DosproxySession{Contract: p, CallOpts: bind.CallOpts{Context: ctx}}
 
-	jsonFile, err := os.Open("../abi/DOSProxy.abi")
+	jsonFile, err := os.Open("./abi/DOSProxy.abi")
 	// if we os.Open returns an error then handle it
 	if err != nil {
 		fmt.Println(err)
