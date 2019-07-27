@@ -73,6 +73,7 @@ func main() {
 			for err := range errc {
 				fmt.Println(err)
 			}
+			transformService.BuildRelations(context.Background())
 		case <-ctx.Done():
 			ticker.Stop()
 			return

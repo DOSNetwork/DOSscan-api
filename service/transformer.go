@@ -23,9 +23,13 @@ func NewTransformer(onchainRepo repository.Onchain, dbRepo repository.DB) *Trans
 		dbRepo:      dbRepo,
 	}
 }
+func (t *Transformer) BuildRelations(ctx context.Context) {
+	t.dbRepo.BuildRelation(ctx)
+}
 
 func (t *Transformer) FetchHistoricalLogs(ctx context.Context, modelsTypes ...int) <-chan error {
 	var errcList []<-chan error
+
 	for _, mType := range modelsTypes {
 		fromBlock, err := t.dbRepo.LastBlockNum(ctx, mType)
 		if err != nil {
@@ -36,6 +40,9 @@ func (t *Transformer) FetchHistoricalLogs(ctx context.Context, modelsTypes ...in
 		toBlock, err := t.onchainRepo.CurrentBlockNum(ctx)
 		if err != nil {
 			fmt.Println("Transformer err ", err)
+		}
+		if toBlock-fromBlock > logsLimit {
+			toBlock = fromBlock + logsLimit
 		}
 		fmt.Println("To blkNum", toBlock)
 		err, logsc, fetchErrc := t.onchainRepo.FetchLogs(ctx, mType, fromBlock, toBlock, logsLimit)

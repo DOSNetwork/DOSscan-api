@@ -132,7 +132,7 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 						if res.Error != nil {
 							fmt.Println("res ", res.Error)
 						}
-						buildGroup(db, log.GroupId)
+						//buildGroup(db, log.GroupId)
 					}
 				}
 			}
@@ -174,7 +174,7 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 						if res.Error != nil {
 							fmt.Println("res ", res.Error)
 						}
-						buildGroup(db, log.GroupId)
+						//buildGroup(db, log.GroupId)
 					}
 				}
 			}
@@ -216,7 +216,7 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 						if res.Error != nil {
 							fmt.Println("res ", res.Error)
 						}
-						buildGroup(db, log.GroupId)
+						//buildGroup(db, log.GroupId)
 					}
 				}
 			}
@@ -258,7 +258,7 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 						if res.Error != nil {
 							fmt.Println("res ", res.Error)
 						}
-						buildRandomRequest(db, log.RequestId)
+						//buildRandomRequest(db, log.RequestId)
 					}
 				}
 			}
@@ -300,7 +300,7 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 						if res.Error != nil {
 							fmt.Println("res ", res.Error)
 						}
-						buildUrlRequest(db, log.RequestId)
+						//buildUrlRequest(db, log.RequestId)
 					}
 				}
 			}
@@ -342,8 +342,8 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 						if res.Error != nil {
 							fmt.Println("res ", res.Error)
 						}
-						buildUrlRequest(db, log.RequestId)
-						buildRandomRequest(db, log.RequestId)
+						//buildUrlRequest(db, log.RequestId)
+						//buildRandomRequest(db, log.RequestId)
 					}
 				}
 			}
@@ -491,6 +491,11 @@ func (g *gormRepo) RandomRequestByID(ctx context.Context, id string) (randReques
 	return
 }
 
+func (g *gormRepo) BuildRelation(ctx context.Context) {
+	buildGroup(g.db, "")
+	buildUrlRequest(g.db, "")
+	buildRandomRequest(g.db, "")
+}
 func buildNode(db *gorm.DB, addr string) {
 	var node models.Node
 	db.Where(models.Node{Addr: addr}).FirstOrCreate(&node)
@@ -562,8 +567,8 @@ func buildGroup(db *gorm.DB, grouId string) {
 func buildUrlRequest(db *gorm.DB, requestId string) {
 	var results []models.UrlRequest
 	tempDb := db.Table("log_urls").Select("log_urls.request_id, log_urls.dispatched_group_id,transactions.sender, transactions.block_number,transactions.hash,log_validation_results.message,log_validation_results.signature,log_validation_results.pub_key,log_validation_results.pass,log_urls.timeout,log_urls.data_source,log_urls.selector,log_urls.randomness")
-	tempDb = tempDb.Joins("inner join log_validation_results on log_validation_results.request_id = log_urls.request_id")
-	tempDb = tempDb.Joins("inner join transactions on log_validation_results.transaction_id = transactions.id")
+	tempDb = tempDb.Joins("left join log_validation_results on log_validation_results.request_id = log_urls.request_id")
+	tempDb = tempDb.Joins("left join transactions on log_validation_results.transaction_id = transactions.id")
 	if requestId == "" {
 		tempDb.Find(&results)
 	} else {
@@ -589,8 +594,8 @@ func buildRandomRequest(db *gorm.DB, requestId string) {
 
 	var results []models.UserRandomRequest
 	tempDb := db.Table("log_request_user_randoms").Select("log_request_user_randoms.request_id, log_request_user_randoms.dispatched_group_id,transactions.sender, transactions.block_number,transactions.hash,log_validation_results.message,log_validation_results.signature,log_validation_results.pub_key,log_validation_results.pass")
-	tempDb = tempDb.Joins("inner join log_validation_results on log_validation_results.request_id = log_request_user_randoms.request_id")
-	tempDb = tempDb.Joins("inner join transactions on log_validation_results.transaction_id = transactions.id")
+	tempDb = tempDb.Joins("left join log_validation_results on log_validation_results.request_id = log_request_user_randoms.request_id")
+	tempDb = tempDb.Joins("left join transactions on log_validation_results.transaction_id = transactions.id")
 	if requestId == "" {
 		tempDb.Find(&results)
 	} else {

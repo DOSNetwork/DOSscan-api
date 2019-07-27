@@ -103,7 +103,7 @@ func setResponse(code int, msg string, rType, totalCount int, logs []interface{}
 		Code:    code,
 		Message: msg,
 	}
-	if rType < _models.TypeGuardianReward {
+	if 0 < rType && rType < _models.TypeGuardianReward {
 		resp.Body = &Body{Events: logs, TotalCount: totalCount}
 	} else {
 		switch rType {
