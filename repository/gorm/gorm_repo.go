@@ -473,8 +473,11 @@ func (g *gormRepo) NodeByAddr(ctx context.Context, addr string) (node models.Nod
 func (g *gormRepo) GroupByID(ctx context.Context, id string) (group models.Group, err error) {
 	group.GroupId = id
 	err = g.db.Where(group).First(&group).Error
-	if err != nil {
-		fmt.Println("GroupByID err", err)
+	if !gorm.IsRecordNotFoundError(err) {
+		g.db.Model(&group).Related(&group.UrlRequests, "UrlRequests")
+		g.db.Model(&group).Related(&group.UserRandomRequests, "UserRandomRequests")
+		group.NumUrl = len(group.UrlRequests)
+		group.NumRandom = len(group.UserRandomRequests)
 	}
 	return
 }
