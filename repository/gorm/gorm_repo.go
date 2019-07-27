@@ -86,6 +86,7 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 						if res.Error != nil {
 							fmt.Println("res ", res.Error)
 						}
+						buildNode(db, log.Node)
 					}
 				}
 			}
@@ -131,6 +132,7 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 						if res.Error != nil {
 							fmt.Println("res ", res.Error)
 						}
+						buildGroup(db, log.GroupId)
 					}
 				}
 			}
@@ -172,6 +174,7 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 						if res.Error != nil {
 							fmt.Println("res ", res.Error)
 						}
+						buildGroup(db, log.GroupId)
 					}
 				}
 			}
@@ -213,6 +216,7 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 						if res.Error != nil {
 							fmt.Println("res ", res.Error)
 						}
+						buildGroup(db, log.GroupId)
 					}
 				}
 			}
@@ -254,6 +258,7 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 						if res.Error != nil {
 							fmt.Println("res ", res.Error)
 						}
+						buildRandomRequest(db, log.RequestId)
 					}
 				}
 			}
@@ -295,6 +300,7 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 						if res.Error != nil {
 							fmt.Println("res ", res.Error)
 						}
+						buildUrlRequest(db, log.RequestId)
 					}
 				}
 			}
@@ -336,6 +342,8 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 						if res.Error != nil {
 							fmt.Println("res ", res.Error)
 						}
+						buildUrlRequest(db, log.RequestId)
+						buildRandomRequest(db, log.RequestId)
 					}
 				}
 			}
@@ -565,10 +573,13 @@ func buildUrlRequest(db *gorm.DB, requestId string) {
 	for _, request := range results {
 		db.Where(request).FirstOrCreate(&request)
 		var group models.Group
-		db.Where(&models.Group{GroupId: request.DispatchedGroupId}).First(&group)
+		if err := db.Where(&models.Group{GroupId: request.DispatchedGroupId}).First(&group).Error; gorm.IsRecordNotFoundError(err) {
+			continue
+		}
 		res := db.Model(&group).Association("UrlRequests").Append(&request)
 		if res.Error != nil {
 			fmt.Println("res ", res.Error)
+			continue
 		}
 		fmt.Println(group.GroupId, "-", " len ", db.Model(&group).Association("UrlRequests").Count())
 	}
@@ -590,7 +601,10 @@ func buildRandomRequest(db *gorm.DB, requestId string) {
 	for _, request := range results {
 		db.Where(request).FirstOrCreate(&request)
 		var group models.Group
-		db.Where(&models.Group{GroupId: request.DispatchedGroupId}).First(&group)
+
+		if err := db.Where(&models.Group{GroupId: request.DispatchedGroupId}).First(&group).Error; gorm.IsRecordNotFoundError(err) {
+			continue
+		}
 		res := db.Model(&group).Association("UserRandomRequests").Append(&request)
 		if res.Error != nil {
 			fmt.Println("res ", res.Error)

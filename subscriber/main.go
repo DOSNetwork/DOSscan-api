@@ -58,6 +58,7 @@ func main() {
 		oscall := <-sigs
 		log.Printf("system call:%+v", oscall)
 		cancel()
+		os.Exit(0)
 	}()
 
 	//4)Start periodic task
