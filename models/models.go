@@ -315,8 +315,8 @@ type Group struct {
 }
 
 type LogRequestUserRandom struct {
-	gorm.Model           `json:"-"`
-	Event                `json:"-"`
+	gorm.Model
+	Event
 	RequestId            string `gorm:"unique;not null" json:"requestId"`
 	LastSystemRandomness string `json:"lastSystemRandomness"`
 	UserSeed             string `json:"userSeed"`
@@ -324,15 +324,15 @@ type LogRequestUserRandom struct {
 }
 
 type LogUpdateRandom struct {
-	gorm.Model        `json:"-"`
-	Event             `json:"-"`
+	gorm.Model
+	Event
 	LastRandomness    string `json:"lastRandomness"`
 	DispatchedGroupId string `json:"dispatchedGroupId"`
 }
 
 type LogUrl struct {
-	gorm.Model        `json:"-"`
-	Event             `json:"-"`
+	gorm.Model
+	Event
 	RequestId         string `gorm:"unique;not null" json:"queryId"`
 	Timeout           string `json:"timeOut"`
 	DataSource        string `json:"dataSource"`
@@ -342,14 +342,16 @@ type LogUrl struct {
 }
 
 type LogValidationResult struct {
-	gorm.Model             `json:"-"`
-	Event                  `json:"-"`
+	gorm.Model
+	Event
+
 	LogUrlID               uint           `json:"-"`
 	LogRequestUserRandomID uint           `json:"-"`
 	LogUpdateRandomID      uint           `json:"-"`
-	RequestId              string         `gorm:"not null" json:"requestId"`
-	RequestType            uint8          `json:"requestType"`
+	RequestId              string         `gorm:"not null" json:"trafficId"`
+	RequestType            uint8          `json:"trafficType"`
 	Message                []byte         `gorm:"type:bytea" json:"-"`
+	MessageStr             string         `json:"message"`
 	Signature              pq.StringArray `gorm:"type:varchar(100)[]" json:"signature"`
 	PubKey                 pq.StringArray `gorm:"type:varchar(100)[]" json:"pubKey"`
 	Pass                   bool           `json:"pass"`

@@ -342,8 +342,6 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 						if res.Error != nil {
 							fmt.Println("res ", res.Error)
 						}
-						//buildUrlRequest(db, log.RequestId)
-						//buildRandomRequest(db, log.RequestId)
 					}
 				}
 			}
@@ -405,6 +403,11 @@ var getTable = []func(ctx context.Context, db *gorm.DB, limit, offset int) (resu
 		var models []models.LogValidationResult
 		db.Limit(limit).Offset(offset).Find(&models)
 		for _, model := range models {
+			if model.RequestType == 2 {
+				model.MessageStr = string(model.Message)
+			} else {
+				model.MessageStr = fmt.Sprintf("0x%x", model.Message)
+			}
 			results = append(results, model)
 		}
 		return
@@ -643,6 +646,11 @@ func relatedEvents(db *gorm.DB, txs []models.Transaction) []interface{} {
 		}
 		db.Model(&tx).Related(&tx.LogValidationResults, "LogValidationResults")
 		for _, event := range tx.LogValidationResults {
+			if event.RequestType == 2 {
+				event.MessageStr = string(event.Message)
+			} else {
+				event.MessageStr = fmt.Sprintf("0x%x", event.Message)
+			}
 			resp = append(resp, event)
 		}
 		db.Model(&tx).Related(&tx.LogGroupings, "LogGroupings")
