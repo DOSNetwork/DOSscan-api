@@ -349,7 +349,7 @@ type LogValidationResult struct {
 	LogUpdateRandomID      uint           `json:"-"`
 	RequestId              string         `gorm:"not null" json:"requestId"`
 	RequestType            uint8          `json:"requestType"`
-	Message                string         `gorm:"type:bytea" json:"message"`
+	Message                []byte         `gorm:"type:bytea" json:"-"`
 	Signature              pq.StringArray `gorm:"type:varchar(100)[]" json:"signature"`
 	PubKey                 pq.StringArray `gorm:"type:varchar(100)[]" json:"pubKey"`
 	Pass                   bool           `json:"pass"`
@@ -364,10 +364,11 @@ type Request struct {
 }
 
 type RequestResult struct {
-	Message   string         `gorm:"type:bytea" json:"message"`
-	Signature pq.StringArray `gorm:"type:varchar(100)[]" json:"signature"`
-	PubKey    pq.StringArray `gorm:"type:varchar(100)[]" json:"pubKey"`
-	Pass      bool           `json:"pass"`
+	Message    []byte         `gorm:"type:bytea" json:"-"`
+	MessageStr string         `json:"message"`
+	Signature  pq.StringArray `gorm:"type:varchar(100)[]" json:"signature"`
+	PubKey     pq.StringArray `gorm:"type:varchar(100)[]" json:"pubKey"`
+	Pass       bool           `json:"pass"`
 }
 
 type UrlRequest struct {

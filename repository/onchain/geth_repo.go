@@ -487,11 +487,16 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 							LogIndex:        log.Raw.Index,
 							Removed:         log.Raw.Removed,
 						},
+						Message:     log.Message,
 						RequestType: log.TrafficType,
 						RequestId:   hexutil.Encode(log.TrafficId.Bytes()),
 						Signature:   []string{hexutil.Encode(log.Signature[0].Bytes()), hexutil.Encode(log.Signature[1].Bytes())},
 						PubKey:      []string{hexutil.Encode(log.PubKey[0].Bytes()), hexutil.Encode(log.PubKey[1].Bytes()), hexutil.Encode(log.PubKey[2].Bytes()), hexutil.Encode(log.PubKey[3].Bytes())},
 						Pass:        log.Pass,
+					}
+					if mLog.RequestId == "0xa49a38aa1c69090e9d4927535b3be2dfe027eb47190dd7809511e6e26a317934" {
+						fmt.Println(len(mLog.Message))
+						fmt.Println(string(mLog.Message))
 					}
 					result = append(result, tx)
 					result = append(result, mLog)

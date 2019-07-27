@@ -482,12 +482,20 @@ func (g *gormRepo) GroupByID(ctx context.Context, id string) (group models.Group
 func (g *gormRepo) UrlRequestByID(ctx context.Context, id string) (urlRequest models.UrlRequest, err error) {
 	urlRequest.RequestId = id
 	err = g.db.Where(urlRequest).First(&urlRequest).Error
+	if !gorm.IsRecordNotFoundError(err) {
+		fmt.Println("UrlRequestByID : ", len(urlRequest.Message))
+
+		urlRequest.MessageStr = string(urlRequest.Message)
+	}
 	return
 }
 
 func (g *gormRepo) RandomRequestByID(ctx context.Context, id string) (randRequest models.UserRandomRequest, err error) {
 	randRequest.RequestId = id
 	err = g.db.Where(randRequest).First(&randRequest).Error
+	if !gorm.IsRecordNotFoundError(err) {
+		randRequest.MessageStr = fmt.Sprintf("0x%x", randRequest.Message)
+	}
 	return
 }
 
@@ -593,7 +601,7 @@ func buildUrlRequest(db *gorm.DB, requestId string) {
 func buildRandomRequest(db *gorm.DB, requestId string) {
 
 	var results []models.UserRandomRequest
-	tempDb := db.Table("log_request_user_randoms").Select("log_request_user_randoms.request_id, log_request_user_randoms.dispatched_group_id,transactions.sender, transactions.block_number,transactions.hash,log_validation_results.message,log_validation_results.signature,log_validation_results.pub_key,log_validation_results.pass")
+	tempDb := db.Table("log_request_user_randoms").Select("log_request_user_randoms.request_id, log_request_user_randoms.dispatched_group_id,log_request_user_randoms.last_system_randomness,log_request_user_randoms.user_seed,transactions.sender, transactions.block_number,transactions.hash,log_validation_results.message,log_validation_results.signature,log_validation_results.pub_key,log_validation_results.pass")
 	tempDb = tempDb.Joins("left join log_validation_results on log_validation_results.request_id = log_request_user_randoms.request_id")
 	tempDb = tempDb.Joins("left join transactions on log_validation_results.transaction_id = transactions.id")
 	if requestId == "" {
