@@ -22,6 +22,7 @@ type DB interface {
 	LastBlockNum(ctx context.Context, modelType int) (lastBlkNum uint64, err error)
 	CountModel(ctx context.Context, modelType int) (total int, err error)
 	SaveModel(ctx context.Context, modelType int, eventc chan []interface{}) (err error, errc chan error)
+	BuildRelation(ctx context.Context)
 	ModelsByType(ctx context.Context, modelType int, limit, offset int) (results []interface{}, err error)
 	LatestEvents(ctx context.Context, limit int) ([]interface{}, error)
 	NodeByAddr(ctx context.Context, id string) (node models.Node, err error)
