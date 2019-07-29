@@ -13,39 +13,36 @@ const (
 )
 
 type Transformer struct {
-	onchainRepo repository.Onchain
-	dbRepo      repository.DB
+	onchainRepo   repository.Onchain
+	dbRepo        repository.DB
+	updatedBlknum uint64
 }
 
 func NewTransformer(onchainRepo repository.Onchain, dbRepo repository.DB) *Transformer {
 	return &Transformer{
-		onchainRepo: onchainRepo,
-		dbRepo:      dbRepo,
+		onchainRepo:   onchainRepo,
+		dbRepo:        dbRepo,
+		updatedBlknum: 4468400,
 	}
 }
 func (t *Transformer) BuildRelations(ctx context.Context) {
 	t.dbRepo.BuildRelation(ctx)
 }
 
-func (t *Transformer) FetchHistoricalLogs(ctx context.Context, modelsTypes ...int) <-chan error {
+func (t *Transformer) FetchHistoricalLogs(ctx context.Context, modelsTypes ...int) (error, <-chan error) {
 	var errcList []<-chan error
+	toBlock, err := t.onchainRepo.CurrentBlockNum(ctx)
+	if err != nil {
+		fmt.Println("Transformer err ", err)
+		return err, nil
+	}
+	if toBlock-t.updatedBlknum > logsLimit {
+		toBlock = t.updatedBlknum + logsLimit
+	}
 
 	for _, mType := range modelsTypes {
-		fromBlock, err := t.dbRepo.LastBlockNum(ctx, mType)
-		if err != nil {
-			fmt.Println("Transformer err ", err)
-		}
-		fmt.Println("From blkNum", fromBlock)
 
-		toBlock, err := t.onchainRepo.CurrentBlockNum(ctx)
-		if err != nil {
-			fmt.Println("Transformer err ", err)
-		}
-		if toBlock-fromBlock > logsLimit {
-			toBlock = fromBlock + logsLimit
-		}
-		fmt.Println("To blkNum", toBlock)
-		err, logsc, fetchErrc := t.onchainRepo.FetchLogs(ctx, mType, fromBlock, toBlock, logsLimit)
+		err, logsc, fetchErrc := t.onchainRepo.FetchLogs(ctx, mType, t.updatedBlknum, toBlock, logsLimit)
 		if err != nil {
 			fmt.Println("FetchLogs Err ", err)
 			continue
@@ -58,7 +55,8 @@ func (t *Transformer) FetchHistoricalLogs(ctx context.Context, modelsTypes ...in
 		}
 		errcList = append(errcList, saveErrc)
 	}
-	return utils.MergeErrors(ctx, errcList...)
+	t.updatedBlknum = toBlock
+	return nil, utils.MergeErrors(ctx, errcList...)
 }
 
 func (t *Transformer) WatchLogs(ctx context.Context, modelsTypes ...int) <-chan error {
