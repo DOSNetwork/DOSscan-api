@@ -67,9 +67,10 @@ func main() {
 		select {
 		case <-ticker.C:
 			fmt.Println("ticker  ")
-			err, errc := transformService.FetchHistoricalLogs(context.Background(), _models.TypeNewPendingNode, _models.TypeGrouping,
-				_models.TypePublicKeyAccepted, _models.TypeGroupDissolve, _models.TypeUrl, _models.TypeRequestUserRandom,
-				_models.TypeValidationResult)
+			err, errc := transformService.FetchHistoricalLogs(context.Background(), _models.TypeNewPendingNode,
+				_models.TypeGrouping, _models.TypePublicKeySuggested, _models.TypePublicKeyAccepted, _models.TypeGroupDissolve,
+				_models.TypeUpdateRandom, _models.TypeUrl, _models.TypeRequestUserRandom, _models.TypeValidationResult,
+				_models.TypeGuardianReward, _models.TypeCallbackTriggeredFor, _models.TypeError)
 			if err != nil {
 				log.Fatal(err)
 			}

@@ -31,6 +31,7 @@ const (
 
 var supportedEvents []string
 var stringToType map[string]int
+var typeToStruct []interface{}
 
 func init() {
 	supportedEvents = append(supportedEvents, "LogRegisteredNewPendingNode")
@@ -47,22 +48,37 @@ func init() {
 	supportedEvents = append(supportedEvents, "LogError")
 
 	stringToType = make(map[string]int)
+	stringToType["node"] = TypeNode
+	stringToType["group"] = TypeGroup
+	stringToType["urlrequest"] = TypeUrlRequest
+	stringToType["randomreques"] = TypeRandomRequest
 	stringToType["logregisterednewpendingnode"] = TypeNewPendingNode
 	stringToType["loggrouping"] = TypeGrouping
 	stringToType["logpublickeysuggested"] = TypePublicKeySuggested
 	stringToType["logpublickeyaccepted"] = TypePublicKeyAccepted
 	stringToType["loggroupdissolve"] = TypeGroupDissolve
 	stringToType["logupdaterandom"] = TypeUpdateRandom
-	stringToType["logrrl"] = TypeUrl
+	stringToType["logurl"] = TypeUrl
 	stringToType["logrequestuserrandom"] = TypeRequestUserRandom
 	stringToType["logvalidationresult"] = TypeValidationResult
 	stringToType["logcallbacktriggeredfor"] = TypeCallbackTriggeredFor
 	stringToType["guardianreward"] = TypeGuardianReward
 	stringToType["logerror"] = TypeError
-	stringToType["node"] = TypeNode
-	stringToType["group"] = TypeGroup
-	stringToType["urlrequest"] = TypeUrlRequest
-	stringToType["randomreques"] = TypeRandomRequest
+
+	typeToStruct = []interface{}{
+		TypeNewPendingNode:       &LogRegisteredNewPendingNode{},
+		TypeGrouping:             &LogGrouping{},
+		TypePublicKeySuggested:   &LogPublicKeySuggested{},
+		TypePublicKeyAccepted:    &LogPublicKeyAccepted{},
+		TypeGroupDissolve:        &LogGroupDissolve{},
+		TypeUpdateRandom:         &LogUpdateRandom{},
+		TypeRequestUserRandom:    &LogRequestUserRandom{},
+		TypeUrl:                  &LogUrl{},
+		TypeValidationResult:     &LogValidationResult{},
+		TypeCallbackTriggeredFor: &LogCallbackTriggeredFor{},
+		TypeGuardianReward:       &GuardianReward{},
+		TypeError:                &LogError{},
+	}
 }
 
 func SupportedEvents() []string {
@@ -71,6 +87,13 @@ func SupportedEvents() []string {
 
 func StringToType(s string) int {
 	return stringToType[strings.ToLower(s)]
+}
+
+func TypeToStruct(t int) interface{} {
+	if t < len(typeToStruct) {
+		return typeToStruct[t]
+	}
+	return nil
 }
 
 type Transaction struct {

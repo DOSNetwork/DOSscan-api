@@ -12,42 +12,19 @@ import (
 )
 
 type gormRepo struct {
-	db             *gorm.DB
-	supportedEvent []string
-	nameToType     map[string]int
+	db *gorm.DB
 }
 
 func NewGormRepo(db *gorm.DB) _repository.DB {
-	var supportedEvent []string
-	supportedEvent = append(supportedEvent, "LogRegisteredNewPendingNode")
-	supportedEvent = append(supportedEvent, "LogGrouping")
-	nameToType := make(map[string]int)
-	nameToType["logregisterednewpendingnode"] = _models.TypeNewPendingNode
-	nameToType["loggrouping"] = _models.TypeGrouping
-	nameToType["logpublickeyaccepted"] = _models.TypePublicKeyAccepted
-	nameToType["loggroupdissolve"] = _models.TypeGroupDissolve
-	nameToType["logurl"] = _models.TypeUrl
-	nameToType["logrequestuserrandom"] = _models.TypeRequestUserRandom
-	nameToType["logvalidationresult"] = _models.TypeValidationResult
-
-	db.AutoMigrate(&_models.Transaction{}, &_models.LogRegisteredNewPendingNode{},
-		&_models.LogGrouping{}, &_models.LogPublicKeyAccepted{}, &_models.LogGroupDissolve{},
-		&_models.Group{}, &_models.Node{}, &_models.LogRequestUserRandom{}, &_models.LogUrl{},
-		&_models.LogValidationResult{}, &_models.UrlRequest{}, &_models.UserRandomRequest{})
+	db.AutoMigrate(&_models.Group{}, &_models.Node{}, &_models.UrlRequest{}, &_models.UserRandomRequest{},
+		&_models.Transaction{}, &_models.LogRegisteredNewPendingNode{},
+		&_models.LogGrouping{}, &_models.LogPublicKeySuggested{}, &_models.LogPublicKeyAccepted{}, &_models.LogGroupDissolve{},
+		&_models.LogUpdateRandom{}, &_models.LogRequestUserRandom{}, &_models.LogUrl{}, &_models.LogValidationResult{},
+		&_models.LogCallbackTriggeredFor{}, &_models.GuardianReward{}, &_models.LogError{})
 
 	return &gormRepo{
 		db: db,
 	}
-}
-
-var typeToStruct = []interface{}{
-	_models.TypeNewPendingNode:    &_models.LogRegisteredNewPendingNode{},
-	_models.TypeGrouping:          &_models.LogGrouping{},
-	_models.TypePublicKeyAccepted: &_models.LogPublicKeyAccepted{},
-	_models.TypeGroupDissolve:     &_models.LogGroupDissolve{},
-	_models.TypeRequestUserRandom: &_models.LogRequestUserRandom{},
-	_models.TypeUrl:               &_models.LogUrl{},
-	_models.TypeValidationResult:  &_models.LogValidationResult{},
 }
 
 func (g *gormRepo) ModelsByType(ctx context.Context, modelType int, limit, offset int) (results []interface{}, err error) {
@@ -60,21 +37,24 @@ func (g *gormRepo) ModelsByType(ctx context.Context, modelType int, limit, offse
 }
 
 func (g *gormRepo) CountModel(ctx context.Context, modelType int) (total int, err error) {
-	if modelType == 0 || modelType >= len(typeToStruct) {
+	if modelType == 0 {
 		err = errors.New("Unsupported Type ")
 		return
 	}
-	err = g.db.Model(typeToStruct[modelType]).Count(&total).Error
+	if model := _models.TypeToStruct(modelType); model != nil {
+		err = g.db.Model(model).Count(&total).Error
+	}
 	return
 }
 
 func (g *gormRepo) LastBlockNum(ctx context.Context, modelType int) (lastBlkNum uint64, err error) {
 	var blkNums []uint64
-	err = g.db.Limit(1).Order("block_number desc").Find(typeToStruct[modelType]).Pluck("block_number", &blkNums).Error
-	if len(blkNums) == 0 {
-		lastBlkNum = 4468402
-	} else {
-		lastBlkNum = blkNums[0]
+	lastBlkNum = 4468402
+	if model := _models.TypeToStruct(modelType); model != nil {
+		err = g.db.Limit(1).Order("block_number desc").Find(model).Pluck("block_number", &blkNums).Error
+		if len(blkNums) != 0 {
+			lastBlkNum = blkNums[0]
+		}
 	}
 	return
 }
