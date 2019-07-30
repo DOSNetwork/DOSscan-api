@@ -10,24 +10,23 @@ import (
 
 const (
 	_ int = iota
+	TypeNode
+	TypeGroup
+	TypeUrlRequest
+	TypeRandomRequest
 	TypeNewPendingNode
 	TypeGrouping
 	TypePublicKeySuggested
 	TypePublicKeyAccepted
 	TypeGroupDissolve
-
 	TypeUpdateRandom
 	TypeUrl
 	TypeRequestUserRandom
 	TypeValidationResult
-	TypeCallbackTriggeredFor
-	TypeGuardianReward
 
+	TypeGuardianReward
+	TypeCallbackTriggeredFor
 	TypeError
-	TypeNode
-	TypeGroup
-	TypeUrlRequest
-	TypeRandomRequest
 )
 
 var supportedEvents []string
@@ -76,35 +75,37 @@ func StringToType(s string) int {
 
 type Transaction struct {
 	gorm.Model
-	Hash                           string                          `gorm:"primary_key;unique;not null"`
-	GasPrice                       uint64                          `json:"gasPrice"`
-	Value                          uint64                          `json:"value"`
-	GasLimit                       uint64                          `json:"gasLimit"`
-	Nonce                          uint64                          `json:"nonce"`
-	Sender                         string                          `json:"sender"`
-	To                             string                          `json:"to"`
-	BlockNumber                    uint64                          `gorm:"primary_key" json:"blockNumber"`
-	Data                           []byte                          `gorm:"type:bytea" json:"data"`
-	Method                         string                          `gorm:"index" json:"method"`
-	LogRegisteredNewPendingNodes   []LogRegisteredNewPendingNode   `gorm:"auto_preload"`
-	LogGroupings                   []LogGrouping                   `gorm:"auto_preload"`
-	LogUrls                        []LogUrl                        `gorm:"auto_preload"`
-	LogRequestUserRandoms          []LogRequestUserRandom          `gorm:"auto_preload"`
-	LogUpdateRandoms               []LogUpdateRandom               `gorm:"auto_preload"`
-	LogValidationResults           []LogValidationResult           `gorm:"auto_preload"`
+	Hash                         string                        `gorm:"primary_key;unique;not null"`
+	GasPrice                     uint64                        `json:"gasPrice"`
+	Value                        uint64                        `json:"value"`
+	GasLimit                     uint64                        `json:"gasLimit"`
+	Nonce                        uint64                        `json:"nonce"`
+	Sender                       string                        `json:"sender"`
+	To                           string                        `json:"to"`
+	BlockNumber                  uint64                        `gorm:"primary_key" json:"blockNumber"`
+	Data                         []byte                        `gorm:"type:bytea" json:"data"`
+	Method                       string                        `gorm:"index" json:"method"`
+	LogRegisteredNewPendingNodes []LogRegisteredNewPendingNode `gorm:"auto_preload"`
+	LogGroupings                 []LogGrouping                 `gorm:"auto_preload"`
+	LogPublicKeySuggesteds       []LogPublicKeySuggested       `gorm:"auto_preload"`
+	LogPublicKeyAccepteds        []LogPublicKeyAccepted        `gorm:"auto_preload"`
+	LogUpdateRandoms             []LogUpdateRandom             `gorm:"auto_preload"`
+	LogUrls                      []LogUrl                      `gorm:"auto_preload"`
+	LogRequestUserRandoms        []LogRequestUserRandom        `gorm:"auto_preload"`
+	LogValidationResults         []LogValidationResult         `gorm:"auto_preload"`
+	LogCallbackTriggeredFors     []LogCallbackTriggeredFor     `gorm:"auto_preload"`
+	GuardianRewards              []GuardianReward              `gorm:"auto_preload"`
+	LogErrors                    []LogError                    `gorm:"auto_preload"`
+
 	LogNonSupportedTypes           []LogNonSupportedType           `gorm:"auto_preload"`
 	LogNonContractCalls            []LogNonContractCall            `gorm:"auto_preload"`
-	LogCallbackTriggeredFors       []LogCallbackTriggeredFor       `gorm:"auto_preload"`
 	LogRequestFromNonExistentUCs   []LogRequestFromNonExistentUC   `gorm:"auto_preload"`
 	LogInsufficientPendingNodes    []LogInsufficientPendingNode    `gorm:"auto_preload"`
 	LogInsufficientWorkingGroups   []LogInsufficientWorkingGroup   `gorm:"auto_preload"`
-	LogPublicKeyAccepteds          []LogPublicKeyAccepted          `gorm:"auto_preload"`
-	LogPublicKeySuggesteds         []LogPublicKeySuggested         `gorm:"auto_preload"`
 	LogGroupDissolves              []LogGroupDissolve              `gorm:"auto_preload"`
 	LogGroupingInitiateds          []LogGroupingInitiated          `gorm:"auto_preload"`
 	LogNoPendingGroups             []LogNoPendingGroup             `gorm:"auto_preload"`
 	LogPendingGroupRemoveds        []LogPendingGroupRemoved        `gorm:"auto_preload"`
-	LogErrors                      []LogError                      `gorm:"auto_preload"`
 	UpdateGroupToPicks             []UpdateGroupToPick             `gorm:"auto_preload"`
 	UpdateGroupSizes               []UpdateGroupSize               `gorm:"auto_preload"`
 	UpdateGroupingThresholds       []UpdateGroupingThreshold       `gorm:"auto_preload"`
@@ -113,7 +114,6 @@ type Transaction struct {
 	UpdateBootstrapRevealDurations []UpdateBootstrapRevealDuration `gorm:"auto_preload"`
 	UpdatebootstrapStartThresholds []UpdatebootstrapStartThreshold `gorm:"auto_preload"`
 	UpdatePendingGroupMaxLifes     []UpdatePendingGroupMaxLife     `gorm:"auto_preload"`
-	GuardianRewards                []GuardianReward                `gorm:"auto_preload"`
 }
 
 type Event struct {
@@ -152,13 +152,13 @@ type LogNonSupportedType struct {
 type LogNonContractCall struct {
 	gorm.Model
 	Event
-	CallAddr string `gorm:"column:call_ddr" json:"callAddr"`
+	CallAddr string `json:"callAddr"`
 }
 
 type LogCallbackTriggeredFor struct {
 	gorm.Model
 	Event
-	CallbackAddr string `gorm:"column:call_back_addr" json:"callbackAddr"`
+	CallbackAddr string `json:"callbackAddr"`
 }
 
 type LogRequestFromNonExistentUC struct {
