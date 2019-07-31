@@ -43,15 +43,20 @@ func (g *gormRepo) CountModel(ctx context.Context, modelType int) (total int, er
 	}
 	if model := _models.TypeToStruct(modelType); model != nil {
 		err = g.db.Model(model).Count(&total).Error
+		if err != nil {
+			fmt.Println("CountModel err ", err)
+		}
 	}
 	return
 }
 
 func (g *gormRepo) LastBlockNum(ctx context.Context, modelType int) (lastBlkNum uint64, err error) {
 	var blkNums []uint64
-	lastBlkNum = 4468402
 	if model := _models.TypeToStruct(modelType); model != nil {
-		err = g.db.Limit(1).Order("block_number desc").Find(model).Pluck("block_number", &blkNums).Error
+		err = g.db.Model(model).Order("block_number desc").Pluck("block_number", &blkNums).Error
+		if err != nil {
+			fmt.Println("LastBlockNum err ", err)
+		}
 		if len(blkNums) != 0 {
 			lastBlkNum = blkNums[0]
 		}
@@ -145,8 +150,8 @@ func buildNode(db *gorm.DB, addr string) {
 			if res.Error != nil {
 				fmt.Println("res ", res.Error)
 			}
-			fmt.Println("len ", db.Model(&node).Association("Groups").Count())
-			fmt.Println("len ", node.Groups[0].GroupId)
+			//fmt.Println("len ", db.Model(&node).Association("Groups").Count())
+			//fmt.Println("len ", node.Groups[0].GroupId)
 		}
 	}
 }
@@ -171,7 +176,8 @@ func buildGroup(db *gorm.DB, grouId string) {
 	} else {
 		tempDb.Where(&_models.LogGrouping{GroupId: grouId}, grouId).Find(&results)
 	}
-	fmt.Println(len(results))
+	fmt.Println("-", " len buildGroup", len(results))
+
 	for _, group := range results {
 		var existGroup _models.Group
 		if err := db.Where("group_id = ?", group.GroupId).First(&existGroup).Error; gorm.IsRecordNotFoundError(err) {
@@ -189,7 +195,6 @@ func buildGroup(db *gorm.DB, grouId string) {
 			}
 		} else {
 			db.Model(&existGroup).Omit("group_id").Updates(&group)
-			fmt.Println("Update group ", existGroup.GroupId, group.DissolvedBlkNum, group.AcceptedBlkNum)
 		}
 	}
 }
@@ -204,6 +209,7 @@ func buildUrlRequest(db *gorm.DB, requestId string) {
 	} else {
 		tempDb.Where("log_urls.request_id = ? ", requestId).Find(&results)
 	}
+	fmt.Println("-", " len buildUrlRequest", len(results))
 
 	for _, request := range results {
 		db.Where(request).FirstOrCreate(&request)
@@ -216,7 +222,6 @@ func buildUrlRequest(db *gorm.DB, requestId string) {
 			fmt.Println("res ", res.Error)
 			continue
 		}
-		fmt.Println(group.GroupId, "-", " len ", db.Model(&group).Association("UrlRequests").Count())
 	}
 }
 
@@ -244,14 +249,12 @@ func buildRandomRequest(db *gorm.DB, requestId string) {
 		if res.Error != nil {
 			fmt.Println("res ", res.Error)
 		}
-		fmt.Println(group.GroupId, "-", " len buildRandomRequest", db.Model(&group).Association("UserRandomRequests").Count())
 	}
 }
 
 func relatedEvents(db *gorm.DB, txs []_models.Transaction) []interface{} {
 	var resp []interface{}
 	for _, tx := range txs {
-		fmt.Println("blockNum ", tx.BlockNumber, tx.Method)
 		db.Model(&tx).Related(&tx.LogUrls, "LogUrls")
 		for _, event := range tx.LogUrls {
 			resp = append(resp, event)

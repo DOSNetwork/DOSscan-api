@@ -48,7 +48,11 @@ func main() {
 	onchainRepo := _onchain.NewGethRepo(client)
 
 	//2)Create a service
-	transformService := _service.NewTransformer(onchainRepo, dbRepo)
+	modelsType := []int{_models.TypeNewPendingNode,
+		_models.TypeGrouping, _models.TypePublicKeySuggested, _models.TypePublicKeyAccepted, _models.TypeGroupDissolve,
+		_models.TypeUpdateRandom, _models.TypeUrl, _models.TypeRequestUserRandom, _models.TypeValidationResult,
+		_models.TypeGuardianReward, _models.TypeCallbackTriggeredFor, _models.TypeError}
+	transformService := _service.NewTransformer(onchainRepo, dbRepo, 4468400, modelsType)
 
 	//3)Graceful shutdown of application
 	ctx, cancel := context.WithCancel(context.Background())
@@ -67,17 +71,13 @@ func main() {
 		select {
 		case <-ticker.C:
 			fmt.Println("ticker  ")
-			err, errc := transformService.FetchHistoricalLogs(context.Background(), _models.TypeNewPendingNode,
-				_models.TypeGrouping, _models.TypePublicKeySuggested, _models.TypePublicKeyAccepted, _models.TypeGroupDissolve,
-				_models.TypeUpdateRandom, _models.TypeUrl, _models.TypeRequestUserRandom, _models.TypeValidationResult,
-				_models.TypeGuardianReward, _models.TypeCallbackTriggeredFor, _models.TypeError)
+			err, errc := transformService.FetchHistoricalLogs(context.Background())
 			if err != nil {
 				log.Fatal(err)
 			}
 			for err := range errc {
 				fmt.Println(err)
 			}
-			transformService.BuildRelations(context.Background())
 		case <-ctx.Done():
 			ticker.Stop()
 			return

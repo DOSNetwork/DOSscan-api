@@ -16,20 +16,47 @@ type Transformer struct {
 	onchainRepo   repository.Onchain
 	dbRepo        repository.DB
 	updatedBlknum uint64
+	modelsTypes   []int
 }
 
-func NewTransformer(onchainRepo repository.Onchain, dbRepo repository.DB) *Transformer {
-	return &Transformer{
+func lastBlcokNum(ctx context.Context, dbRepo repository.DB, modelsTypes []int) (lastBlk uint64) {
+	for _, mType := range modelsTypes {
+		blkNum, err := dbRepo.LastBlockNum(ctx, mType)
+		if err != nil {
+			fmt.Println("Transformer err ", err)
+			continue
+		}
+		if lastBlk == 0 {
+			lastBlk = blkNum
+		} else if blkNum != 0 && lastBlk > blkNum {
+			lastBlk = blkNum
+		}
+	}
+	fmt.Println("lastBlcokNum ", lastBlk)
+	return
+}
+
+func NewTransformer(onchainRepo repository.Onchain, dbRepo repository.DB, updatedBlknum uint64, modelsTypes []int) *Transformer {
+	t := &Transformer{
 		onchainRepo:   onchainRepo,
 		dbRepo:        dbRepo,
-		updatedBlknum: 4468400,
+		updatedBlknum: updatedBlknum,
+		modelsTypes:   modelsTypes,
 	}
+
+	if lastBlk := lastBlcokNum(context.Background(), dbRepo, modelsTypes); lastBlk != 0 {
+		if t.updatedBlknum > lastBlk {
+			t.updatedBlknum = lastBlk
+		}
+	}
+	return t
 }
+
 func (t *Transformer) BuildRelations(ctx context.Context) {
 	t.dbRepo.BuildRelation(ctx)
 }
 
-func (t *Transformer) FetchHistoricalLogs(ctx context.Context, modelsTypes ...int) (error, <-chan error) {
+func (t *Transformer) FetchHistoricalLogs(ctx context.Context) (error, <-chan error) {
 	var errcList []<-chan error
 	toBlock, err := t.onchainRepo.CurrentBlockNum(ctx)
 	if err != nil {
@@ -39,9 +66,8 @@ func (t *Transformer) FetchHistoricalLogs(ctx context.Context, modelsTypes ...in
 	if toBlock-t.updatedBlknum > logsLimit {
 		toBlock = t.updatedBlknum + logsLimit
 	}
-
-	for _, mType := range modelsTypes {
-
+	fmt.Println("FetchHistoricalLogs from ", t.updatedBlknum, " to ", toBlock)
+	for _, mType := range t.modelsTypes {
 		err, logsc, fetchErrc := t.onchainRepo.FetchLogs(ctx, mType, t.updatedBlknum, toBlock, logsLimit)
 		if err != nil {
 			fmt.Println("FetchLogs Err ", err)

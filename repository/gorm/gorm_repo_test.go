@@ -18,7 +18,7 @@ const (
 	DB_PORT     = "5432"
 	DB_USER     = "postgres"
 	DB_PASSWORD = "postgres"
-	DB_NAME     = "postgres"
+	DB_NAME     = "test"
 	ETH_URL     = "wss://rinkeby.infura.io/ws/v3/3a3e5d776961418e93a8b33fef2f6642"
 )
 
@@ -133,7 +133,6 @@ func mockValidationResult(r repository.DB, t *testing.T, sender string, nonce ui
 		BlockNumber:     blknum,
 	},
 		RequestId: requestId,
-		Message:   "Fake Mesage",
 		Pass:      true,
 	}
 
@@ -533,7 +532,7 @@ func TestCount(t *testing.T) {
 	db := initDB()
 
 	r := NewGormRepo(db)
-	total, err := r.CountModel(context.Background(), models.TypeUrl)
+	total, err := r.CountModel(context.Background(), models.TypeNewPendingNode)
 
 	fmt.Println(total, err)
 

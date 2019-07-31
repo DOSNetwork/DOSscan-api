@@ -36,17 +36,73 @@ func initClient(url string) *ethclient.Client {
 	}
 	return client
 }
+
 func TestFetchHistoricalLogs(t *testing.T) {
 
 	db := initDB("postgres", "postgres", "test")
 	repositoryGorm := _gorm.NewGormRepo(db)
-
 	client := initClient("wss://rinkeby.infura.io/ws/v3/3a3e5d776961418e93a8b33fef2f6642")
 	repositoryOnchain := _onchain.NewGethRepo(client)
+	modelsType := []int{_models.TypeNewPendingNode,
+		_models.TypeGrouping, _models.TypePublicKeySuggested, _models.TypePublicKeyAccepted, _models.TypeGroupDissolve,
+		_models.TypeUpdateRandom, _models.TypeUrl, _models.TypeRequestUserRandom, _models.TypeValidationResult,
+		_models.TypeGuardianReward, _models.TypeCallbackTriggeredFor, _models.TypeError}
+	initBlkNum := uint64(4468400)
+	transformer := NewTransformer(repositoryOnchain, repositoryGorm, initBlkNum, modelsType)
 
-	transformer := NewTransformer(repositoryOnchain, repositoryGorm)
-	errc := transformer.FetchHistoricalLogs(context.Background(), _models.TypeNewPendingNode, _models.TypeGrouping)
+	err, errc := transformer.FetchHistoricalLogs(context.Background())
+	if err != nil {
+		t.Errorf("TestFetchHistoricalLogs ,Error %v", err)
+	}
 	for err := range errc {
-		fmt.Println(err)
+		t.Errorf("TestFetchHistoricalLogs ,Error %v", err)
+	}
+
+	//Verify the results
+	if logTotal, err := repositoryGorm.CountModel(context.Background(), _models.TypeNewPendingNode); err != nil {
+		t.Errorf("TestFetchHistoricalLogs ,Error %v", err)
+	} else {
+		if total, err := repositoryGorm.CountModel(context.Background(), _models.TypeNode); err != nil {
+			t.Errorf("TestFetchHistoricalLogs ,Error %v", err)
+		} else {
+			if logTotal != total {
+				t.Errorf("TestFetchHistoricalLogs ,Expected %d Actual %d ", logTotal, total)
+			}
+		}
+	}
+
+	if logTotal, err := repositoryGorm.CountModel(context.Background(), _models.TypeGrouping); err != nil {
+		t.Errorf("TestFetchHistoricalLogs ,Error %v", err)
+	} else {
+		if total, err := repositoryGorm.CountModel(context.Background(), _models.TypeGroup); err != nil {
+			t.Errorf("TestFetchHistoricalLogs ,Error %v", err)
+		} else {
+			if logTotal != total {
+				t.Errorf("TestFetchHistoricalLogs ,Expected %d Actual %d ", logTotal, total)
+			}
+		}
+	}
+
+	if logTotal, err := repositoryGorm.CountModel(context.Background(), _models.TypeRequestUserRandom); err != nil {
+		t.Errorf("TestFetchHistoricalLogs ,Error %v", err)
+	} else {
+		if total, err := repositoryGorm.CountModel(context.Background(), _models.TypeRandomRequest); err != nil {
+			t.Errorf("TestFetchHistoricalLogs ,Error %v", err)
+		} else {
+			if logTotal != total {
+				t.Errorf("TestFetchHistoricalLogs ,Expected %d Actual %d ", logTotal, total)
+			}
+		}
+	}
+	if logTotal, err := repositoryGorm.CountModel(context.Background(), _models.TypeUrl); err != nil {
+		t.Errorf("TestFetchHistoricalLogs ,Error %v", err)
+	} else {
+		if total, err := repositoryGorm.CountModel(context.Background(), _models.TypeUrlRequest); err != nil {
+			t.Errorf("TestFetchHistoricalLogs ,Error %v", err)
+		} else {
+			if logTotal != total {
+				t.Errorf("TestFetchHistoricalLogs ,Expected %d Actual %d ", logTotal, total)
+			}
+		}
 	}
 }

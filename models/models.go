@@ -78,6 +78,10 @@ func init() {
 		TypeCallbackTriggeredFor: &LogCallbackTriggeredFor{},
 		TypeGuardianReward:       &GuardianReward{},
 		TypeError:                &LogError{},
+		TypeNode:                 &Node{},
+		TypeGroup:                &Group{},
+		TypeUrlRequest:           &UrlRequest{},
+		TypeRandomRequest:        &UserRandomRequest{},
 	}
 }
 

@@ -77,7 +77,6 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 						fmt.Println("log !ok")
 						continue
 					}
-					fmt.Println("tx.Hash ", tx.Hash, " tx.BlockNumber ", tx.BlockNumber)
 					if tx.Hash != log.TransactionHash || tx.BlockNumber != log.Event.BlockNumber {
 						continue
 					}
@@ -90,7 +89,10 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 						if res.Error != nil {
 							fmt.Println("res ", res.Error)
 						}
-						//buildGroup(db, log.GroupId)
+						buildGroup(db, log.GroupId)
+						for _, node := range log.NodeId {
+							buildNode(db, node)
+						}
 					}
 				}
 			}
@@ -132,6 +134,7 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 						if res.Error != nil {
 							fmt.Println("res ", res.Error)
 						}
+						buildGroup(db, log.GroupId)
 					}
 				}
 			}
@@ -173,7 +176,7 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 						if res.Error != nil {
 							fmt.Println("res ", res.Error)
 						}
-						//buildGroup(db, log.GroupId)
+						buildGroup(db, log.GroupId)
 					}
 				}
 			}
@@ -215,7 +218,7 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 						if res.Error != nil {
 							fmt.Println("res ", res.Error)
 						}
-						//buildGroup(db, log.GroupId)
+						buildGroup(db, log.GroupId)
 					}
 				}
 			}
@@ -257,7 +260,7 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 						if res.Error != nil {
 							fmt.Println("res ", res.Error)
 						}
-						//buildRandomRequest(db, log.RequestId)
+						buildRandomRequest(db, log.RequestId)
 					}
 				}
 			}
@@ -340,7 +343,7 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 						if res.Error != nil {
 							fmt.Println("res ", res.Error)
 						}
-						//buildUrlRequest(db, log.RequestId)
+						buildUrlRequest(db, log.RequestId)
 					}
 				}
 			}
@@ -374,7 +377,11 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 						continue
 					}
 					if err := db.Where("hash = ?", tx.Hash).First(tx).Error; gorm.IsRecordNotFoundError(err) {
-						db.Create(tx)
+						if err := db.Create(tx).Error; err != nil {
+							fmt.Println("Create tx err ", err)
+						}
+					} else if err != nil {
+						fmt.Println("save TypeValidationResult err ", err)
 					}
 					if err := db.Where("transaction_hash = ? AND log_index = ?", tx.Hash, log.Event.LogIndex).First(log).Error; gorm.IsRecordNotFoundError(err) {
 						db.Create(log)
@@ -457,6 +464,8 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 					}
 					if err := db.Where("hash = ?", tx.Hash).First(tx).Error; gorm.IsRecordNotFoundError(err) {
 						db.Create(tx)
+					} else if err != nil {
+						fmt.Println("save TypeCallbackTriggeredFor err ", err)
 					}
 					if err := db.Where("transaction_hash = ? AND log_index = ?", tx.Hash, log.Event.LogIndex).First(log).Error; gorm.IsRecordNotFoundError(err) {
 						db.Create(log)
