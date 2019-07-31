@@ -14,6 +14,7 @@ const (
 	TypeGroup
 	TypeUrlRequest
 	TypeRandomRequest
+	TypeLatestEvents
 	TypeNewPendingNode
 	TypeGrouping
 	TypePublicKeySuggested

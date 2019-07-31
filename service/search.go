@@ -26,7 +26,7 @@ func (s *Search) Search(ctx context.Context, query string, pageSize, pageIndex i
 	if query == "" {
 		//Latest event
 		results, err = s.dbRepo.LatestEvents(ctx, 20)
-		respType = 1
+		respType = _models.TypeLatestEvents
 		total = len(results)
 		return
 	} else if strings.HasPrefix(query, "0x") {
