@@ -103,7 +103,7 @@ func setResponse(code int, msg string, rType, totalCount int, logs []interface{}
 		Code:    code,
 		Message: msg,
 	}
-	if 0 < rType && rType <= _models.TypeError {
+	if TypeRandomRequest < rType && rType <= _models.TypeError {
 		resp.Body = &Body{Events: logs, TotalCount: totalCount}
 	} else {
 		switch rType {
