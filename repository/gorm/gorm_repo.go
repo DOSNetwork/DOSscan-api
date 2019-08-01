@@ -77,6 +77,8 @@ func (g *gormRepo) LatestEvents(ctx context.Context, limit int) (resp []interfac
 
 	if err := g.db.Order("block_number desc").Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
 		resp = relatedEvents(g.db, logs)
+	} else if err != nil {
+		fmt.Println("LatestEvents err ", err)
 	}
 	if limit < len(resp) {
 		resp = resp[:limit]

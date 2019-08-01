@@ -98,12 +98,14 @@ func (s *SearchHandler) Search(c *gin.Context) {
 
 func setResponse(code int, msg string, rType, totalCount int, logs []interface{}) (string, error) {
 	var resp Response
-	fmt.Println("setResponse type = ", rType, len(logs))
+	fmt.Println("setResponse type = ", rType, _models.TypeLatestEvents)
 	resp = Response{
 		Code:    code,
 		Message: msg,
 	}
-	if _models.TypeLatestEvents <= rType && rType <= _models.TypeError {
+	fmt.Println(_models.TypeLatestEvents <= rType)
+	if _models.TypeLatestEvents <= rType {
+		fmt.Println("!!!!setResponse type = ", rType, len(logs))
 		resp.Body = &Body{Events: logs, TotalCount: totalCount}
 	} else {
 		switch rType {
