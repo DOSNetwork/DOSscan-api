@@ -178,7 +178,7 @@ func buildGroup(db *gorm.DB, grouId string) {
 	} else {
 		tempDb.Where(&_models.LogGrouping{GroupId: grouId}, grouId).Find(&results)
 	}
-	fmt.Println("-", " len buildGroup", len(results))
+	//fmt.Println("-", " len buildGroup", len(results))
 
 	for _, group := range results {
 		var existGroup _models.Group
@@ -211,7 +211,7 @@ func buildUrlRequest(db *gorm.DB, requestId string) {
 	} else {
 		tempDb.Where("log_urls.request_id = ? ", requestId).Find(&results)
 	}
-	fmt.Println("-", " len buildUrlRequest", len(results))
+	//fmt.Println("-", " len buildUrlRequest", len(results))
 
 	for _, request := range results {
 		db.Where(request).FirstOrCreate(&request)
@@ -238,7 +238,7 @@ func buildRandomRequest(db *gorm.DB, requestId string) {
 	} else {
 		tempDb.Where("log_request_user_randoms.request_id = ? ", requestId).Find(&results)
 	}
-	fmt.Println("-", " len buildRandomRequest", len(results))
+	//fmt.Println("-", " len buildRandomRequest", len(results))
 
 	for _, request := range results {
 		db.Where(request).FirstOrCreate(&request)

@@ -24,7 +24,7 @@ const (
 	DB_USER     = "postgres"
 	DB_PASSWORD = "postgres"
 	DB_NAME     = "postgres"
-	ETH_URL     = "wss://rinkeby.infura.io/ws/v3/3a3e5d776961418e93a8b33fef2f6642"
+	ETH_URL     = "https://rinkeby.infura.io/v3/2a6901876ca54406960499e888e70439"
 )
 
 func main() {
