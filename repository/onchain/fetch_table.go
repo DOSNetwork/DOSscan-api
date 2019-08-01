@@ -643,6 +643,11 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 				}
 				logs, err := filter.FilterLogCallbackTriggeredFor(&bind.FilterOpts{Start: fromBlock, End: &nextBlk, Context: ctx})
 				if err != nil {
+					/* TODO: Handle err
+					FilterLogCallbackTriggeredFor err  websocket: read limit exceeded
+					TransactionByHash err websocket: read limit exceeded
+					panic: runtime error: invalid memory address or nil pointer dereference
+					*/
 					fmt.Println("FilterLogCallbackTriggeredFor err ", err)
 				}
 				for logs.Next() {
