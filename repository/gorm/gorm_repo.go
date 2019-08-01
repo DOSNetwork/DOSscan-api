@@ -76,6 +76,7 @@ func (g *gormRepo) LatestEvents(ctx context.Context, limit int) (resp []interfac
 	logs := []_models.Transaction{}
 
 	if err := g.db.Order("block_number desc").Limit(limit).Find(&logs).Error; !gorm.IsRecordNotFoundError(err) {
+		fmt.Println("LatestEvents number of tx ", len(logs))
 		resp = relatedEvents(g.db, logs)
 	} else if err != nil {
 		fmt.Println("LatestEvents err ", err)
@@ -257,6 +258,33 @@ func buildRandomRequest(db *gorm.DB, requestId string) {
 func relatedEvents(db *gorm.DB, txs []_models.Transaction) []interface{} {
 	var resp []interface{}
 	for _, tx := range txs {
+		db.Model(&tx).Related(&tx.LogRegisteredNewPendingNodes, "LogRegisteredNewPendingNodes")
+		for _, event := range tx.LogRegisteredNewPendingNodes {
+			resp = append(resp, event)
+		}
+		db.Model(&tx).Related(&tx.LogGroupings, "LogGroupings")
+		for _, event := range tx.LogGroupings {
+			resp = append(resp, event)
+		}
+
+		db.Model(&tx).Related(&tx.LogPublicKeySuggesteds, "LogPublicKeySuggesteds")
+		for _, event := range tx.LogPublicKeySuggesteds {
+			resp = append(resp, event)
+		}
+
+		db.Model(&tx).Related(&tx.LogPublicKeyAccepteds, "LogPublicKeyAccepteds")
+		for _, event := range tx.LogPublicKeyAccepteds {
+			resp = append(resp, event)
+		}
+
+		db.Model(&tx).Related(&tx.LogGroupDissolves, "LogGroupDissolves")
+		for _, event := range tx.LogGroupDissolves {
+			resp = append(resp, event)
+		}
+		db.Model(&tx).Related(&tx.LogUpdateRandoms, "LogUpdateRandoms")
+		for _, event := range tx.LogUpdateRandoms {
+			resp = append(resp, event)
+		}
 		db.Model(&tx).Related(&tx.LogUrls, "LogUrls")
 		for _, event := range tx.LogUrls {
 			resp = append(resp, event)
@@ -274,20 +302,16 @@ func relatedEvents(db *gorm.DB, txs []_models.Transaction) []interface{} {
 			}
 			resp = append(resp, event)
 		}
-		db.Model(&tx).Related(&tx.LogGroupings, "LogGroupings")
-		for _, event := range tx.LogGroupings {
+		db.Model(&tx).Related(&tx.LogCallbackTriggeredFors, "LogCallbackTriggeredFors")
+		for _, event := range tx.LogCallbackTriggeredFors {
 			resp = append(resp, event)
 		}
-		db.Model(&tx).Related(&tx.LogPublicKeyAccepteds, "LogPublicKeyAccepteds")
-		for _, event := range tx.LogPublicKeyAccepteds {
+		db.Model(&tx).Related(&tx.GuardianRewards, "GuardianRewards")
+		for _, event := range tx.GuardianRewards {
 			resp = append(resp, event)
 		}
-		db.Model(&tx).Related(&tx.LogGroupDissolves, "LogGroupDissolves")
-		for _, event := range tx.LogGroupDissolves {
-			resp = append(resp, event)
-		}
-		db.Model(&tx).Related(&tx.LogRegisteredNewPendingNodes, "LogRegisteredNewPendingNodes")
-		for _, event := range tx.LogRegisteredNewPendingNodes {
+		db.Model(&tx).Related(&tx.LogErrors, "LogErrors")
+		for _, event := range tx.LogErrors {
 			resp = append(resp, event)
 		}
 	}
