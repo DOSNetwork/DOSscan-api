@@ -18,7 +18,6 @@ import (
 	"github.com/DOSNetwork/DOSscan-api/server/middleware"
 	_service "github.com/DOSNetwork/DOSscan-api/service"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/gomodule/redigo/redis"
 	"github.com/jinzhu/gorm"
@@ -68,12 +67,6 @@ func main() {
 	r.ForwardedByClientIP = true
 	r.Use(middleware.CORS())
 
-	// Serve frontend static files
-	r.Use(static.Serve("/", static.LocalFile("./view", true)))
-	r.Use(static.Serve("/explorer", static.LocalFile("./view", true)))
-	r.Use(static.Serve("/myaccount", static.LocalFile("./view", true)))
-	r.Use(static.Serve("/nodelist", static.LocalFile("./view", true)))
-
 	// Setup route group for the API
 	searchHandler := _handler.NesSearchHandler(search, cacheRepo)
 	api := r.Group("/api")
@@ -82,7 +75,7 @@ func main() {
 	v1.GET("/eventNames", searchHandler.SupportedEvents)
 
 	server := &http.Server{
-		Addr:           ":80",
+		Addr:           ":8080",
 		Handler:        r,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
