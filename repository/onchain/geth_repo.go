@@ -31,35 +31,35 @@ const (
 	bridgeAddress = "0xf0CEFfc4209e38EA3Cd1926DDc2bC641cbFFd1cF"
 )
 
-func NewGethRepo(client *ethclient.Client) _repository.Onchain {
+func NewGethRepo(client *ethclient.Client) (_repository.Onchain, error) {
 	ctx := context.Background()
 	d, err := _models.NewDosbridge(common.HexToAddress(bridgeAddress), client)
 	if err != nil {
 		fmt.Println("NewDosbridge err ", err)
-		return nil
+		return nil, err
 	}
 
 	bridge := &_models.DosbridgeSession{Contract: d, CallOpts: bind.CallOpts{Context: ctx}}
 	proxyAddr, err := bridge.GetProxyAddress()
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
 	p, err := _models.NewDosproxy(proxyAddr, client)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 	proxy := &_models.DosproxySession{Contract: p, CallOpts: bind.CallOpts{Context: ctx}}
 
 	jsonFile, err := os.Open("./abi/DOSProxy.abi")
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
 	abiJsonByte, _ := ioutil.ReadAll(jsonFile)
 	proxyAbi, err := abi.JSON(strings.NewReader(string(abiJsonByte)))
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
 
 	return &gethRepo{
@@ -67,7 +67,7 @@ func NewGethRepo(client *ethclient.Client) _repository.Onchain {
 		proxy:    proxy,
 		bridge:   bridge,
 		proxyAbi: proxyAbi,
-	}
+	}, nil
 }
 
 func (g *gethRepo) CurrentBlockNum(ctx context.Context) (blknum uint64, err error) {
@@ -105,23 +105,24 @@ func (g *gethRepo) FetchLogs(ctx context.Context, logType int, fromBlock, toBloc
 	return nil, out, errc
 }
 
+/*
 func (g *gethRepo) SubscribeLogs(ctx context.Context, logType int) (err error, eventc chan []interface{}, errc <-chan error) {
 	if logType >= len(subscriptionTable) {
 		return errors.New("Not support model type"), nil, nil
 	}
 	return subscriptionTable[logType](ctx, &g.proxy.Contract.DosproxyFilterer, g.proxyAbi, g.client)
 }
-
-func getTx(txHash common.Hash, blockNum uint64, blockhash common.Hash, index uint, proxyAbi abi.ABI, client *ethclient.Client) *_models.Transaction {
+*/
+func getTx(txHash common.Hash, blockNum uint64, blockhash common.Hash, index uint, proxyAbi abi.ABI, client *ethclient.Client) (*_models.Transaction, error) {
 	tx, _, err := client.TransactionByHash(context.Background(), txHash)
 	if err != nil {
 		fmt.Println("TransactionByHash err", err)
-		return nil
+		return nil, err
 	}
 	sender, err := client.TransactionSender(context.Background(), tx, blockhash, index)
 	if err != nil {
 		fmt.Println("GetTransactionSender err", err)
-		return nil
+		return nil, err
 	}
 	var methodName string
 	if method, err := proxyAbi.MethodById(tx.Data()[:4]); err == nil {
@@ -129,7 +130,7 @@ func getTx(txHash common.Hash, blockNum uint64, blockhash common.Hash, index uin
 	} else {
 		methodName = fmt.Sprintf("ExternalCall 0x%x", tx.Data()[:4])
 	}
-	mTx := _models.Transaction{
+	mtx := _models.Transaction{
 		Hash:        txHash.Hex(),
 		GasPrice:    tx.GasPrice().Uint64(),
 		Value:       tx.Value().Uint64(),
@@ -141,5 +142,5 @@ func getTx(txHash common.Hash, blockNum uint64, blockhash common.Hash, index uin
 		Data:        tx.Data(),
 		Method:      methodName,
 	}
-	return &mTx
+	return &mtx, nil
 }

@@ -48,9 +48,11 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 				for logs.Next() {
 					var result []interface{}
 					log := logs.Event
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, proxyAbi, client)
-					if tx == nil {
-						continue
+					tx, err := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, proxyAbi, client)
+					if err != nil {
+						err = errors.Errorf("fetchTable : %w", err)
+						reportErr(ctx, errc, err)
+						return
 					}
 					var topics []string
 					for i := range log.Raw.Topics {
@@ -109,9 +111,11 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 				for logs.Next() {
 					var result []interface{}
 					log := logs.Event
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, proxyAbi, client)
-					if tx == nil {
-						continue
+					tx, err := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, proxyAbi, client)
+					if err != nil {
+						err = errors.Errorf("fetchTable : %w", err)
+						reportErr(ctx, errc, err)
+						return
 					}
 					var topics []string
 					for i := range log.Raw.Topics {
@@ -176,9 +180,11 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 				for logs.Next() {
 					var result []interface{}
 					log := logs.Event
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, proxyAbi, client)
-					if tx == nil {
-						continue
+					tx, err := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, proxyAbi, client)
+					if err != nil {
+						err = errors.Errorf("fetchTable : %w", err)
+						reportErr(ctx, errc, err)
+						return
 					}
 					var topics []string
 					for i := range log.Raw.Topics {
@@ -237,9 +243,11 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 				for logs.Next() {
 					var result []interface{}
 					log := logs.Event
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, proxyAbi, client)
-					if tx == nil {
-						continue
+					tx, err := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, proxyAbi, client)
+					if err != nil {
+						err = errors.Errorf("fetchTable : %w", err)
+						reportErr(ctx, errc, err)
+						return
 					}
 					var topics []string
 					for i := range log.Raw.Topics {
@@ -300,9 +308,11 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 				for logs.Next() {
 					var result []interface{}
 					log := logs.Event
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, proxyAbi, client)
-					if tx == nil {
-						continue
+					tx, err := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, proxyAbi, client)
+					if err != nil {
+						err = errors.Errorf("fetchTable : %w", err)
+						reportErr(ctx, errc, err)
+						return
 					}
 					var topics []string
 					for i := range log.Raw.Topics {
@@ -363,9 +373,11 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 				for logs.Next() {
 					var result []interface{}
 					log := logs.Event
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, proxyAbi, client)
-					if tx == nil {
-						continue
+					tx, err := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, proxyAbi, client)
+					if err != nil {
+						err = errors.Errorf("fetchTable : %w", err)
+						reportErr(ctx, errc, err)
+						return
 					}
 					var topics []string
 					for i := range log.Raw.Topics {
@@ -426,9 +438,11 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 				for logs.Next() {
 					var result []interface{}
 					log := logs.Event
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, proxyAbi, client)
-					if tx == nil {
-						continue
+					tx, err := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, proxyAbi, client)
+					if err != nil {
+						err = errors.Errorf("fetchTable : %w", err)
+						reportErr(ctx, errc, err)
+						return
 					}
 					var topics []string
 					for i := range log.Raw.Topics {
@@ -489,9 +503,11 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 				for logs.Next() {
 					var result []interface{}
 					log := logs.Event
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, proxyAbi, client)
-					if tx == nil {
-						continue
+					tx, err := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, proxyAbi, client)
+					if err != nil {
+						err = errors.Errorf("fetchTable : %w", err)
+						reportErr(ctx, errc, err)
+						return
 					}
 					var topics []string
 					for i := range log.Raw.Topics {
@@ -554,9 +570,11 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 				for logs.Next() {
 					var result []interface{}
 					log := logs.Event
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, proxyAbi, client)
-					if tx == nil {
-						continue
+					tx, err := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, proxyAbi, client)
+					if err != nil {
+						err = errors.Errorf("fetchTable : %w", err)
+						reportErr(ctx, errc, err)
+						return
 					}
 					var topics []string
 					for i := range log.Raw.Topics {
@@ -620,9 +638,11 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 				for logs.Next() {
 					var result []interface{}
 					log := logs.Event
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, proxyAbi, client)
-					if tx == nil {
-						continue
+					tx, err := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, proxyAbi, client)
+					if err != nil {
+						err = errors.Errorf("fetchTable : %w", err)
+						reportErr(ctx, errc, err)
+						return
 					}
 					var topics []string
 					for i := range log.Raw.Topics {
@@ -685,9 +705,11 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 				for logs.Next() {
 					var result []interface{}
 					log := logs.Event
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, proxyAbi, client)
-					if tx == nil {
-						continue
+					tx, err := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, proxyAbi, client)
+					if err != nil {
+						err = errors.Errorf("fetchTable : %w", err)
+						reportErr(ctx, errc, err)
+						return
 					}
 					var topics []string
 					for i := range log.Raw.Topics {
@@ -743,9 +765,11 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 				for logs.Next() {
 					var result []interface{}
 					log := logs.Event
-					tx := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, proxyAbi, client)
-					if tx == nil {
-						continue
+					tx, err := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, proxyAbi, client)
+					if err != nil {
+						err = errors.Errorf("fetchTable : %w", err)
+						reportErr(ctx, errc, err)
+						return
 					}
 					var topics []string
 					for i := range log.Raw.Topics {

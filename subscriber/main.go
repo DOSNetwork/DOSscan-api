@@ -62,6 +62,7 @@ func LoadConfig(path string) (c *Config, err error) {
 	}
 	return
 }
+
 func main() {
 	configPath := ""
 	if len(os.Args) >= 2 {
@@ -84,24 +85,8 @@ func main() {
 	}
 	defer db.Close()
 	dbRepo := _gorm.NewGormRepo(db)
-	ethIndex := 0
-RECONN:
-	var client *ethclient.Client
-	client, err = ethclient.Dial(config.ChainNodePool[ethIndex])
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer client.Close()
-	onchainRepo := _onchain.NewGethRepo(client)
 
-	//2)Create a service
-	modelsType := []int{_models.TypeNewPendingNode,
-		_models.TypeGrouping, _models.TypePublicKeySuggested, _models.TypePublicKeyAccepted, _models.TypeGroupDissolve,
-		_models.TypeUpdateRandom, _models.TypeUrl, _models.TypeRequestUserRandom, _models.TypeValidationResult,
-		_models.TypeGuardianReward, _models.TypeCallbackTriggeredFor, _models.TypeError}
-	transformService := _service.NewTransformer(onchainRepo, dbRepo, 4468400, modelsType)
-
-	//3)Graceful shutdown of application
+	//Graceful shutdown of application
 	ctx, cancel := context.WithCancel(context.Background())
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
@@ -111,27 +96,60 @@ RECONN:
 		cancel()
 		os.Exit(0)
 	}()
-
 	//4)Start periodic task
 	ticker := time.NewTicker(15 * time.Second)
+	defer ticker.Stop()
+RECONN:
+	var transformService *_service.Transformer
+	for _, geth := range config.ChainNodePool {
+		fmt.Println("Dial to ", geth)
+		var client *ethclient.Client
+		client, err = ethclient.Dial(geth)
+		if err != nil {
+			fmt.Printf("Dial %v\n", err)
+			client.Close()
+			continue
+		}
+		onchainRepo, err := _onchain.NewGethRepo(client)
+		if err != nil {
+			fmt.Printf("NewGethRepo %v\n", err)
+			client.Close()
+			continue
+		}
+		//2)Create a service
+		modelsType := []int{_models.TypeNewPendingNode,
+			_models.TypeGrouping, _models.TypePublicKeySuggested, _models.TypePublicKeyAccepted, _models.TypeGroupDissolve,
+			_models.TypeUpdateRandom, _models.TypeUrl, _models.TypeRequestUserRandom, _models.TypeValidationResult,
+			_models.TypeGuardianReward, _models.TypeCallbackTriggeredFor, _models.TypeError}
+		transformService = _service.NewTransformer(onchainRepo, dbRepo, 4468400, modelsType)
+		if transformService != nil {
+			break
+		}
+	}
+	if transformService == nil {
+		fmt.Println("Failed to new transformService")
+		os.Exit(0)
+	}
+
 	for {
 		select {
 		case <-ticker.C:
 			fmt.Println("ticker  ")
 			err, errc := transformService.FetchHistoricalLogs(context.Background())
 			if err != nil {
-				log.Fatal(err)
+				fmt.Printf("FetchHistoricalLogs %v\n", err)
+				goto RECONN
 			}
 			for err := range errc {
-				fmt.Println(err)
+				fmt.Printf("errc %v\n", err)
+			}
+			if err != nil {
+				goto RECONN
 			}
 		case <-ctx.Done():
 			ticker.Stop()
 			return
 		}
 	}
-	ethIndex = (ethIndex + 1) % len(config.ChainNodePool)
-	goto RECONN
 	//TODO Add subbscriber task to get real time events
-
 }

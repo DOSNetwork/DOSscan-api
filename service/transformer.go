@@ -85,6 +85,7 @@ func (t *Transformer) FetchHistoricalLogs(ctx context.Context) (error, <-chan er
 	return nil, utils.MergeErrors(ctx, errcList...)
 }
 
+/*
 func (t *Transformer) WatchLogs(ctx context.Context, modelsTypes ...int) <-chan error {
 	var errcList []<-chan error
 	for _, mType := range modelsTypes {
@@ -114,3 +115,4 @@ func (t *Transformer) WatchLogs(ctx context.Context, modelsTypes ...int) <-chan 
 	}
 	return utils.MergeErrors(ctx, errcList...)
 }
+*/
