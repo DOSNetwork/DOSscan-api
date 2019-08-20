@@ -54,7 +54,7 @@ func LoadConfig(path string) (c *Config, err error) {
 		errors.Errorf(": %w", err)
 		return
 	}
-
+	c = &Config{}
 	err = json.Unmarshal(byteValue, c)
 	if err != nil {
 		errors.Errorf(": %w", err)
@@ -63,12 +63,16 @@ func LoadConfig(path string) (c *Config, err error) {
 	return
 }
 func main() {
-	configPath := os.Args[1]
+	configPath := ""
+	if len(os.Args) >= 2 {
+		configPath = os.Args[1]
+	}
 	if configPath == "" {
 		configPath = "./config.json"
 	}
 	config, err := LoadConfig(configPath)
 	if err != nil {
+		fmt.Println(err)
 		log.Fatal(err)
 	}
 	//1)Init repositorys
