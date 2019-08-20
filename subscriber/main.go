@@ -21,14 +21,6 @@ import (
 	errors "golang.org/x/xerrors"
 )
 
-const (
-	DB_IP       = "localhost"
-	DB_PORT     = "5432"
-	DB_USER     = "postgres"
-	DB_PASSWORD = "postgres"
-	DB_NAME     = "postgres"
-)
-
 // Config is the configuration for creating a DOS client instance.
 type Config struct {
 	DB_IP         string
@@ -82,7 +74,7 @@ func main() {
 	//1)Init repositorys
 	var db *gorm.DB
 	postgres_url := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
-		DB_USER, DB_PASSWORD, DB_IP, DB_PORT, DB_NAME)
+		config.DB_USER, config.DB_PASSWORD, config.DB_IP, config.DB_PORT, config.DB_NAME)
 	if db, err = gorm.Open("postgres", postgres_url); err != nil {
 		log.Fatal(err)
 	}
