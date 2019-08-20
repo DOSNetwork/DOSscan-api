@@ -10,7 +10,16 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/ethclient"
+	errors "golang.org/x/xerrors"
 )
+
+func reportErr(ctx context.Context, errc chan error, err error) {
+	fmt.Printf("%v\n", err)
+	select {
+	case <-ctx.Done():
+	case errc <- err:
+	}
+}
 
 var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLimit uint64, filter *_models.DosproxyFilterer, proxyAbi abi.ABI, client *ethclient.Client) (chan []interface{}, chan error){
 	_models.TypeNewPendingNode: func(ctx context.Context, fromBlock, toBlock uint64, blockLimit uint64, filter *_models.DosproxyFilterer, proxyAbi abi.ABI, client *ethclient.Client) (chan []interface{}, chan error) {
@@ -32,7 +41,9 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 				//get the historic data from proxy that start from lastBlkNum to latest
 				logs, err := filter.FilterLogRegisteredNewPendingNode(&bind.FilterOpts{Start: fromBlock, End: &nextBlk, Context: ctx})
 				if err != nil {
-					fmt.Println("FilterLogRegisteredNewPendingNode err ", err)
+					err = errors.Errorf("fetchTable : %w", err)
+					reportErr(ctx, errc, err)
+					return
 				}
 				for logs.Next() {
 					var result []interface{}
@@ -91,7 +102,9 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 				//2) get the historic data from proxy that start from lastBlkNum to latest
 				logs, err := filter.FilterLogGrouping(&bind.FilterOpts{Start: fromBlock, End: &nextBlk, Context: ctx})
 				if err != nil {
-					fmt.Println("FilterLogGrouping err ", err)
+					err = errors.Errorf("fetchTable : %w", err)
+					reportErr(ctx, errc, err)
+					return
 				}
 				for logs.Next() {
 					var result []interface{}
@@ -156,7 +169,9 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 				//get the historic data from proxy that start from lastBlkNum to latest
 				logs, err := filter.FilterLogPublicKeySuggested(&bind.FilterOpts{Start: fromBlock, End: &nextBlk, Context: ctx})
 				if err != nil {
-					fmt.Println("FilterLogPublicKeySuggested err ", err)
+					err = errors.Errorf("fetchTable : %w", err)
+					reportErr(ctx, errc, err)
+					return
 				}
 				for logs.Next() {
 					var result []interface{}
@@ -215,7 +230,9 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 				//get the historic data from proxy that start from lastBlkNum to latest
 				logs, err := filter.FilterLogPublicKeyAccepted(&bind.FilterOpts{Start: fromBlock, End: &nextBlk, Context: ctx})
 				if err != nil {
-					fmt.Println("FilterLogPublicKeyAccepted err ", err)
+					err = errors.Errorf("fetchTable : %w", err)
+					reportErr(ctx, errc, err)
+					return
 				}
 				for logs.Next() {
 					var result []interface{}
@@ -276,7 +293,9 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 				//get the historic data from proxy that start from lastBlkNum to latest
 				logs, err := filter.FilterLogGroupDissolve(&bind.FilterOpts{Start: fromBlock, End: &nextBlk, Context: ctx})
 				if err != nil {
-					fmt.Println("FilterLogGroupDissolve err ", err)
+					err = errors.Errorf("fetchTable : %w", err)
+					reportErr(ctx, errc, err)
+					return
 				}
 				for logs.Next() {
 					var result []interface{}
@@ -337,7 +356,9 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 				//get the historic data from proxy that start from lastBlkNum to latest
 				logs, err := filter.FilterLogRequestUserRandom(&bind.FilterOpts{Start: fromBlock, End: &nextBlk, Context: ctx})
 				if err != nil {
-					fmt.Println("FilterLogRequestUserRandom err ", err)
+					err = errors.Errorf("fetchTable : %w", err)
+					reportErr(ctx, errc, err)
+					return
 				}
 				for logs.Next() {
 					var result []interface{}
@@ -398,7 +419,9 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 				//1) get the historic data from proxy that start from lastBlkNum to latest
 				logs, err := filter.FilterLogUpdateRandom(&bind.FilterOpts{Start: fromBlock, End: &nextBlk, Context: ctx})
 				if err != nil {
-					fmt.Println("FilterLogUrl err ", err)
+					err = errors.Errorf("fetchTable : %w", err)
+					reportErr(ctx, errc, err)
+					return
 				}
 				for logs.Next() {
 					var result []interface{}
@@ -459,7 +482,9 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 
 				logs, err := filter.FilterLogUrl(&bind.FilterOpts{Start: fromBlock, End: &nextBlk, Context: ctx})
 				if err != nil {
-					fmt.Println("FilterLogUrl err ", err)
+					err = errors.Errorf("fetchTable : %w", err)
+					reportErr(ctx, errc, err)
+					return
 				}
 				for logs.Next() {
 					var result []interface{}
@@ -522,7 +547,9 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 				fmt.Println("LogValidationResult ", fromBlock, " - ", nextBlk)
 				logs, err := filter.FilterLogValidationResult(&bind.FilterOpts{Start: fromBlock, End: &nextBlk, Context: ctx})
 				if err != nil {
-					fmt.Println("FilterLogValidationResult err ", err)
+					err = errors.Errorf("fetchTable : %w", err)
+					reportErr(ctx, errc, err)
+					return
 				}
 				for logs.Next() {
 					var result []interface{}
@@ -586,7 +613,9 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 				}
 				logs, err := filter.FilterGuardianReward(&bind.FilterOpts{Start: fromBlock, End: &nextBlk, Context: ctx}, nil)
 				if err != nil {
-					fmt.Println("FilterGuardianReward err ", err)
+					err = errors.Errorf("fetchTable : %w", err)
+					reportErr(ctx, errc, err)
+					return
 				}
 				for logs.Next() {
 					var result []interface{}
@@ -644,11 +673,14 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 				logs, err := filter.FilterLogCallbackTriggeredFor(&bind.FilterOpts{Start: fromBlock, End: &nextBlk, Context: ctx})
 				if err != nil {
 					/* TODO: Handle err
+					FilterLogRegisteredNewPendingNode err  internal error
 					FilterLogCallbackTriggeredFor err  websocket: read limit exceeded
 					TransactionByHash err websocket: read limit exceeded
 					panic: runtime error: invalid memory address or nil pointer dereference
 					*/
-					fmt.Println("FilterLogCallbackTriggeredFor err ", err)
+					err = errors.Errorf("fetchTable : %w", err)
+					reportErr(ctx, errc, err)
+					return
 				}
 				for logs.Next() {
 					var result []interface{}
@@ -704,7 +736,9 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 				}
 				logs, err := filter.FilterLogError(&bind.FilterOpts{Start: fromBlock, End: &nextBlk, Context: ctx})
 				if err != nil {
-					fmt.Println("FilterLogError err ", err)
+					err = errors.Errorf("fetchTable : %w", err)
+					reportErr(ctx, errc, err)
+					return
 				}
 				for logs.Next() {
 					var result []interface{}

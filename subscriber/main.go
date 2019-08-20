@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/signal"
@@ -16,6 +18,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/jinzhu/gorm"
+	errors "golang.org/x/xerrors"
 )
 
 const (
@@ -24,13 +27,60 @@ const (
 	DB_USER     = "postgres"
 	DB_PASSWORD = "postgres"
 	DB_NAME     = "postgres"
-	ETH_URL     = "https://rinkeby.infura.io/v3/2a6901876ca54406960499e888e70439"
 )
 
+// Config is the configuration for creating a DOS client instance.
+type Config struct {
+	DB_IP         string
+	DB_PORT       string
+	DB_USER       string
+	DB_PASSWORD   string
+	DB_NAME       string
+	ChainNodePool []string
+}
+
+// LoadConfig loads configuration file from path.
+func LoadConfig(path string) (c *Config, err error) {
+	var jsonFile *os.File
+	var byteValue []byte
+
+	fmt.Println("Path ", path)
+	// Open our jsonFile
+	jsonFile, err = os.Open(path)
+	// if we os.Open returns an error then handle it
+	if err != nil {
+		errors.Errorf(": %w", err)
+		return
+	}
+	fmt.Println("Successfully Opened json")
+	// defer the closing of our jsonFile so that we can parse it later on
+	defer jsonFile.Close()
+
+	// read our opened xmlFile as a byte array.
+	byteValue, err = ioutil.ReadAll(jsonFile)
+	if err != nil {
+		errors.Errorf(": %w", err)
+		return
+	}
+
+	err = json.Unmarshal(byteValue, c)
+	if err != nil {
+		errors.Errorf(": %w", err)
+		return
+	}
+	return
+}
 func main() {
+	configPath := os.Args[1]
+	if configPath == "" {
+		configPath = "./config.json"
+	}
+	config, err := LoadConfig(configPath)
+	if err != nil {
+		log.Fatal(err)
+	}
 	//1)Init repositorys
 	var db *gorm.DB
-	var err error
 	postgres_url := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
 		DB_USER, DB_PASSWORD, DB_IP, DB_PORT, DB_NAME)
 	if db, err = gorm.Open("postgres", postgres_url); err != nil {
@@ -38,9 +88,10 @@ func main() {
 	}
 	defer db.Close()
 	dbRepo := _gorm.NewGormRepo(db)
-
+	ethIndex := 0
+RECONN:
 	var client *ethclient.Client
-	client, err = ethclient.Dial(ETH_URL)
+	client, err = ethclient.Dial(config.ChainNodePool[ethIndex])
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -83,7 +134,8 @@ func main() {
 			return
 		}
 	}
-
+	ethIndex = (ethIndex + 1) % len(config.ChainNodePool)
+	goto RECONN
 	//TODO Add subbscriber task to get real time events
 
 }
