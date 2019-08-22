@@ -111,9 +111,14 @@ func (g *gormRepo) GroupByID(ctx context.Context, id string) (group _models.Grou
 
 func (g *gormRepo) UrlRequestByID(ctx context.Context, id string) (urlRequest _models.UrlRequest, err error) {
 	urlRequest.RequestId = id
-	err = g.db.Where(urlRequest).First(&urlRequest).Error
+	fmt.Println("UrlRequestByID : ", id)
+	//err = g.db.Where(urlRequest).First(&urlRequest).Error
+	err = g.db.First(&urlRequest, "request_id = ?", id).Error
+	if err != nil {
+		fmt.Println("UrlRequestByID : err ", err)
+	}
 	if !gorm.IsRecordNotFoundError(err) {
-		fmt.Println("UrlRequestByID : ", len(urlRequest.Message))
+		fmt.Println("UrlRequestByID : ", urlRequest)
 
 		urlRequest.MessageStr = string(urlRequest.Message)
 	}
@@ -215,7 +220,7 @@ func buildUrlRequest(db *gorm.DB, requestId string) {
 	//fmt.Println("-", " len buildUrlRequest", len(results))
 
 	for _, request := range results {
-		db.Where(request).FirstOrCreate(&request)
+		db.Save(&request)
 		var group _models.Group
 		if err := db.Where(&_models.Group{GroupId: request.DispatchedGroupId}).First(&group).Error; gorm.IsRecordNotFoundError(err) {
 			continue
@@ -242,7 +247,7 @@ func buildRandomRequest(db *gorm.DB, requestId string) {
 	//fmt.Println("-", " len buildRandomRequest", len(results))
 
 	for _, request := range results {
-		db.Where(request).FirstOrCreate(&request)
+		db.Save(&request)
 		var group _models.Group
 
 		if err := db.Where(&_models.Group{GroupId: request.DispatchedGroupId}).First(&group).Error; gorm.IsRecordNotFoundError(err) {

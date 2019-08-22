@@ -117,9 +117,8 @@ RECONN:
 			continue
 		}
 		//2)Create a service
-		modelsType := []int{_models.TypeNewPendingNode,
-			_models.TypeGrouping, _models.TypePublicKeySuggested, _models.TypePublicKeyAccepted, _models.TypeGroupDissolve,
-			_models.TypeUpdateRandom, _models.TypeUrl, _models.TypeRequestUserRandom, _models.TypeValidationResult,
+		modelsType := []int{_models.TypePublicKeyAccepted, _models.TypeGroupDissolve,
+			_models.TypeUpdateRandom, _models.TypeUrl, _models.TypeRequestUserRandom,
 			_models.TypeGuardianReward, _models.TypeCallbackTriggeredFor, _models.TypeError}
 		transformService = _service.NewTransformer(onchainRepo, dbRepo, 4468400, modelsType)
 		if transformService != nil {
@@ -135,15 +134,9 @@ RECONN:
 		select {
 		case <-ticker.C:
 			fmt.Println("ticker  ")
-			err, errc := transformService.FetchHistoricalLogs(context.Background())
+			err := transformService.FetchHistoricalLogs(context.Background())
 			if err != nil {
 				fmt.Printf("FetchHistoricalLogs %v\n", err)
-				goto RECONN
-			}
-			for err := range errc {
-				fmt.Printf("errc %v\n", err)
-			}
-			if err != nil {
 				goto RECONN
 			}
 		case <-ctx.Done():

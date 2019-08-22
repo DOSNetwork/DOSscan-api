@@ -386,7 +386,7 @@ type LogValidationResult struct {
 }
 
 type Request struct {
-	RequestId         string `json:"requestId"`
+	RequestId         string `gorm:"unique" json:"requestId"`
 	DispatchedGroupId string `json:"dispatchedGroupId"`
 	Sender            string `json:"submitter"`
 	BlockNumber       uint64 `json:"submittedBlkNum"`

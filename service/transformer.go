@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	_models "github.com/DOSNetwork/DOSscan-api/models"
+
 	"github.com/DOSNetwork/DOSscan-api/repository"
 	"github.com/DOSNetwork/DOSscan-api/utils"
 )
@@ -55,34 +57,58 @@ func NewTransformer(onchainRepo repository.Onchain, dbRepo repository.DB, update
 func (t *Transformer) BuildRelations(ctx context.Context) {
 	t.dbRepo.BuildRelation(ctx)
 }
-
-func (t *Transformer) FetchHistoricalLogs(ctx context.Context) (error, <-chan error) {
+func (t *Transformer) FetchHistoricalLog(ctx context.Context, modelType int, toBlock uint64) (err error) {
 	var errcList []<-chan error
+	err, logsc, fetchErrc := t.onchainRepo.FetchLogs(ctx, modelType, t.updatedBlknum, toBlock, logsLimit)
+	if err != nil {
+		fmt.Println("FetchLogs Err ", err)
+		return
+	}
+	errcList = append(errcList, fetchErrc)
+	err, saveErrc := t.dbRepo.SaveModel(ctx, modelType, logsc)
+	if err != nil {
+		fmt.Println("SaveModel Err ", err)
+		return
+	}
+	errcList = append(errcList, saveErrc)
+	for err = range utils.MergeErrors(ctx, errcList...) {
+		fmt.Println(err)
+	}
+
+	return
+}
+func (t *Transformer) FetchHistoricalLogs(ctx context.Context) (err error) {
+	//	var errcList []<-chan error
 	toBlock, err := t.onchainRepo.CurrentBlockNum(ctx)
 	if err != nil {
 		fmt.Println("Transformer err ", err)
-		return err, nil
+		return
 	}
 	if toBlock-t.updatedBlknum > logsLimit {
 		toBlock = t.updatedBlknum + logsLimit
 	}
+	err = t.FetchHistoricalLog(ctx, _models.TypeNewPendingNode, toBlock)
+	if err != nil {
+		return
+	}
+	err = t.FetchHistoricalLog(ctx, _models.TypeGrouping, toBlock)
+	if err != nil {
+		return
+	}
+	err = t.FetchHistoricalLog(ctx, _models.TypePublicKeySuggested, toBlock)
+	if err != nil {
+		return
+	}
 	fmt.Println("FetchHistoricalLogs from ", t.updatedBlknum, " to ", toBlock)
 	for _, mType := range t.modelsTypes {
-		err, logsc, fetchErrc := t.onchainRepo.FetchLogs(ctx, mType, t.updatedBlknum, toBlock, logsLimit)
+		err = t.FetchHistoricalLog(ctx, mType, toBlock)
 		if err != nil {
-			fmt.Println("FetchLogs Err ", err)
-			continue
+			return
 		}
-		errcList = append(errcList, fetchErrc)
-		err, saveErrc := t.dbRepo.SaveModel(ctx, mType, logsc)
-		if err != nil {
-			fmt.Println("SaveModel Err ", err)
-			continue
-		}
-		errcList = append(errcList, saveErrc)
 	}
-	t.updatedBlknum = toBlock
-	return nil, utils.MergeErrors(ctx, errcList...)
+
+	err = t.FetchHistoricalLog(ctx, _models.TypeValidationResult, toBlock)
+	return
 }
 
 /*
