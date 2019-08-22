@@ -390,6 +390,17 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 							fmt.Println("res ", res.Error)
 						}
 					}
+					if log.RequestType == 2 {
+						buildUrlRequest(db, log.RequestId)
+						var urlRequest _models.UrlRequest
+						urlRequest.RequestId = log.RequestId
+						err := db.Where(urlRequest).First(&urlRequest).Error
+						if !gorm.IsRecordNotFoundError(err) {
+							fmt.Println("UrlRequestByID : ", urlRequest)
+						}
+					} else if log.RequestType == 1 {
+						buildRandomRequest(db, log.RequestId)
+					}
 				}
 			}
 		}()

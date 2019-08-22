@@ -402,20 +402,20 @@ type RequestResult struct {
 }
 
 type UrlRequest struct {
-	gorm.Model `json:"-"`
-	Request
-	RequestResult
-	GroupID    uint   `json:"-"`
-	Timeout    string `json:"timeOut"`
-	DataSource string `json:"dataSource"`
-	Selector   string `json:"selector"`
-	Randomness string `json:"randomness"`
+	gorm.Model    `json:"-"`
+	Request       `gorm:"embedded"`
+	RequestResult `gorm:"embedded"`
+	GroupID       uint   `json:"-"`
+	Timeout       string `json:"timeOut"`
+	DataSource    string `json:"dataSource"`
+	Selector      string `json:"selector"`
+	Randomness    string `json:"randomness"`
 }
 
 type UserRandomRequest struct {
-	gorm.Model `json:"-"`
-	Request
-	RequestResult
+	gorm.Model           `json:"-"`
+	Request              `gorm:"embedded"`
+	RequestResult        `gorm:"embedded"`
 	GroupID              uint   `json:"-"`
 	LastSystemRandomness string `json:"lastSystemRandomness"`
 	UserSeed             string `json:"userSeed"`
