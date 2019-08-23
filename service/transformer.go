@@ -108,6 +108,7 @@ func (t *Transformer) FetchHistoricalLogs(ctx context.Context) (err error) {
 	}
 
 	err = t.FetchHistoricalLog(ctx, _models.TypeValidationResult, toBlock)
+	t.updatedBlknum = toBlock
 	return
 }
 
