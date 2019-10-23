@@ -59,7 +59,10 @@ func main() {
 		log.Fatal(err)
 	}
 	defer client.Close()
-	onchainRepo := _onchain.NewGethRepo(client)
+	onchainRepo, err := _onchain.NewGethRepo(client)
+	if err != nil {
+		log.Fatal(err)
+	}
 	search := _service.NewSearch(onchainRepo, dbRepo)
 
 	gin.SetMode(gin.ReleaseMode)

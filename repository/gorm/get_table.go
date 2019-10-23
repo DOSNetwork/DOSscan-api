@@ -17,6 +17,14 @@ var getTable = []func(ctx context.Context, db *gorm.DB, limit, offset int) (resu
 		}
 		return
 	},
+	_models.TypeUnregisterPendingNode: func(ctx context.Context, db *gorm.DB, limit, offset int) (results []interface{}, err error) {
+		var _models []_models.LogUnRegisteredNewPendingNode
+		db.Order("block_number desc").Limit(limit).Offset(offset).Find(&_models)
+		for _, model := range _models {
+			results = append(results, model)
+		}
+		return
+	},
 	_models.TypeGrouping: func(ctx context.Context, db *gorm.DB, limit, offset int) (results []interface{}, err error) {
 		var _models []_models.LogGrouping
 		db.Order("block_number desc").Limit(limit).Offset(offset).Find(&_models)
@@ -102,8 +110,8 @@ var getTable = []func(ctx context.Context, db *gorm.DB, limit, offset int) (resu
 		}
 		return
 	},
-	_models.TypeError: func(ctx context.Context, db *gorm.DB, limit, offset int) (results []interface{}, err error) {
-		var _models []_models.LogError
+	_models.TypeMessage: func(ctx context.Context, db *gorm.DB, limit, offset int) (results []interface{}, err error) {
+		var _models []_models.LogMessage
 		db.Order("block_number desc").Limit(limit).Offset(offset).Find(&_models)
 		for _, model := range _models {
 			results = append(results, model)

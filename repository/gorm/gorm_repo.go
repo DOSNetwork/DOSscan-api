@@ -17,10 +17,10 @@ type gormRepo struct {
 
 func NewGormRepo(db *gorm.DB) _repository.DB {
 	db.AutoMigrate(&_models.Group{}, &_models.Node{}, &_models.UrlRequest{}, &_models.UserRandomRequest{},
-		&_models.Transaction{}, &_models.LogRegisteredNewPendingNode{},
+		&_models.Transaction{}, &_models.LogRegisteredNewPendingNode{}, &_models.LogUnRegisteredNewPendingNode{},
 		&_models.LogGrouping{}, &_models.LogPublicKeySuggested{}, &_models.LogPublicKeyAccepted{}, &_models.LogGroupDissolve{},
 		&_models.LogUpdateRandom{}, &_models.LogRequestUserRandom{}, &_models.LogUrl{}, &_models.LogValidationResult{},
-		&_models.LogCallbackTriggeredFor{}, &_models.GuardianReward{}, &_models.LogError{})
+		&_models.LogCallbackTriggeredFor{}, &_models.GuardianReward{}, &_models.LogMessage{})
 
 	return &gormRepo{
 		db: db,
@@ -267,6 +267,10 @@ func relatedEvents(db *gorm.DB, txs []_models.Transaction) []interface{} {
 		for _, event := range tx.LogRegisteredNewPendingNodes {
 			resp = append(resp, event)
 		}
+		db.Model(&tx).Related(&tx.LogUnRegisteredNewPendingNodes, "LogUnRegisteredNewPendingNode")
+		for _, event := range tx.LogUnRegisteredNewPendingNodes {
+			resp = append(resp, event)
+		}
 		db.Model(&tx).Related(&tx.LogGroupings, "LogGroupings")
 		for _, event := range tx.LogGroupings {
 			resp = append(resp, event)
@@ -315,8 +319,8 @@ func relatedEvents(db *gorm.DB, txs []_models.Transaction) []interface{} {
 		for _, event := range tx.GuardianRewards {
 			resp = append(resp, event)
 		}
-		db.Model(&tx).Related(&tx.LogErrors, "LogErrors")
-		for _, event := range tx.LogErrors {
+		db.Model(&tx).Related(&tx.LogMessages, "LogMessages")
+		for _, event := range tx.LogMessages {
 			resp = append(resp, event)
 		}
 	}

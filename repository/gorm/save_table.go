@@ -51,6 +51,48 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 		}()
 		return errc
 	},
+	_models.TypeUnregisterPendingNode: func(ctx context.Context, db *gorm.DB, eventc chan []interface{}) chan error {
+		errc := make(chan error)
+		go func() {
+			defer close(errc)
+			for {
+				select {
+				case <-ctx.Done():
+					return
+				case event, ok := <-eventc:
+					if !ok {
+						return
+					}
+					if len(event) != 2 {
+						continue
+					}
+					tx, ok := event[0].(*_models.Transaction)
+					if !ok {
+						continue
+					}
+					log, ok := event[1].(*_models.LogUnRegisteredNewPendingNode)
+					if !ok {
+						continue
+					}
+					if tx.Hash != log.TransactionHash || tx.BlockNumber != log.Event.BlockNumber {
+						continue
+					}
+					if err := db.Where("hash = ?", tx.Hash).First(tx).Error; gorm.IsRecordNotFoundError(err) {
+						db.Create(tx)
+					}
+					if err := db.Where("transaction_hash = ? AND log_index = ?", tx.Hash, log.Event.LogIndex).First(log).Error; gorm.IsRecordNotFoundError(err) {
+						db.Create(log)
+						res := db.Model(tx).Association("LogUnRegisteredNewPendingNode").Append(log)
+						if res.Error != nil {
+							fmt.Println("res ", res.Error)
+						}
+						buildNode(db, log.Node)
+					}
+				}
+			}
+		}()
+		return errc
+	},
 	_models.TypeGrouping: func(ctx context.Context, db *gorm.DB, eventc chan []interface{}) chan error {
 		errc := make(chan error)
 		go func() {
@@ -482,7 +524,7 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 		}()
 		return errc
 	},
-	_models.TypeError: func(ctx context.Context, db *gorm.DB, eventc chan []interface{}) chan error {
+	_models.TypeMessage: func(ctx context.Context, db *gorm.DB, eventc chan []interface{}) chan error {
 		errc := make(chan error)
 		go func() {
 			defer close(errc)
@@ -501,7 +543,7 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 					if !ok {
 						continue
 					}
-					log, ok := event[1].(*_models.LogError)
+					log, ok := event[1].(*_models.LogMessage)
 					if !ok {
 						continue
 					}
@@ -513,7 +555,7 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 					}
 					if err := db.Where("transaction_hash = ? AND log_index = ?", tx.Hash, log.Event.LogIndex).First(log).Error; gorm.IsRecordNotFoundError(err) {
 						db.Create(log)
-						res := db.Model(tx).Association("LogErrors").Append(log)
+						res := db.Model(tx).Association("LogMessages").Append(log)
 						if res.Error != nil {
 							fmt.Println("res ", res.Error)
 						}

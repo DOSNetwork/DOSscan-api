@@ -119,7 +119,7 @@ RECONN:
 		//2)Create a service
 		modelsType := []int{_models.TypePublicKeyAccepted, _models.TypeGroupDissolve,
 			_models.TypeUpdateRandom, _models.TypeUrl, _models.TypeRequestUserRandom,
-			_models.TypeGuardianReward, _models.TypeCallbackTriggeredFor, _models.TypeError}
+			_models.TypeGuardianReward, _models.TypeCallbackTriggeredFor, _models.TypeMessage}
 		transformService = _service.NewTransformer(onchainRepo, dbRepo, 4468400, modelsType)
 		if transformService != nil {
 			break

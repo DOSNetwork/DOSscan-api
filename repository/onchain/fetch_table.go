@@ -5,7 +5,8 @@ import (
 	"fmt"
 
 	_models "github.com/DOSNetwork/DOSscan-api/models"
-
+	//	"github.com/DOSNetwork/DOSscan-api/models/dosbridge"
+	"github.com/DOSNetwork/DOSscan-api/models/dosproxy"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common/hexutil"
@@ -21,8 +22,8 @@ func reportErr(ctx context.Context, errc chan error, err error) {
 	}
 }
 
-var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLimit uint64, filter *_models.DosproxyFilterer, proxyAbi abi.ABI, client *ethclient.Client) (chan []interface{}, chan error){
-	_models.TypeNewPendingNode: func(ctx context.Context, fromBlock, toBlock uint64, blockLimit uint64, filter *_models.DosproxyFilterer, proxyAbi abi.ABI, client *ethclient.Client) (chan []interface{}, chan error) {
+var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLimit uint64, filter *dosproxy.DosproxyFilterer, proxyAbi abi.ABI, client *ethclient.Client) (chan []interface{}, chan error){
+	_models.TypeNewPendingNode: func(ctx context.Context, fromBlock, toBlock uint64, blockLimit uint64, filter *dosproxy.DosproxyFilterer, proxyAbi abi.ABI, client *ethclient.Client) (chan []interface{}, chan error) {
 		out := make(chan []interface{})
 		errc := make(chan error)
 		go func() {
@@ -85,7 +86,71 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 		}()
 		return out, errc
 	},
-	_models.TypeGrouping: func(ctx context.Context, fromBlock, toBlock uint64, blockLimit uint64, filter *_models.DosproxyFilterer, proxyAbi abi.ABI, client *ethclient.Client) (chan []interface{}, chan error) {
+	_models.TypeUnregisterPendingNode: func(ctx context.Context, fromBlock, toBlock uint64, blockLimit uint64, filter *dosproxy.DosproxyFilterer, proxyAbi abi.ABI, client *ethclient.Client) (chan []interface{}, chan error) {
+		out := make(chan []interface{})
+		errc := make(chan error)
+		go func() {
+			defer close(out)
+			defer close(errc)
+			defer fmt.Println("Done LogUnRegisteredNewPendingNode")
+			if toBlock <= fromBlock {
+				return
+			}
+			for fromBlock <= toBlock {
+				nextBlk := toBlock
+				if nextBlk-fromBlock > blockLimit {
+					nextBlk = fromBlock + blockLimit
+				}
+				fmt.Println("LogUnRegisteredNewPendingNode ", fromBlock, " - ", nextBlk)
+				//get the historic data from proxy that start from lastBlkNum to latest
+				logs, err := filter.FilterLogUnRegisteredNewPendingNode(&bind.FilterOpts{Start: fromBlock, End: &nextBlk, Context: ctx})
+				if err != nil {
+					err = errors.Errorf("fetchTable : %w", err)
+					reportErr(ctx, errc, err)
+					return
+				}
+				for logs.Next() {
+					var result []interface{}
+					log := logs.Event
+					tx, err := getTx(log.Raw.TxHash, log.Raw.BlockNumber, log.Raw.BlockHash, log.Raw.Index, proxyAbi, client)
+					if err != nil {
+						err = errors.Errorf("fetchTable : %w", err)
+						reportErr(ctx, errc, err)
+						return
+					}
+					var topics []string
+					for i := range log.Raw.Topics {
+						topics = append(topics, log.Raw.Topics[i].Hex())
+					}
+					mLog := &_models.LogUnRegisteredNewPendingNode{
+						Event: _models.Event{
+							EventLog:        "LogUnRegisteredNewPendingNode",
+							Method:          tx.Method,
+							Topics:          topics,
+							BlockNumber:     log.Raw.BlockNumber,
+							BlockHash:       log.Raw.BlockHash.Hex(),
+							TransactionHash: log.Raw.TxHash.Hex(),
+							TxIndex:         log.Raw.TxIndex,
+							LogIndex:        log.Raw.Index,
+							Removed:         log.Raw.Removed,
+						},
+						Node:           log.Node.Hex(),
+						UnregisterFrom: log.UnregisterFrom,
+					}
+					result = append(result, tx)
+					result = append(result, mLog)
+					select {
+					case <-ctx.Done():
+					case out <- result:
+					}
+				}
+				fromBlock = nextBlk + 1
+
+			}
+		}()
+		return out, errc
+	},
+	_models.TypeGrouping: func(ctx context.Context, fromBlock, toBlock uint64, blockLimit uint64, filter *dosproxy.DosproxyFilterer, proxyAbi abi.ABI, client *ethclient.Client) (chan []interface{}, chan error) {
 		out := make(chan []interface{})
 		errc := make(chan error)
 		go func() {
@@ -154,7 +219,7 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 		}()
 		return out, errc
 	},
-	_models.TypePublicKeySuggested: func(ctx context.Context, fromBlock, toBlock uint64, blockLimit uint64, filter *_models.DosproxyFilterer, proxyAbi abi.ABI, client *ethclient.Client) (chan []interface{}, chan error) {
+	_models.TypePublicKeySuggested: func(ctx context.Context, fromBlock, toBlock uint64, blockLimit uint64, filter *dosproxy.DosproxyFilterer, proxyAbi abi.ABI, client *ethclient.Client) (chan []interface{}, chan error) {
 		out := make(chan []interface{})
 		errc := make(chan error)
 		go func() {
@@ -217,7 +282,7 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 		}()
 		return out, errc
 	},
-	_models.TypePublicKeyAccepted: func(ctx context.Context, fromBlock, toBlock uint64, blockLimit uint64, filter *_models.DosproxyFilterer, proxyAbi abi.ABI, client *ethclient.Client) (chan []interface{}, chan error) {
+	_models.TypePublicKeyAccepted: func(ctx context.Context, fromBlock, toBlock uint64, blockLimit uint64, filter *dosproxy.DosproxyFilterer, proxyAbi abi.ABI, client *ethclient.Client) (chan []interface{}, chan error) {
 		out := make(chan []interface{})
 		errc := make(chan error)
 		go func() {
@@ -282,7 +347,7 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 		}()
 		return out, errc
 	},
-	_models.TypeGroupDissolve: func(ctx context.Context, fromBlock, toBlock uint64, blockLimit uint64, filter *_models.DosproxyFilterer, proxyAbi abi.ABI, client *ethclient.Client) (chan []interface{}, chan error) {
+	_models.TypeGroupDissolve: func(ctx context.Context, fromBlock, toBlock uint64, blockLimit uint64, filter *dosproxy.DosproxyFilterer, proxyAbi abi.ABI, client *ethclient.Client) (chan []interface{}, chan error) {
 		out := make(chan []interface{})
 		errc := make(chan error)
 		go func() {
@@ -347,7 +412,7 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 		}()
 		return out, errc
 	},
-	_models.TypeRequestUserRandom: func(ctx context.Context, fromBlock, toBlock uint64, blockLimit uint64, filter *_models.DosproxyFilterer, proxyAbi abi.ABI, client *ethclient.Client) (chan []interface{}, chan error) {
+	_models.TypeRequestUserRandom: func(ctx context.Context, fromBlock, toBlock uint64, blockLimit uint64, filter *dosproxy.DosproxyFilterer, proxyAbi abi.ABI, client *ethclient.Client) (chan []interface{}, chan error) {
 		out := make(chan []interface{})
 		errc := make(chan error)
 		go func() {
@@ -413,7 +478,7 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 		}()
 		return out, errc
 	},
-	_models.TypeUpdateRandom: func(ctx context.Context, fromBlock, toBlock uint64, blockLimit uint64, filter *_models.DosproxyFilterer, proxyAbi abi.ABI, client *ethclient.Client) (chan []interface{}, chan error) {
+	_models.TypeUpdateRandom: func(ctx context.Context, fromBlock, toBlock uint64, blockLimit uint64, filter *dosproxy.DosproxyFilterer, proxyAbi abi.ABI, client *ethclient.Client) (chan []interface{}, chan error) {
 		out := make(chan []interface{})
 		errc := make(chan error)
 		go func() {
@@ -477,7 +542,7 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 		}()
 		return out, errc
 	},
-	_models.TypeUrl: func(ctx context.Context, fromBlock, toBlock uint64, blockLimit uint64, filter *_models.DosproxyFilterer, proxyAbi abi.ABI, client *ethclient.Client) (chan []interface{}, chan error) {
+	_models.TypeUrl: func(ctx context.Context, fromBlock, toBlock uint64, blockLimit uint64, filter *dosproxy.DosproxyFilterer, proxyAbi abi.ABI, client *ethclient.Client) (chan []interface{}, chan error) {
 		out := make(chan []interface{})
 		errc := make(chan error)
 		go func() {
@@ -546,7 +611,7 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 		}()
 		return out, errc
 	},
-	_models.TypeValidationResult: func(ctx context.Context, fromBlock, toBlock uint64, blockLimit uint64, filter *_models.DosproxyFilterer, proxyAbi abi.ABI, client *ethclient.Client) (chan []interface{}, chan error) {
+	_models.TypeValidationResult: func(ctx context.Context, fromBlock, toBlock uint64, blockLimit uint64, filter *dosproxy.DosproxyFilterer, proxyAbi abi.ABI, client *ethclient.Client) (chan []interface{}, chan error) {
 		out := make(chan []interface{})
 		errc := make(chan error)
 		go func() {
@@ -615,7 +680,7 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 		}()
 		return out, errc
 	},
-	_models.TypeGuardianReward: func(ctx context.Context, fromBlock, toBlock uint64, blockLimit uint64, filter *_models.DosproxyFilterer, proxyAbi abi.ABI, client *ethclient.Client) (chan []interface{}, chan error) {
+	_models.TypeGuardianReward: func(ctx context.Context, fromBlock, toBlock uint64, blockLimit uint64, filter *dosproxy.DosproxyFilterer, proxyAbi abi.ABI, client *ethclient.Client) (chan []interface{}, chan error) {
 		out := make(chan []interface{})
 		errc := make(chan error)
 		go func() {
@@ -676,7 +741,7 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 		}()
 		return out, errc
 	},
-	_models.TypeCallbackTriggeredFor: func(ctx context.Context, fromBlock, toBlock uint64, blockLimit uint64, filter *_models.DosproxyFilterer, proxyAbi abi.ABI, client *ethclient.Client) (chan []interface{}, chan error) {
+	_models.TypeCallbackTriggeredFor: func(ctx context.Context, fromBlock, toBlock uint64, blockLimit uint64, filter *dosproxy.DosproxyFilterer, proxyAbi abi.ABI, client *ethclient.Client) (chan []interface{}, chan error) {
 		out := make(chan []interface{})
 		errc := make(chan error)
 		go func() {
@@ -742,7 +807,7 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 		}()
 		return out, errc
 	},
-	_models.TypeError: func(ctx context.Context, fromBlock, toBlock uint64, blockLimit uint64, filter *_models.DosproxyFilterer, proxyAbi abi.ABI, client *ethclient.Client) (chan []interface{}, chan error) {
+	_models.TypeMessage: func(ctx context.Context, fromBlock, toBlock uint64, blockLimit uint64, filter *dosproxy.DosproxyFilterer, proxyAbi abi.ABI, client *ethclient.Client) (chan []interface{}, chan error) {
 		out := make(chan []interface{})
 		errc := make(chan error)
 		go func() {
@@ -756,7 +821,7 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 				if nextBlk-fromBlock > blockLimit {
 					nextBlk = fromBlock + blockLimit
 				}
-				logs, err := filter.FilterLogError(&bind.FilterOpts{Start: fromBlock, End: &nextBlk, Context: ctx})
+				logs, err := filter.FilterLogMessage(&bind.FilterOpts{Start: fromBlock, End: &nextBlk, Context: ctx})
 				if err != nil {
 					err = errors.Errorf("fetchTable : %w", err)
 					reportErr(ctx, errc, err)
@@ -775,7 +840,7 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 					for i := range log.Raw.Topics {
 						topics = append(topics, log.Raw.Topics[i].Hex())
 					}
-					mLog := &_models.LogError{
+					mLog := &_models.LogMessage{
 						Event: _models.Event{
 							EventLog:        "LogError",
 							Method:          tx.Method,
@@ -787,7 +852,7 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 							LogIndex:        log.Raw.Index,
 							Removed:         log.Raw.Removed,
 						},
-						Err: log.Err,
+						Info: log.Info,
 					}
 
 					result = append(result, tx)

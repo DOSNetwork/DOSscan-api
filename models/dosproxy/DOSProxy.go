@@ -1,7 +1,7 @@
 // Code generated - DO NOT EDIT.
 // This file is a generated binding and any manual changes will be lost.
 
-package models
+package dosproxy
 
 import (
 	"math/big"
@@ -28,7 +28,7 @@ var (
 )
 
 // DosproxyABI is the input ABI used to generate the binding from.
-const DosproxyABI = "[{\"constant\":true,\"inputs\":[{\"name\":\"groupId\",\"type\":\"uint256\"}],\"name\":\"getWorkingGroupById\",\"outputs\":[{\"name\":\"\",\"type\":\"address[]\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"groupToPick\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"pendingNodeTail\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newSize\",\"type\":\"uint256\"}],\"name\":\"setGroupSize\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"address\"},{\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"nodeToGroupIdList\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"sig\",\"type\":\"uint256[2]\"},{\"name\":\"version\",\"type\":\"uint8\"}],\"name\":\"updateRandomness\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"bootstrapStartThreshold\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"signalGroupFormation\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"requestId\",\"type\":\"uint256\"},{\"name\":\"rndSeed\",\"type\":\"uint256\"}],\"name\":\"__callback__\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"pendingGroupTail\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"from\",\"type\":\"address\"},{\"name\":\"mode\",\"type\":\"uint8\"},{\"name\":\"userSeed\",\"type\":\"uint256\"}],\"name\":\"requestRandom\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"bootstrapCommitDuration\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"unregisterNode\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newLife\",\"type\":\"uint256\"}],\"name\":\"setPendingGroupMaxLife\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getLastHandledGroup\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"},{\"name\":\"\",\"type\":\"uint256[4]\"},{\"name\":\"\",\"type\":\"uint256\"},{\"name\":\"\",\"type\":\"address[]\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"signalGroupDissolve\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_cid\",\"type\":\"uint256\"}],\"name\":\"signalBootstrap\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"workingGroupIds\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"groupSize\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"addressBridge\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"groupMaturityPeriod\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"bootstrapRound\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"numPendingGroups\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"groupingThreshold\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"isOwner\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"idx\",\"type\":\"uint256\"}],\"name\":\"getGroupPubKey\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256[4]\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newPeriod\",\"type\":\"uint256\"}],\"name\":\"setGroupMaturityPeriod\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"refreshSystemRandomHardLimit\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newCommitDuration\",\"type\":\"uint256\"}],\"name\":\"setBootstrapCommitDuration\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"pendingGroupList\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"address\"}],\"name\":\"pendingNodeList\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newNum\",\"type\":\"uint256\"}],\"name\":\"setGroupToPick\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"registerNewNode\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"expiredWorkingGroupIds\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getWorkingGroupSize\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"from\",\"type\":\"address\"},{\"name\":\"timeout\",\"type\":\"uint256\"},{\"name\":\"dataSource\",\"type\":\"string\"},{\"name\":\"selector\",\"type\":\"string\"}],\"name\":\"query\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"groupId\",\"type\":\"uint256\"},{\"name\":\"suggestedPubKey\",\"type\":\"uint256[4]\"}],\"name\":\"registerGroupPubKey\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newRevealDuration\",\"type\":\"uint256\"}],\"name\":\"setBootstrapRevealDuration\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"signalRandom\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newNum\",\"type\":\"uint256\"}],\"name\":\"setbootstrapStartThreshold\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"pendingGroups\",\"outputs\":[{\"name\":\"groupId\",\"type\":\"uint256\"},{\"name\":\"startBlkNum\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"requestId\",\"type\":\"uint256\"},{\"name\":\"trafficType\",\"type\":\"uint8\"},{\"name\":\"result\",\"type\":\"bytes\"},{\"name\":\"sig\",\"type\":\"uint256[2]\"},{\"name\":\"version\",\"type\":\"uint8\"}],\"name\":\"triggerCallback\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newThreshold\",\"type\":\"uint256\"}],\"name\":\"setGroupingThreshold\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"bootstrapRevealDuration\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getExpiredWorkingGroupSize\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"lastRandomness\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"numPendingNodes\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"lastUpdatedBlock\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"pendingGroupMaxLife\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"queryId\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"timeout\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"dataSource\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"selector\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"randomness\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"dispatchedGroupId\",\"type\":\"uint256\"}],\"name\":\"LogUrl\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"requestId\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"lastSystemRandomness\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"userSeed\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"dispatchedGroupId\",\"type\":\"uint256\"}],\"name\":\"LogRequestUserRandom\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"invalidSelector\",\"type\":\"string\"}],\"name\":\"LogNonSupportedType\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"from\",\"type\":\"address\"}],\"name\":\"LogNonContractCall\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"callbackAddr\",\"type\":\"address\"}],\"name\":\"LogCallbackTriggeredFor\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[],\"name\":\"LogRequestFromNonExistentUC\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"lastRandomness\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"dispatchedGroupId\",\"type\":\"uint256\"}],\"name\":\"LogUpdateRandom\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"trafficType\",\"type\":\"uint8\"},{\"indexed\":false,\"name\":\"trafficId\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"message\",\"type\":\"bytes\"},{\"indexed\":false,\"name\":\"signature\",\"type\":\"uint256[2]\"},{\"indexed\":false,\"name\":\"pubKey\",\"type\":\"uint256[4]\"},{\"indexed\":false,\"name\":\"version\",\"type\":\"uint8\"},{\"indexed\":false,\"name\":\"pass\",\"type\":\"bool\"}],\"name\":\"LogValidationResult\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"numPendingNodes\",\"type\":\"uint256\"}],\"name\":\"LogInsufficientPendingNode\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"numWorkingGroups\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"numPendingGroups\",\"type\":\"uint256\"}],\"name\":\"LogInsufficientWorkingGroup\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"groupId\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"nodeId\",\"type\":\"address[]\"}],\"name\":\"LogGrouping\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"groupId\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"pubKey\",\"type\":\"uint256[4]\"},{\"indexed\":false,\"name\":\"numWorkingGroups\",\"type\":\"uint256\"}],\"name\":\"LogPublicKeyAccepted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"groupId\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"pubKeyCount\",\"type\":\"uint256\"}],\"name\":\"LogPublicKeySuggested\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"groupId\",\"type\":\"uint256\"}],\"name\":\"LogGroupDissolve\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"node\",\"type\":\"address\"}],\"name\":\"LogRegisteredNewPendingNode\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"node\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"unregisterFrom\",\"type\":\"uint256\"}],\"name\":\"LogUnRegisteredNewPendingNode\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"pendingNodePool\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"groupsize\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"groupingthreshold\",\"type\":\"uint256\"}],\"name\":\"LogGroupingInitiated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"groupId\",\"type\":\"uint256\"}],\"name\":\"LogNoPendingGroup\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"groupId\",\"type\":\"uint256\"}],\"name\":\"LogPendingGroupRemoved\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"err\",\"type\":\"string\"}],\"name\":\"LogError\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"oldNum\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"newNum\",\"type\":\"uint256\"}],\"name\":\"UpdateGroupToPick\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"oldSize\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"newSize\",\"type\":\"uint256\"}],\"name\":\"UpdateGroupSize\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"oldThreshold\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"newThreshold\",\"type\":\"uint256\"}],\"name\":\"UpdateGroupingThreshold\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"oldPeriod\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"newPeriod\",\"type\":\"uint256\"}],\"name\":\"UpdateGroupMaturityPeriod\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"oldDuration\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"newDuration\",\"type\":\"uint256\"}],\"name\":\"UpdateBootstrapCommitDuration\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"oldDuration\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"newDuration\",\"type\":\"uint256\"}],\"name\":\"UpdateBootstrapRevealDuration\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"oldThreshold\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"newThreshold\",\"type\":\"uint256\"}],\"name\":\"UpdatebootstrapStartThreshold\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"oldLifeBlocks\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"newLifeBlocks\",\"type\":\"uint256\"}],\"name\":\"UpdatePendingGroupMaxLife\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"blkNum\",\"type\":\"uint256\"},{\"indexed\":true,\"name\":\"guardian\",\"type\":\"address\"}],\"name\":\"GuardianReward\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"previousOwner\",\"type\":\"address\"}],\"name\":\"OwnershipRenounced\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"}]"
+const DosproxyABI = "[{\"constant\":true,\"inputs\":[{\"name\":\"groupId\",\"type\":\"uint256\"}],\"name\":\"getWorkingGroupById\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"},{\"name\":\"\",\"type\":\"uint256[4]\"},{\"name\":\"\",\"type\":\"uint256\"},{\"name\":\"\",\"type\":\"uint256\"},{\"name\":\"\",\"type\":\"address[]\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"groupToPick\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"pendingNodeTail\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"sig\",\"type\":\"uint256[2]\"}],\"name\":\"updateRandomness\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newSize\",\"type\":\"uint256\"}],\"name\":\"setGroupSize\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"address\"},{\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"nodeToGroupIdList\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"bootstrapStartThreshold\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"workingGroupIdsLength\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"signalGroupFormation\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"requestId\",\"type\":\"uint256\"},{\"name\":\"rndSeed\",\"type\":\"uint256\"}],\"name\":\"__callback__\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"pendingGroupTail\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"bootstrapEndBlk\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"bootstrapGroups\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"bootstrapCommitDuration\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"unregisterNode\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newFund\",\"type\":\"address\"},{\"name\":\"newFundToken\",\"type\":\"address\"}],\"name\":\"setProxyFund\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newGroups\",\"type\":\"uint256\"}],\"name\":\"setBootstrapGroups\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newLife\",\"type\":\"uint256\"}],\"name\":\"setPendingGroupMaxLife\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getLastHandledGroup\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"},{\"name\":\"\",\"type\":\"uint256[4]\"},{\"name\":\"\",\"type\":\"uint256\"},{\"name\":\"\",\"type\":\"uint256\"},{\"name\":\"\",\"type\":\"address[]\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"signalGroupDissolve\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_cid\",\"type\":\"uint256\"}],\"name\":\"signalBootstrap\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"workingGroupIds\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"groupSize\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"checkExpireLimit\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"requestId\",\"type\":\"uint256\"},{\"name\":\"trafficType\",\"type\":\"uint8\"},{\"name\":\"result\",\"type\":\"bytes\"},{\"name\":\"sig\",\"type\":\"uint256[2]\"}],\"name\":\"triggerCallback\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"addressBridge\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"member\",\"type\":\"address\"}],\"name\":\"signalUnregister\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"groupMaturityPeriod\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"expiredWorkingGroupIdsLength\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"bootstrapRound\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"numPendingGroups\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"groupingThreshold\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"isOwner\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"idx\",\"type\":\"uint256\"}],\"name\":\"getGroupPubKey\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256[4]\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newPeriod\",\"type\":\"uint256\"}],\"name\":\"setGroupMaturityPeriod\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"refreshSystemRandomHardLimit\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"proxyFundsTokenAddr\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newCommitDuration\",\"type\":\"uint256\"}],\"name\":\"setBootstrapCommitDuration\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"pendingGroupList\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"address\"}],\"name\":\"pendingNodeList\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"registerNewNode\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"expiredWorkingGroupIds\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getWorkingGroupSize\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"from\",\"type\":\"address\"},{\"name\":\"timeout\",\"type\":\"uint256\"},{\"name\":\"dataSource\",\"type\":\"string\"},{\"name\":\"selector\",\"type\":\"string\"}],\"name\":\"query\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"groupId\",\"type\":\"uint256\"},{\"name\":\"suggestedPubKey\",\"type\":\"uint256[4]\"}],\"name\":\"registerGroupPubKey\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newRevealDuration\",\"type\":\"uint256\"}],\"name\":\"setBootstrapRevealDuration\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"signalRandom\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newLimit\",\"type\":\"uint256\"}],\"name\":\"setSystemRandomHardLimit\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"from\",\"type\":\"address\"},{\"name\":\"userSeed\",\"type\":\"uint256\"}],\"name\":\"requestRandom\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newNum\",\"type\":\"uint256\"}],\"name\":\"setbootstrapStartThreshold\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"pendingGroups\",\"outputs\":[{\"name\":\"groupId\",\"type\":\"uint256\"},{\"name\":\"startBlkNum\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"lifeDiversity\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"proxyFundsAddr\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"bootstrapRevealDuration\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getExpiredWorkingGroupSize\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"lastRandomness\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"numPendingNodes\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"lastUpdatedBlock\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"pendingGroupMaxLife\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"queryId\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"timeout\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"dataSource\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"selector\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"randomness\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"dispatchedGroupId\",\"type\":\"uint256\"}],\"name\":\"LogUrl\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"requestId\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"lastSystemRandomness\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"userSeed\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"dispatchedGroupId\",\"type\":\"uint256\"}],\"name\":\"LogRequestUserRandom\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"invalidSelector\",\"type\":\"string\"}],\"name\":\"LogNonSupportedType\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"from\",\"type\":\"address\"}],\"name\":\"LogNonContractCall\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"callbackAddr\",\"type\":\"address\"}],\"name\":\"LogCallbackTriggeredFor\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[],\"name\":\"LogRequestFromNonExistentUC\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"lastRandomness\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"dispatchedGroupId\",\"type\":\"uint256\"}],\"name\":\"LogUpdateRandom\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"trafficType\",\"type\":\"uint8\"},{\"indexed\":false,\"name\":\"trafficId\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"message\",\"type\":\"bytes\"},{\"indexed\":false,\"name\":\"signature\",\"type\":\"uint256[2]\"},{\"indexed\":false,\"name\":\"pubKey\",\"type\":\"uint256[4]\"},{\"indexed\":false,\"name\":\"pass\",\"type\":\"bool\"}],\"name\":\"LogValidationResult\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"numPendingNodes\",\"type\":\"uint256\"}],\"name\":\"LogInsufficientPendingNode\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"numWorkingGroups\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"numPendingGroups\",\"type\":\"uint256\"}],\"name\":\"LogInsufficientWorkingGroup\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"groupId\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"nodeId\",\"type\":\"address[]\"}],\"name\":\"LogGrouping\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"groupId\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"pubKey\",\"type\":\"uint256[4]\"},{\"indexed\":false,\"name\":\"numWorkingGroups\",\"type\":\"uint256\"}],\"name\":\"LogPublicKeyAccepted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"groupId\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"pubKeyCount\",\"type\":\"uint256\"}],\"name\":\"LogPublicKeySuggested\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"groupId\",\"type\":\"uint256\"}],\"name\":\"LogGroupDissolve\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"node\",\"type\":\"address\"}],\"name\":\"LogRegisteredNewPendingNode\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"node\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"unregisterFrom\",\"type\":\"uint8\"}],\"name\":\"LogUnRegisteredNewPendingNode\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"pendingNodePool\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"groupsize\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"groupingthreshold\",\"type\":\"uint256\"}],\"name\":\"LogGroupingInitiated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"groupId\",\"type\":\"uint256\"}],\"name\":\"LogNoPendingGroup\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"groupId\",\"type\":\"uint256\"}],\"name\":\"LogPendingGroupRemoved\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"info\",\"type\":\"string\"}],\"name\":\"LogMessage\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"oldSize\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"newSize\",\"type\":\"uint256\"}],\"name\":\"UpdateGroupSize\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"oldPeriod\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"newPeriod\",\"type\":\"uint256\"}],\"name\":\"UpdateGroupMaturityPeriod\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"oldDuration\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"newDuration\",\"type\":\"uint256\"}],\"name\":\"UpdateBootstrapCommitDuration\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"oldDuration\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"newDuration\",\"type\":\"uint256\"}],\"name\":\"UpdateBootstrapRevealDuration\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"oldThreshold\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"newThreshold\",\"type\":\"uint256\"}],\"name\":\"UpdatebootstrapStartThreshold\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"oldLifeBlocks\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"newLifeBlocks\",\"type\":\"uint256\"}],\"name\":\"UpdatePendingGroupMaxLife\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"oldSize\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"newSize\",\"type\":\"uint256\"}],\"name\":\"UpdateBootstrapGroups\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"oldLimit\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"newLimit\",\"type\":\"uint256\"}],\"name\":\"UpdateSystemRandomHardLimit\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"oldFundAddr\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"newFundAddr\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"oldTokenAddr\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"newTokenAddr\",\"type\":\"address\"}],\"name\":\"UpdateProxyFund\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"blkNum\",\"type\":\"uint256\"},{\"indexed\":true,\"name\":\"guardian\",\"type\":\"address\"}],\"name\":\"GuardianReward\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"previousOwner\",\"type\":\"address\"}],\"name\":\"OwnershipRenounced\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"}]"
 
 // Dosproxy is an auto generated Go binding around an Ethereum contract.
 type Dosproxy struct {
@@ -224,6 +224,58 @@ func (_Dosproxy *DosproxyCallerSession) BootstrapCommitDuration() (*big.Int, err
 	return _Dosproxy.Contract.BootstrapCommitDuration(&_Dosproxy.CallOpts)
 }
 
+// BootstrapEndBlk is a free data retrieval call binding the contract method 0x19717203.
+//
+// Solidity: function bootstrapEndBlk() constant returns(uint256)
+func (_Dosproxy *DosproxyCaller) BootstrapEndBlk(opts *bind.CallOpts) (*big.Int, error) {
+	var (
+		ret0 = new(*big.Int)
+	)
+	out := ret0
+	err := _Dosproxy.contract.Call(opts, out, "bootstrapEndBlk")
+	return *ret0, err
+}
+
+// BootstrapEndBlk is a free data retrieval call binding the contract method 0x19717203.
+//
+// Solidity: function bootstrapEndBlk() constant returns(uint256)
+func (_Dosproxy *DosproxySession) BootstrapEndBlk() (*big.Int, error) {
+	return _Dosproxy.Contract.BootstrapEndBlk(&_Dosproxy.CallOpts)
+}
+
+// BootstrapEndBlk is a free data retrieval call binding the contract method 0x19717203.
+//
+// Solidity: function bootstrapEndBlk() constant returns(uint256)
+func (_Dosproxy *DosproxyCallerSession) BootstrapEndBlk() (*big.Int, error) {
+	return _Dosproxy.Contract.BootstrapEndBlk(&_Dosproxy.CallOpts)
+}
+
+// BootstrapGroups is a free data retrieval call binding the contract method 0x31bf6464.
+//
+// Solidity: function bootstrapGroups() constant returns(uint256)
+func (_Dosproxy *DosproxyCaller) BootstrapGroups(opts *bind.CallOpts) (*big.Int, error) {
+	var (
+		ret0 = new(*big.Int)
+	)
+	out := ret0
+	err := _Dosproxy.contract.Call(opts, out, "bootstrapGroups")
+	return *ret0, err
+}
+
+// BootstrapGroups is a free data retrieval call binding the contract method 0x31bf6464.
+//
+// Solidity: function bootstrapGroups() constant returns(uint256)
+func (_Dosproxy *DosproxySession) BootstrapGroups() (*big.Int, error) {
+	return _Dosproxy.Contract.BootstrapGroups(&_Dosproxy.CallOpts)
+}
+
+// BootstrapGroups is a free data retrieval call binding the contract method 0x31bf6464.
+//
+// Solidity: function bootstrapGroups() constant returns(uint256)
+func (_Dosproxy *DosproxyCallerSession) BootstrapGroups() (*big.Int, error) {
+	return _Dosproxy.Contract.BootstrapGroups(&_Dosproxy.CallOpts)
+}
+
 // BootstrapRevealDuration is a free data retrieval call binding the contract method 0xef112dfc.
 //
 // Solidity: function bootstrapRevealDuration() constant returns(uint256)
@@ -302,6 +354,32 @@ func (_Dosproxy *DosproxyCallerSession) BootstrapStartThreshold() (*big.Int, err
 	return _Dosproxy.Contract.BootstrapStartThreshold(&_Dosproxy.CallOpts)
 }
 
+// CheckExpireLimit is a free data retrieval call binding the contract method 0x6e5454d3.
+//
+// Solidity: function checkExpireLimit() constant returns(uint256)
+func (_Dosproxy *DosproxyCaller) CheckExpireLimit(opts *bind.CallOpts) (*big.Int, error) {
+	var (
+		ret0 = new(*big.Int)
+	)
+	out := ret0
+	err := _Dosproxy.contract.Call(opts, out, "checkExpireLimit")
+	return *ret0, err
+}
+
+// CheckExpireLimit is a free data retrieval call binding the contract method 0x6e5454d3.
+//
+// Solidity: function checkExpireLimit() constant returns(uint256)
+func (_Dosproxy *DosproxySession) CheckExpireLimit() (*big.Int, error) {
+	return _Dosproxy.Contract.CheckExpireLimit(&_Dosproxy.CallOpts)
+}
+
+// CheckExpireLimit is a free data retrieval call binding the contract method 0x6e5454d3.
+//
+// Solidity: function checkExpireLimit() constant returns(uint256)
+func (_Dosproxy *DosproxyCallerSession) CheckExpireLimit() (*big.Int, error) {
+	return _Dosproxy.Contract.CheckExpireLimit(&_Dosproxy.CallOpts)
+}
+
 // ExpiredWorkingGroupIds is a free data retrieval call binding the contract method 0xb45ef79d.
 //
 // Solidity: function expiredWorkingGroupIds(uint256 ) constant returns(uint256)
@@ -326,6 +404,32 @@ func (_Dosproxy *DosproxySession) ExpiredWorkingGroupIds(arg0 *big.Int) (*big.In
 // Solidity: function expiredWorkingGroupIds(uint256 ) constant returns(uint256)
 func (_Dosproxy *DosproxyCallerSession) ExpiredWorkingGroupIds(arg0 *big.Int) (*big.Int, error) {
 	return _Dosproxy.Contract.ExpiredWorkingGroupIds(&_Dosproxy.CallOpts, arg0)
+}
+
+// ExpiredWorkingGroupIdsLength is a free data retrieval call binding the contract method 0x830687c4.
+//
+// Solidity: function expiredWorkingGroupIdsLength() constant returns(uint256)
+func (_Dosproxy *DosproxyCaller) ExpiredWorkingGroupIdsLength(opts *bind.CallOpts) (*big.Int, error) {
+	var (
+		ret0 = new(*big.Int)
+	)
+	out := ret0
+	err := _Dosproxy.contract.Call(opts, out, "expiredWorkingGroupIdsLength")
+	return *ret0, err
+}
+
+// ExpiredWorkingGroupIdsLength is a free data retrieval call binding the contract method 0x830687c4.
+//
+// Solidity: function expiredWorkingGroupIdsLength() constant returns(uint256)
+func (_Dosproxy *DosproxySession) ExpiredWorkingGroupIdsLength() (*big.Int, error) {
+	return _Dosproxy.Contract.ExpiredWorkingGroupIdsLength(&_Dosproxy.CallOpts)
+}
+
+// ExpiredWorkingGroupIdsLength is a free data retrieval call binding the contract method 0x830687c4.
+//
+// Solidity: function expiredWorkingGroupIdsLength() constant returns(uint256)
+func (_Dosproxy *DosproxyCallerSession) ExpiredWorkingGroupIdsLength() (*big.Int, error) {
+	return _Dosproxy.Contract.ExpiredWorkingGroupIdsLength(&_Dosproxy.CallOpts)
 }
 
 // GetExpiredWorkingGroupSize is a free data retrieval call binding the contract method 0xefde068b.
@@ -382,61 +486,73 @@ func (_Dosproxy *DosproxyCallerSession) GetGroupPubKey(idx *big.Int) ([4]*big.In
 
 // GetLastHandledGroup is a free data retrieval call binding the contract method 0x4a4b52b4.
 //
-// Solidity: function getLastHandledGroup() constant returns(uint256, uint256[4], uint256, address[])
-func (_Dosproxy *DosproxyCaller) GetLastHandledGroup(opts *bind.CallOpts) (*big.Int, [4]*big.Int, *big.Int, []common.Address, error) {
+// Solidity: function getLastHandledGroup() constant returns(uint256, uint256[4], uint256, uint256, address[])
+func (_Dosproxy *DosproxyCaller) GetLastHandledGroup(opts *bind.CallOpts) (*big.Int, [4]*big.Int, *big.Int, *big.Int, []common.Address, error) {
 	var (
 		ret0 = new(*big.Int)
 		ret1 = new([4]*big.Int)
 		ret2 = new(*big.Int)
-		ret3 = new([]common.Address)
+		ret3 = new(*big.Int)
+		ret4 = new([]common.Address)
 	)
 	out := &[]interface{}{
 		ret0,
 		ret1,
 		ret2,
 		ret3,
+		ret4,
 	}
 	err := _Dosproxy.contract.Call(opts, out, "getLastHandledGroup")
-	return *ret0, *ret1, *ret2, *ret3, err
+	return *ret0, *ret1, *ret2, *ret3, *ret4, err
 }
 
 // GetLastHandledGroup is a free data retrieval call binding the contract method 0x4a4b52b4.
 //
-// Solidity: function getLastHandledGroup() constant returns(uint256, uint256[4], uint256, address[])
-func (_Dosproxy *DosproxySession) GetLastHandledGroup() (*big.Int, [4]*big.Int, *big.Int, []common.Address, error) {
+// Solidity: function getLastHandledGroup() constant returns(uint256, uint256[4], uint256, uint256, address[])
+func (_Dosproxy *DosproxySession) GetLastHandledGroup() (*big.Int, [4]*big.Int, *big.Int, *big.Int, []common.Address, error) {
 	return _Dosproxy.Contract.GetLastHandledGroup(&_Dosproxy.CallOpts)
 }
 
 // GetLastHandledGroup is a free data retrieval call binding the contract method 0x4a4b52b4.
 //
-// Solidity: function getLastHandledGroup() constant returns(uint256, uint256[4], uint256, address[])
-func (_Dosproxy *DosproxyCallerSession) GetLastHandledGroup() (*big.Int, [4]*big.Int, *big.Int, []common.Address, error) {
+// Solidity: function getLastHandledGroup() constant returns(uint256, uint256[4], uint256, uint256, address[])
+func (_Dosproxy *DosproxyCallerSession) GetLastHandledGroup() (*big.Int, [4]*big.Int, *big.Int, *big.Int, []common.Address, error) {
 	return _Dosproxy.Contract.GetLastHandledGroup(&_Dosproxy.CallOpts)
 }
 
 // GetWorkingGroupById is a free data retrieval call binding the contract method 0x02957d53.
 //
-// Solidity: function getWorkingGroupById(uint256 groupId) constant returns(address[])
-func (_Dosproxy *DosproxyCaller) GetWorkingGroupById(opts *bind.CallOpts, groupId *big.Int) ([]common.Address, error) {
+// Solidity: function getWorkingGroupById(uint256 groupId) constant returns(uint256, uint256[4], uint256, uint256, address[])
+func (_Dosproxy *DosproxyCaller) GetWorkingGroupById(opts *bind.CallOpts, groupId *big.Int) (*big.Int, [4]*big.Int, *big.Int, *big.Int, []common.Address, error) {
 	var (
-		ret0 = new([]common.Address)
+		ret0 = new(*big.Int)
+		ret1 = new([4]*big.Int)
+		ret2 = new(*big.Int)
+		ret3 = new(*big.Int)
+		ret4 = new([]common.Address)
 	)
-	out := ret0
+	out := &[]interface{}{
+		ret0,
+		ret1,
+		ret2,
+		ret3,
+		ret4,
+	}
 	err := _Dosproxy.contract.Call(opts, out, "getWorkingGroupById", groupId)
-	return *ret0, err
+	return *ret0, *ret1, *ret2, *ret3, *ret4, err
 }
 
 // GetWorkingGroupById is a free data retrieval call binding the contract method 0x02957d53.
 //
-// Solidity: function getWorkingGroupById(uint256 groupId) constant returns(address[])
-func (_Dosproxy *DosproxySession) GetWorkingGroupById(groupId *big.Int) ([]common.Address, error) {
+// Solidity: function getWorkingGroupById(uint256 groupId) constant returns(uint256, uint256[4], uint256, uint256, address[])
+func (_Dosproxy *DosproxySession) GetWorkingGroupById(groupId *big.Int) (*big.Int, [4]*big.Int, *big.Int, *big.Int, []common.Address, error) {
 	return _Dosproxy.Contract.GetWorkingGroupById(&_Dosproxy.CallOpts, groupId)
 }
 
 // GetWorkingGroupById is a free data retrieval call binding the contract method 0x02957d53.
 //
-// Solidity: function getWorkingGroupById(uint256 groupId) constant returns(address[])
-func (_Dosproxy *DosproxyCallerSession) GetWorkingGroupById(groupId *big.Int) ([]common.Address, error) {
+// Solidity: function getWorkingGroupById(uint256 groupId) constant returns(uint256, uint256[4], uint256, uint256, address[])
+func (_Dosproxy *DosproxyCallerSession) GetWorkingGroupById(groupId *big.Int) (*big.Int, [4]*big.Int, *big.Int, *big.Int, []common.Address, error) {
 	return _Dosproxy.Contract.GetWorkingGroupById(&_Dosproxy.CallOpts, groupId)
 }
 
@@ -646,6 +762,32 @@ func (_Dosproxy *DosproxySession) LastUpdatedBlock() (*big.Int, error) {
 // Solidity: function lastUpdatedBlock() constant returns(uint256)
 func (_Dosproxy *DosproxyCallerSession) LastUpdatedBlock() (*big.Int, error) {
 	return _Dosproxy.Contract.LastUpdatedBlock(&_Dosproxy.CallOpts)
+}
+
+// LifeDiversity is a free data retrieval call binding the contract method 0xdd6ceddf.
+//
+// Solidity: function lifeDiversity() constant returns(uint256)
+func (_Dosproxy *DosproxyCaller) LifeDiversity(opts *bind.CallOpts) (*big.Int, error) {
+	var (
+		ret0 = new(*big.Int)
+	)
+	out := ret0
+	err := _Dosproxy.contract.Call(opts, out, "lifeDiversity")
+	return *ret0, err
+}
+
+// LifeDiversity is a free data retrieval call binding the contract method 0xdd6ceddf.
+//
+// Solidity: function lifeDiversity() constant returns(uint256)
+func (_Dosproxy *DosproxySession) LifeDiversity() (*big.Int, error) {
+	return _Dosproxy.Contract.LifeDiversity(&_Dosproxy.CallOpts)
+}
+
+// LifeDiversity is a free data retrieval call binding the contract method 0xdd6ceddf.
+//
+// Solidity: function lifeDiversity() constant returns(uint256)
+func (_Dosproxy *DosproxyCallerSession) LifeDiversity() (*big.Int, error) {
+	return _Dosproxy.Contract.LifeDiversity(&_Dosproxy.CallOpts)
 }
 
 // NodeToGroupIdList is a free data retrieval call binding the contract method 0x0eeee5c1.
@@ -918,6 +1060,58 @@ func (_Dosproxy *DosproxyCallerSession) PendingNodeTail() (common.Address, error
 	return _Dosproxy.Contract.PendingNodeTail(&_Dosproxy.CallOpts)
 }
 
+// ProxyFundsAddr is a free data retrieval call binding the contract method 0xdf37c617.
+//
+// Solidity: function proxyFundsAddr() constant returns(address)
+func (_Dosproxy *DosproxyCaller) ProxyFundsAddr(opts *bind.CallOpts) (common.Address, error) {
+	var (
+		ret0 = new(common.Address)
+	)
+	out := ret0
+	err := _Dosproxy.contract.Call(opts, out, "proxyFundsAddr")
+	return *ret0, err
+}
+
+// ProxyFundsAddr is a free data retrieval call binding the contract method 0xdf37c617.
+//
+// Solidity: function proxyFundsAddr() constant returns(address)
+func (_Dosproxy *DosproxySession) ProxyFundsAddr() (common.Address, error) {
+	return _Dosproxy.Contract.ProxyFundsAddr(&_Dosproxy.CallOpts)
+}
+
+// ProxyFundsAddr is a free data retrieval call binding the contract method 0xdf37c617.
+//
+// Solidity: function proxyFundsAddr() constant returns(address)
+func (_Dosproxy *DosproxyCallerSession) ProxyFundsAddr() (common.Address, error) {
+	return _Dosproxy.Contract.ProxyFundsAddr(&_Dosproxy.CallOpts)
+}
+
+// ProxyFundsTokenAddr is a free data retrieval call binding the contract method 0x99ca2d30.
+//
+// Solidity: function proxyFundsTokenAddr() constant returns(address)
+func (_Dosproxy *DosproxyCaller) ProxyFundsTokenAddr(opts *bind.CallOpts) (common.Address, error) {
+	var (
+		ret0 = new(common.Address)
+	)
+	out := ret0
+	err := _Dosproxy.contract.Call(opts, out, "proxyFundsTokenAddr")
+	return *ret0, err
+}
+
+// ProxyFundsTokenAddr is a free data retrieval call binding the contract method 0x99ca2d30.
+//
+// Solidity: function proxyFundsTokenAddr() constant returns(address)
+func (_Dosproxy *DosproxySession) ProxyFundsTokenAddr() (common.Address, error) {
+	return _Dosproxy.Contract.ProxyFundsTokenAddr(&_Dosproxy.CallOpts)
+}
+
+// ProxyFundsTokenAddr is a free data retrieval call binding the contract method 0x99ca2d30.
+//
+// Solidity: function proxyFundsTokenAddr() constant returns(address)
+func (_Dosproxy *DosproxyCallerSession) ProxyFundsTokenAddr() (common.Address, error) {
+	return _Dosproxy.Contract.ProxyFundsTokenAddr(&_Dosproxy.CallOpts)
+}
+
 // RefreshSystemRandomHardLimit is a free data retrieval call binding the contract method 0x962ba8a4.
 //
 // Solidity: function refreshSystemRandomHardLimit() constant returns(uint256)
@@ -968,6 +1162,32 @@ func (_Dosproxy *DosproxySession) WorkingGroupIds(arg0 *big.Int) (*big.Int, erro
 // Solidity: function workingGroupIds(uint256 ) constant returns(uint256)
 func (_Dosproxy *DosproxyCallerSession) WorkingGroupIds(arg0 *big.Int) (*big.Int, error) {
 	return _Dosproxy.Contract.WorkingGroupIds(&_Dosproxy.CallOpts, arg0)
+}
+
+// WorkingGroupIdsLength is a free data retrieval call binding the contract method 0x11db6574.
+//
+// Solidity: function workingGroupIdsLength() constant returns(uint256)
+func (_Dosproxy *DosproxyCaller) WorkingGroupIdsLength(opts *bind.CallOpts) (*big.Int, error) {
+	var (
+		ret0 = new(*big.Int)
+	)
+	out := ret0
+	err := _Dosproxy.contract.Call(opts, out, "workingGroupIdsLength")
+	return *ret0, err
+}
+
+// WorkingGroupIdsLength is a free data retrieval call binding the contract method 0x11db6574.
+//
+// Solidity: function workingGroupIdsLength() constant returns(uint256)
+func (_Dosproxy *DosproxySession) WorkingGroupIdsLength() (*big.Int, error) {
+	return _Dosproxy.Contract.WorkingGroupIdsLength(&_Dosproxy.CallOpts)
+}
+
+// WorkingGroupIdsLength is a free data retrieval call binding the contract method 0x11db6574.
+//
+// Solidity: function workingGroupIdsLength() constant returns(uint256)
+func (_Dosproxy *DosproxyCallerSession) WorkingGroupIdsLength() (*big.Int, error) {
+	return _Dosproxy.Contract.WorkingGroupIdsLength(&_Dosproxy.CallOpts)
 }
 
 // Callback is a paid mutator transaction binding the contract method 0x18a1908d.
@@ -1075,25 +1295,25 @@ func (_Dosproxy *DosproxyTransactorSession) RenounceOwnership() (*types.Transact
 	return _Dosproxy.Contract.RenounceOwnership(&_Dosproxy.TransactOpts)
 }
 
-// RequestRandom is a paid mutator transaction binding the contract method 0x1bf82057.
+// RequestRandom is a paid mutator transaction binding the contract method 0xc7c3f4a5.
 //
-// Solidity: function requestRandom(address from, uint8 mode, uint256 userSeed) returns(uint256)
-func (_Dosproxy *DosproxyTransactor) RequestRandom(opts *bind.TransactOpts, from common.Address, mode uint8, userSeed *big.Int) (*types.Transaction, error) {
-	return _Dosproxy.contract.Transact(opts, "requestRandom", from, mode, userSeed)
+// Solidity: function requestRandom(address from, uint256 userSeed) returns(uint256)
+func (_Dosproxy *DosproxyTransactor) RequestRandom(opts *bind.TransactOpts, from common.Address, userSeed *big.Int) (*types.Transaction, error) {
+	return _Dosproxy.contract.Transact(opts, "requestRandom", from, userSeed)
 }
 
-// RequestRandom is a paid mutator transaction binding the contract method 0x1bf82057.
+// RequestRandom is a paid mutator transaction binding the contract method 0xc7c3f4a5.
 //
-// Solidity: function requestRandom(address from, uint8 mode, uint256 userSeed) returns(uint256)
-func (_Dosproxy *DosproxySession) RequestRandom(from common.Address, mode uint8, userSeed *big.Int) (*types.Transaction, error) {
-	return _Dosproxy.Contract.RequestRandom(&_Dosproxy.TransactOpts, from, mode, userSeed)
+// Solidity: function requestRandom(address from, uint256 userSeed) returns(uint256)
+func (_Dosproxy *DosproxySession) RequestRandom(from common.Address, userSeed *big.Int) (*types.Transaction, error) {
+	return _Dosproxy.Contract.RequestRandom(&_Dosproxy.TransactOpts, from, userSeed)
 }
 
-// RequestRandom is a paid mutator transaction binding the contract method 0x1bf82057.
+// RequestRandom is a paid mutator transaction binding the contract method 0xc7c3f4a5.
 //
-// Solidity: function requestRandom(address from, uint8 mode, uint256 userSeed) returns(uint256)
-func (_Dosproxy *DosproxyTransactorSession) RequestRandom(from common.Address, mode uint8, userSeed *big.Int) (*types.Transaction, error) {
-	return _Dosproxy.Contract.RequestRandom(&_Dosproxy.TransactOpts, from, mode, userSeed)
+// Solidity: function requestRandom(address from, uint256 userSeed) returns(uint256)
+func (_Dosproxy *DosproxyTransactorSession) RequestRandom(from common.Address, userSeed *big.Int) (*types.Transaction, error) {
+	return _Dosproxy.Contract.RequestRandom(&_Dosproxy.TransactOpts, from, userSeed)
 }
 
 // SetBootstrapCommitDuration is a paid mutator transaction binding the contract method 0x9e718573.
@@ -1115,6 +1335,27 @@ func (_Dosproxy *DosproxySession) SetBootstrapCommitDuration(newCommitDuration *
 // Solidity: function setBootstrapCommitDuration(uint256 newCommitDuration) returns()
 func (_Dosproxy *DosproxyTransactorSession) SetBootstrapCommitDuration(newCommitDuration *big.Int) (*types.Transaction, error) {
 	return _Dosproxy.Contract.SetBootstrapCommitDuration(&_Dosproxy.TransactOpts, newCommitDuration)
+}
+
+// SetBootstrapGroups is a paid mutator transaction binding the contract method 0x495f4def.
+//
+// Solidity: function setBootstrapGroups(uint256 newGroups) returns()
+func (_Dosproxy *DosproxyTransactor) SetBootstrapGroups(opts *bind.TransactOpts, newGroups *big.Int) (*types.Transaction, error) {
+	return _Dosproxy.contract.Transact(opts, "setBootstrapGroups", newGroups)
+}
+
+// SetBootstrapGroups is a paid mutator transaction binding the contract method 0x495f4def.
+//
+// Solidity: function setBootstrapGroups(uint256 newGroups) returns()
+func (_Dosproxy *DosproxySession) SetBootstrapGroups(newGroups *big.Int) (*types.Transaction, error) {
+	return _Dosproxy.Contract.SetBootstrapGroups(&_Dosproxy.TransactOpts, newGroups)
+}
+
+// SetBootstrapGroups is a paid mutator transaction binding the contract method 0x495f4def.
+//
+// Solidity: function setBootstrapGroups(uint256 newGroups) returns()
+func (_Dosproxy *DosproxyTransactorSession) SetBootstrapGroups(newGroups *big.Int) (*types.Transaction, error) {
+	return _Dosproxy.Contract.SetBootstrapGroups(&_Dosproxy.TransactOpts, newGroups)
 }
 
 // SetBootstrapRevealDuration is a paid mutator transaction binding the contract method 0xb8fa82e0.
@@ -1180,48 +1421,6 @@ func (_Dosproxy *DosproxyTransactorSession) SetGroupSize(newSize *big.Int) (*typ
 	return _Dosproxy.Contract.SetGroupSize(&_Dosproxy.TransactOpts, newSize)
 }
 
-// SetGroupToPick is a paid mutator transaction binding the contract method 0xa8c0649e.
-//
-// Solidity: function setGroupToPick(uint256 newNum) returns()
-func (_Dosproxy *DosproxyTransactor) SetGroupToPick(opts *bind.TransactOpts, newNum *big.Int) (*types.Transaction, error) {
-	return _Dosproxy.contract.Transact(opts, "setGroupToPick", newNum)
-}
-
-// SetGroupToPick is a paid mutator transaction binding the contract method 0xa8c0649e.
-//
-// Solidity: function setGroupToPick(uint256 newNum) returns()
-func (_Dosproxy *DosproxySession) SetGroupToPick(newNum *big.Int) (*types.Transaction, error) {
-	return _Dosproxy.Contract.SetGroupToPick(&_Dosproxy.TransactOpts, newNum)
-}
-
-// SetGroupToPick is a paid mutator transaction binding the contract method 0xa8c0649e.
-//
-// Solidity: function setGroupToPick(uint256 newNum) returns()
-func (_Dosproxy *DosproxyTransactorSession) SetGroupToPick(newNum *big.Int) (*types.Transaction, error) {
-	return _Dosproxy.Contract.SetGroupToPick(&_Dosproxy.TransactOpts, newNum)
-}
-
-// SetGroupingThreshold is a paid mutator transaction binding the contract method 0xdbdd0ab9.
-//
-// Solidity: function setGroupingThreshold(uint256 newThreshold) returns()
-func (_Dosproxy *DosproxyTransactor) SetGroupingThreshold(opts *bind.TransactOpts, newThreshold *big.Int) (*types.Transaction, error) {
-	return _Dosproxy.contract.Transact(opts, "setGroupingThreshold", newThreshold)
-}
-
-// SetGroupingThreshold is a paid mutator transaction binding the contract method 0xdbdd0ab9.
-//
-// Solidity: function setGroupingThreshold(uint256 newThreshold) returns()
-func (_Dosproxy *DosproxySession) SetGroupingThreshold(newThreshold *big.Int) (*types.Transaction, error) {
-	return _Dosproxy.Contract.SetGroupingThreshold(&_Dosproxy.TransactOpts, newThreshold)
-}
-
-// SetGroupingThreshold is a paid mutator transaction binding the contract method 0xdbdd0ab9.
-//
-// Solidity: function setGroupingThreshold(uint256 newThreshold) returns()
-func (_Dosproxy *DosproxyTransactorSession) SetGroupingThreshold(newThreshold *big.Int) (*types.Transaction, error) {
-	return _Dosproxy.Contract.SetGroupingThreshold(&_Dosproxy.TransactOpts, newThreshold)
-}
-
 // SetPendingGroupMaxLife is a paid mutator transaction binding the contract method 0x4a28a74d.
 //
 // Solidity: function setPendingGroupMaxLife(uint256 newLife) returns()
@@ -1241,6 +1440,48 @@ func (_Dosproxy *DosproxySession) SetPendingGroupMaxLife(newLife *big.Int) (*typ
 // Solidity: function setPendingGroupMaxLife(uint256 newLife) returns()
 func (_Dosproxy *DosproxyTransactorSession) SetPendingGroupMaxLife(newLife *big.Int) (*types.Transaction, error) {
 	return _Dosproxy.Contract.SetPendingGroupMaxLife(&_Dosproxy.TransactOpts, newLife)
+}
+
+// SetProxyFund is a paid mutator transaction binding the contract method 0x40e4a5af.
+//
+// Solidity: function setProxyFund(address newFund, address newFundToken) returns()
+func (_Dosproxy *DosproxyTransactor) SetProxyFund(opts *bind.TransactOpts, newFund common.Address, newFundToken common.Address) (*types.Transaction, error) {
+	return _Dosproxy.contract.Transact(opts, "setProxyFund", newFund, newFundToken)
+}
+
+// SetProxyFund is a paid mutator transaction binding the contract method 0x40e4a5af.
+//
+// Solidity: function setProxyFund(address newFund, address newFundToken) returns()
+func (_Dosproxy *DosproxySession) SetProxyFund(newFund common.Address, newFundToken common.Address) (*types.Transaction, error) {
+	return _Dosproxy.Contract.SetProxyFund(&_Dosproxy.TransactOpts, newFund, newFundToken)
+}
+
+// SetProxyFund is a paid mutator transaction binding the contract method 0x40e4a5af.
+//
+// Solidity: function setProxyFund(address newFund, address newFundToken) returns()
+func (_Dosproxy *DosproxyTransactorSession) SetProxyFund(newFund common.Address, newFundToken common.Address) (*types.Transaction, error) {
+	return _Dosproxy.Contract.SetProxyFund(&_Dosproxy.TransactOpts, newFund, newFundToken)
+}
+
+// SetSystemRandomHardLimit is a paid mutator transaction binding the contract method 0xc457aa8f.
+//
+// Solidity: function setSystemRandomHardLimit(uint256 newLimit) returns()
+func (_Dosproxy *DosproxyTransactor) SetSystemRandomHardLimit(opts *bind.TransactOpts, newLimit *big.Int) (*types.Transaction, error) {
+	return _Dosproxy.contract.Transact(opts, "setSystemRandomHardLimit", newLimit)
+}
+
+// SetSystemRandomHardLimit is a paid mutator transaction binding the contract method 0xc457aa8f.
+//
+// Solidity: function setSystemRandomHardLimit(uint256 newLimit) returns()
+func (_Dosproxy *DosproxySession) SetSystemRandomHardLimit(newLimit *big.Int) (*types.Transaction, error) {
+	return _Dosproxy.Contract.SetSystemRandomHardLimit(&_Dosproxy.TransactOpts, newLimit)
+}
+
+// SetSystemRandomHardLimit is a paid mutator transaction binding the contract method 0xc457aa8f.
+//
+// Solidity: function setSystemRandomHardLimit(uint256 newLimit) returns()
+func (_Dosproxy *DosproxyTransactorSession) SetSystemRandomHardLimit(newLimit *big.Int) (*types.Transaction, error) {
+	return _Dosproxy.Contract.SetSystemRandomHardLimit(&_Dosproxy.TransactOpts, newLimit)
 }
 
 // SetbootstrapStartThreshold is a paid mutator transaction binding the contract method 0xcb0abe2a.
@@ -1348,6 +1589,27 @@ func (_Dosproxy *DosproxyTransactorSession) SignalRandom() (*types.Transaction, 
 	return _Dosproxy.Contract.SignalRandom(&_Dosproxy.TransactOpts)
 }
 
+// SignalUnregister is a paid mutator transaction binding the contract method 0x7c1cf083.
+//
+// Solidity: function signalUnregister(address member) returns()
+func (_Dosproxy *DosproxyTransactor) SignalUnregister(opts *bind.TransactOpts, member common.Address) (*types.Transaction, error) {
+	return _Dosproxy.contract.Transact(opts, "signalUnregister", member)
+}
+
+// SignalUnregister is a paid mutator transaction binding the contract method 0x7c1cf083.
+//
+// Solidity: function signalUnregister(address member) returns()
+func (_Dosproxy *DosproxySession) SignalUnregister(member common.Address) (*types.Transaction, error) {
+	return _Dosproxy.Contract.SignalUnregister(&_Dosproxy.TransactOpts, member)
+}
+
+// SignalUnregister is a paid mutator transaction binding the contract method 0x7c1cf083.
+//
+// Solidity: function signalUnregister(address member) returns()
+func (_Dosproxy *DosproxyTransactorSession) SignalUnregister(member common.Address) (*types.Transaction, error) {
+	return _Dosproxy.Contract.SignalUnregister(&_Dosproxy.TransactOpts, member)
+}
+
 // TransferOwnership is a paid mutator transaction binding the contract method 0xf2fde38b.
 //
 // Solidity: function transferOwnership(address newOwner) returns()
@@ -1369,67 +1631,67 @@ func (_Dosproxy *DosproxyTransactorSession) TransferOwnership(newOwner common.Ad
 	return _Dosproxy.Contract.TransferOwnership(&_Dosproxy.TransactOpts, newOwner)
 }
 
-// TriggerCallback is a paid mutator transaction binding the contract method 0xd7d9860f.
+// TriggerCallback is a paid mutator transaction binding the contract method 0x74ad3a06.
 //
-// Solidity: function triggerCallback(uint256 requestId, uint8 trafficType, bytes result, uint256[2] sig, uint8 version) returns()
-func (_Dosproxy *DosproxyTransactor) TriggerCallback(opts *bind.TransactOpts, requestId *big.Int, trafficType uint8, result []byte, sig [2]*big.Int, version uint8) (*types.Transaction, error) {
-	return _Dosproxy.contract.Transact(opts, "triggerCallback", requestId, trafficType, result, sig, version)
+// Solidity: function triggerCallback(uint256 requestId, uint8 trafficType, bytes result, uint256[2] sig) returns()
+func (_Dosproxy *DosproxyTransactor) TriggerCallback(opts *bind.TransactOpts, requestId *big.Int, trafficType uint8, result []byte, sig [2]*big.Int) (*types.Transaction, error) {
+	return _Dosproxy.contract.Transact(opts, "triggerCallback", requestId, trafficType, result, sig)
 }
 
-// TriggerCallback is a paid mutator transaction binding the contract method 0xd7d9860f.
+// TriggerCallback is a paid mutator transaction binding the contract method 0x74ad3a06.
 //
-// Solidity: function triggerCallback(uint256 requestId, uint8 trafficType, bytes result, uint256[2] sig, uint8 version) returns()
-func (_Dosproxy *DosproxySession) TriggerCallback(requestId *big.Int, trafficType uint8, result []byte, sig [2]*big.Int, version uint8) (*types.Transaction, error) {
-	return _Dosproxy.Contract.TriggerCallback(&_Dosproxy.TransactOpts, requestId, trafficType, result, sig, version)
+// Solidity: function triggerCallback(uint256 requestId, uint8 trafficType, bytes result, uint256[2] sig) returns()
+func (_Dosproxy *DosproxySession) TriggerCallback(requestId *big.Int, trafficType uint8, result []byte, sig [2]*big.Int) (*types.Transaction, error) {
+	return _Dosproxy.Contract.TriggerCallback(&_Dosproxy.TransactOpts, requestId, trafficType, result, sig)
 }
 
-// TriggerCallback is a paid mutator transaction binding the contract method 0xd7d9860f.
+// TriggerCallback is a paid mutator transaction binding the contract method 0x74ad3a06.
 //
-// Solidity: function triggerCallback(uint256 requestId, uint8 trafficType, bytes result, uint256[2] sig, uint8 version) returns()
-func (_Dosproxy *DosproxyTransactorSession) TriggerCallback(requestId *big.Int, trafficType uint8, result []byte, sig [2]*big.Int, version uint8) (*types.Transaction, error) {
-	return _Dosproxy.Contract.TriggerCallback(&_Dosproxy.TransactOpts, requestId, trafficType, result, sig, version)
+// Solidity: function triggerCallback(uint256 requestId, uint8 trafficType, bytes result, uint256[2] sig) returns()
+func (_Dosproxy *DosproxyTransactorSession) TriggerCallback(requestId *big.Int, trafficType uint8, result []byte, sig [2]*big.Int) (*types.Transaction, error) {
+	return _Dosproxy.Contract.TriggerCallback(&_Dosproxy.TransactOpts, requestId, trafficType, result, sig)
 }
 
 // UnregisterNode is a paid mutator transaction binding the contract method 0x3d385cf5.
 //
-// Solidity: function unregisterNode() returns()
+// Solidity: function unregisterNode() returns(bool)
 func (_Dosproxy *DosproxyTransactor) UnregisterNode(opts *bind.TransactOpts) (*types.Transaction, error) {
 	return _Dosproxy.contract.Transact(opts, "unregisterNode")
 }
 
 // UnregisterNode is a paid mutator transaction binding the contract method 0x3d385cf5.
 //
-// Solidity: function unregisterNode() returns()
+// Solidity: function unregisterNode() returns(bool)
 func (_Dosproxy *DosproxySession) UnregisterNode() (*types.Transaction, error) {
 	return _Dosproxy.Contract.UnregisterNode(&_Dosproxy.TransactOpts)
 }
 
 // UnregisterNode is a paid mutator transaction binding the contract method 0x3d385cf5.
 //
-// Solidity: function unregisterNode() returns()
+// Solidity: function unregisterNode() returns(bool)
 func (_Dosproxy *DosproxyTransactorSession) UnregisterNode() (*types.Transaction, error) {
 	return _Dosproxy.Contract.UnregisterNode(&_Dosproxy.TransactOpts)
 }
 
-// UpdateRandomness is a paid mutator transaction binding the contract method 0x1127f49f.
+// UpdateRandomness is a paid mutator transaction binding the contract method 0x09ac86d3.
 //
-// Solidity: function updateRandomness(uint256[2] sig, uint8 version) returns()
-func (_Dosproxy *DosproxyTransactor) UpdateRandomness(opts *bind.TransactOpts, sig [2]*big.Int, version uint8) (*types.Transaction, error) {
-	return _Dosproxy.contract.Transact(opts, "updateRandomness", sig, version)
+// Solidity: function updateRandomness(uint256[2] sig) returns()
+func (_Dosproxy *DosproxyTransactor) UpdateRandomness(opts *bind.TransactOpts, sig [2]*big.Int) (*types.Transaction, error) {
+	return _Dosproxy.contract.Transact(opts, "updateRandomness", sig)
 }
 
-// UpdateRandomness is a paid mutator transaction binding the contract method 0x1127f49f.
+// UpdateRandomness is a paid mutator transaction binding the contract method 0x09ac86d3.
 //
-// Solidity: function updateRandomness(uint256[2] sig, uint8 version) returns()
-func (_Dosproxy *DosproxySession) UpdateRandomness(sig [2]*big.Int, version uint8) (*types.Transaction, error) {
-	return _Dosproxy.Contract.UpdateRandomness(&_Dosproxy.TransactOpts, sig, version)
+// Solidity: function updateRandomness(uint256[2] sig) returns()
+func (_Dosproxy *DosproxySession) UpdateRandomness(sig [2]*big.Int) (*types.Transaction, error) {
+	return _Dosproxy.Contract.UpdateRandomness(&_Dosproxy.TransactOpts, sig)
 }
 
-// UpdateRandomness is a paid mutator transaction binding the contract method 0x1127f49f.
+// UpdateRandomness is a paid mutator transaction binding the contract method 0x09ac86d3.
 //
-// Solidity: function updateRandomness(uint256[2] sig, uint8 version) returns()
-func (_Dosproxy *DosproxyTransactorSession) UpdateRandomness(sig [2]*big.Int, version uint8) (*types.Transaction, error) {
-	return _Dosproxy.Contract.UpdateRandomness(&_Dosproxy.TransactOpts, sig, version)
+// Solidity: function updateRandomness(uint256[2] sig) returns()
+func (_Dosproxy *DosproxyTransactorSession) UpdateRandomness(sig [2]*big.Int) (*types.Transaction, error) {
+	return _Dosproxy.Contract.UpdateRandomness(&_Dosproxy.TransactOpts, sig)
 }
 
 // DosproxyGuardianRewardIterator is returned from FilterGuardianReward and is used to iterate over the raw logs and unpacked data for GuardianReward events raised by the Dosproxy contract.
@@ -1667,128 +1929,6 @@ func (_Dosproxy *DosproxyFilterer) WatchLogCallbackTriggeredFor(opts *bind.Watch
 				// New log arrived, parse the event and forward to the user
 				event := new(DosproxyLogCallbackTriggeredFor)
 				if err := _Dosproxy.contract.UnpackLog(event, "LogCallbackTriggeredFor", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// DosproxyLogErrorIterator is returned from FilterLogError and is used to iterate over the raw logs and unpacked data for LogError events raised by the Dosproxy contract.
-type DosproxyLogErrorIterator struct {
-	Event *DosproxyLogError // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *DosproxyLogErrorIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(DosproxyLogError)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(DosproxyLogError)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *DosproxyLogErrorIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *DosproxyLogErrorIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// DosproxyLogError represents a LogError event raised by the Dosproxy contract.
-type DosproxyLogError struct {
-	Err string
-	Raw types.Log // Blockchain specific contextual infos
-}
-
-// FilterLogError is a free log retrieval operation binding the contract event 0xc35a0ec6603ff0b5966d7ca053a5f0984a70aad58a9a0ecb1349308815a4151a.
-//
-// Solidity: event LogError(string err)
-func (_Dosproxy *DosproxyFilterer) FilterLogError(opts *bind.FilterOpts) (*DosproxyLogErrorIterator, error) {
-
-	logs, sub, err := _Dosproxy.contract.FilterLogs(opts, "LogError")
-	if err != nil {
-		return nil, err
-	}
-	return &DosproxyLogErrorIterator{contract: _Dosproxy.contract, event: "LogError", logs: logs, sub: sub}, nil
-}
-
-// WatchLogError is a free log subscription operation binding the contract event 0xc35a0ec6603ff0b5966d7ca053a5f0984a70aad58a9a0ecb1349308815a4151a.
-//
-// Solidity: event LogError(string err)
-func (_Dosproxy *DosproxyFilterer) WatchLogError(opts *bind.WatchOpts, sink chan<- *DosproxyLogError) (event.Subscription, error) {
-
-	logs, sub, err := _Dosproxy.contract.WatchLogs(opts, "LogError")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(DosproxyLogError)
-				if err := _Dosproxy.contract.UnpackLog(event, "LogError", log); err != nil {
 					return err
 				}
 				event.Raw = log
@@ -2403,6 +2543,128 @@ func (_Dosproxy *DosproxyFilterer) WatchLogInsufficientWorkingGroup(opts *bind.W
 				// New log arrived, parse the event and forward to the user
 				event := new(DosproxyLogInsufficientWorkingGroup)
 				if err := _Dosproxy.contract.UnpackLog(event, "LogInsufficientWorkingGroup", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// DosproxyLogMessageIterator is returned from FilterLogMessage and is used to iterate over the raw logs and unpacked data for LogMessage events raised by the Dosproxy contract.
+type DosproxyLogMessageIterator struct {
+	Event *DosproxyLogMessage // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *DosproxyLogMessageIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(DosproxyLogMessage)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(DosproxyLogMessage)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *DosproxyLogMessageIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *DosproxyLogMessageIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// DosproxyLogMessage represents a LogMessage event raised by the Dosproxy contract.
+type DosproxyLogMessage struct {
+	Info string
+	Raw  types.Log // Blockchain specific contextual infos
+}
+
+// FilterLogMessage is a free log retrieval operation binding the contract event 0x96561394bac381230de4649200e8831afcab1f451881bbade9ef209f6dd30480.
+//
+// Solidity: event LogMessage(string info)
+func (_Dosproxy *DosproxyFilterer) FilterLogMessage(opts *bind.FilterOpts) (*DosproxyLogMessageIterator, error) {
+
+	logs, sub, err := _Dosproxy.contract.FilterLogs(opts, "LogMessage")
+	if err != nil {
+		return nil, err
+	}
+	return &DosproxyLogMessageIterator{contract: _Dosproxy.contract, event: "LogMessage", logs: logs, sub: sub}, nil
+}
+
+// WatchLogMessage is a free log subscription operation binding the contract event 0x96561394bac381230de4649200e8831afcab1f451881bbade9ef209f6dd30480.
+//
+// Solidity: event LogMessage(string info)
+func (_Dosproxy *DosproxyFilterer) WatchLogMessage(opts *bind.WatchOpts, sink chan<- *DosproxyLogMessage) (event.Subscription, error) {
+
+	logs, sub, err := _Dosproxy.contract.WatchLogs(opts, "LogMessage")
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(DosproxyLogMessage)
+				if err := _Dosproxy.contract.UnpackLog(event, "LogMessage", log); err != nil {
 					return err
 				}
 				event.Raw = log
@@ -3596,13 +3858,13 @@ func (it *DosproxyLogUnRegisteredNewPendingNodeIterator) Close() error {
 // DosproxyLogUnRegisteredNewPendingNode represents a LogUnRegisteredNewPendingNode event raised by the Dosproxy contract.
 type DosproxyLogUnRegisteredNewPendingNode struct {
 	Node           common.Address
-	UnregisterFrom *big.Int
+	UnregisterFrom uint8
 	Raw            types.Log // Blockchain specific contextual infos
 }
 
-// FilterLogUnRegisteredNewPendingNode is a free log retrieval operation binding the contract event 0xcd586665046a807f477578e9afc1d2f05305483d2792b62cdbaa802ddfad93f6.
+// FilterLogUnRegisteredNewPendingNode is a free log retrieval operation binding the contract event 0xaa40dce54d678a8a16fc3cf106c1ddf0b34b66a43c7a365af3268c63bb95fead.
 //
-// Solidity: event LogUnRegisteredNewPendingNode(address node, uint256 unregisterFrom)
+// Solidity: event LogUnRegisteredNewPendingNode(address node, uint8 unregisterFrom)
 func (_Dosproxy *DosproxyFilterer) FilterLogUnRegisteredNewPendingNode(opts *bind.FilterOpts) (*DosproxyLogUnRegisteredNewPendingNodeIterator, error) {
 
 	logs, sub, err := _Dosproxy.contract.FilterLogs(opts, "LogUnRegisteredNewPendingNode")
@@ -3612,9 +3874,9 @@ func (_Dosproxy *DosproxyFilterer) FilterLogUnRegisteredNewPendingNode(opts *bin
 	return &DosproxyLogUnRegisteredNewPendingNodeIterator{contract: _Dosproxy.contract, event: "LogUnRegisteredNewPendingNode", logs: logs, sub: sub}, nil
 }
 
-// WatchLogUnRegisteredNewPendingNode is a free log subscription operation binding the contract event 0xcd586665046a807f477578e9afc1d2f05305483d2792b62cdbaa802ddfad93f6.
+// WatchLogUnRegisteredNewPendingNode is a free log subscription operation binding the contract event 0xaa40dce54d678a8a16fc3cf106c1ddf0b34b66a43c7a365af3268c63bb95fead.
 //
-// Solidity: event LogUnRegisteredNewPendingNode(address node, uint256 unregisterFrom)
+// Solidity: event LogUnRegisteredNewPendingNode(address node, uint8 unregisterFrom)
 func (_Dosproxy *DosproxyFilterer) WatchLogUnRegisteredNewPendingNode(opts *bind.WatchOpts, sink chan<- *DosproxyLogUnRegisteredNewPendingNode) (event.Subscription, error) {
 
 	logs, sub, err := _Dosproxy.contract.WatchLogs(opts, "LogUnRegisteredNewPendingNode")
@@ -3973,14 +4235,13 @@ type DosproxyLogValidationResult struct {
 	Message     []byte
 	Signature   [2]*big.Int
 	PubKey      [4]*big.Int
-	Version     uint8
 	Pass        bool
 	Raw         types.Log // Blockchain specific contextual infos
 }
 
-// FilterLogValidationResult is a free log retrieval operation binding the contract event 0x497fa4e028a5c3bb3abae04d8c38d7f90446f1133794172f7da1a3127c173115.
+// FilterLogValidationResult is a free log retrieval operation binding the contract event 0xd33c44f7ce166bcd2616c8f4d811261d4d24e1af815f78614683e0c7682c42a5.
 //
-// Solidity: event LogValidationResult(uint8 trafficType, uint256 trafficId, bytes message, uint256[2] signature, uint256[4] pubKey, uint8 version, bool pass)
+// Solidity: event LogValidationResult(uint8 trafficType, uint256 trafficId, bytes message, uint256[2] signature, uint256[4] pubKey, bool pass)
 func (_Dosproxy *DosproxyFilterer) FilterLogValidationResult(opts *bind.FilterOpts) (*DosproxyLogValidationResultIterator, error) {
 
 	logs, sub, err := _Dosproxy.contract.FilterLogs(opts, "LogValidationResult")
@@ -3990,9 +4251,9 @@ func (_Dosproxy *DosproxyFilterer) FilterLogValidationResult(opts *bind.FilterOp
 	return &DosproxyLogValidationResultIterator{contract: _Dosproxy.contract, event: "LogValidationResult", logs: logs, sub: sub}, nil
 }
 
-// WatchLogValidationResult is a free log subscription operation binding the contract event 0x497fa4e028a5c3bb3abae04d8c38d7f90446f1133794172f7da1a3127c173115.
+// WatchLogValidationResult is a free log subscription operation binding the contract event 0xd33c44f7ce166bcd2616c8f4d811261d4d24e1af815f78614683e0c7682c42a5.
 //
-// Solidity: event LogValidationResult(uint8 trafficType, uint256 trafficId, bytes message, uint256[2] signature, uint256[4] pubKey, uint8 version, bool pass)
+// Solidity: event LogValidationResult(uint8 trafficType, uint256 trafficId, bytes message, uint256[2] signature, uint256[4] pubKey, bool pass)
 func (_Dosproxy *DosproxyFilterer) WatchLogValidationResult(opts *bind.WatchOpts, sink chan<- *DosproxyLogValidationResult) (event.Subscription, error) {
 
 	logs, sub, err := _Dosproxy.contract.WatchLogs(opts, "LogValidationResult")
@@ -4423,6 +4684,129 @@ func (_Dosproxy *DosproxyFilterer) WatchUpdateBootstrapCommitDuration(opts *bind
 	}), nil
 }
 
+// DosproxyUpdateBootstrapGroupsIterator is returned from FilterUpdateBootstrapGroups and is used to iterate over the raw logs and unpacked data for UpdateBootstrapGroups events raised by the Dosproxy contract.
+type DosproxyUpdateBootstrapGroupsIterator struct {
+	Event *DosproxyUpdateBootstrapGroups // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *DosproxyUpdateBootstrapGroupsIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(DosproxyUpdateBootstrapGroups)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(DosproxyUpdateBootstrapGroups)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *DosproxyUpdateBootstrapGroupsIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *DosproxyUpdateBootstrapGroupsIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// DosproxyUpdateBootstrapGroups represents a UpdateBootstrapGroups event raised by the Dosproxy contract.
+type DosproxyUpdateBootstrapGroups struct {
+	OldSize *big.Int
+	NewSize *big.Int
+	Raw     types.Log // Blockchain specific contextual infos
+}
+
+// FilterUpdateBootstrapGroups is a free log retrieval operation binding the contract event 0xf9da68cf2452df09a5c96de5099bed44a4f40947e5dfbac9fc0a0775be49675b.
+//
+// Solidity: event UpdateBootstrapGroups(uint256 oldSize, uint256 newSize)
+func (_Dosproxy *DosproxyFilterer) FilterUpdateBootstrapGroups(opts *bind.FilterOpts) (*DosproxyUpdateBootstrapGroupsIterator, error) {
+
+	logs, sub, err := _Dosproxy.contract.FilterLogs(opts, "UpdateBootstrapGroups")
+	if err != nil {
+		return nil, err
+	}
+	return &DosproxyUpdateBootstrapGroupsIterator{contract: _Dosproxy.contract, event: "UpdateBootstrapGroups", logs: logs, sub: sub}, nil
+}
+
+// WatchUpdateBootstrapGroups is a free log subscription operation binding the contract event 0xf9da68cf2452df09a5c96de5099bed44a4f40947e5dfbac9fc0a0775be49675b.
+//
+// Solidity: event UpdateBootstrapGroups(uint256 oldSize, uint256 newSize)
+func (_Dosproxy *DosproxyFilterer) WatchUpdateBootstrapGroups(opts *bind.WatchOpts, sink chan<- *DosproxyUpdateBootstrapGroups) (event.Subscription, error) {
+
+	logs, sub, err := _Dosproxy.contract.WatchLogs(opts, "UpdateBootstrapGroups")
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(DosproxyUpdateBootstrapGroups)
+				if err := _Dosproxy.contract.UnpackLog(event, "UpdateBootstrapGroups", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
 // DosproxyUpdateBootstrapRevealDurationIterator is returned from FilterUpdateBootstrapRevealDuration and is used to iterate over the raw logs and unpacked data for UpdateBootstrapRevealDuration events raised by the Dosproxy contract.
 type DosproxyUpdateBootstrapRevealDurationIterator struct {
 	Event *DosproxyUpdateBootstrapRevealDuration // Event containing the contract specifics and raw log
@@ -4792,252 +5176,6 @@ func (_Dosproxy *DosproxyFilterer) WatchUpdateGroupSize(opts *bind.WatchOpts, si
 	}), nil
 }
 
-// DosproxyUpdateGroupToPickIterator is returned from FilterUpdateGroupToPick and is used to iterate over the raw logs and unpacked data for UpdateGroupToPick events raised by the Dosproxy contract.
-type DosproxyUpdateGroupToPickIterator struct {
-	Event *DosproxyUpdateGroupToPick // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *DosproxyUpdateGroupToPickIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(DosproxyUpdateGroupToPick)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(DosproxyUpdateGroupToPick)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *DosproxyUpdateGroupToPickIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *DosproxyUpdateGroupToPickIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// DosproxyUpdateGroupToPick represents a UpdateGroupToPick event raised by the Dosproxy contract.
-type DosproxyUpdateGroupToPick struct {
-	OldNum *big.Int
-	NewNum *big.Int
-	Raw    types.Log // Blockchain specific contextual infos
-}
-
-// FilterUpdateGroupToPick is a free log retrieval operation binding the contract event 0xd59c63bea5896e4c45a71fef794b137cd11f9cdbfebb378b1f7d003284af96a1.
-//
-// Solidity: event UpdateGroupToPick(uint256 oldNum, uint256 newNum)
-func (_Dosproxy *DosproxyFilterer) FilterUpdateGroupToPick(opts *bind.FilterOpts) (*DosproxyUpdateGroupToPickIterator, error) {
-
-	logs, sub, err := _Dosproxy.contract.FilterLogs(opts, "UpdateGroupToPick")
-	if err != nil {
-		return nil, err
-	}
-	return &DosproxyUpdateGroupToPickIterator{contract: _Dosproxy.contract, event: "UpdateGroupToPick", logs: logs, sub: sub}, nil
-}
-
-// WatchUpdateGroupToPick is a free log subscription operation binding the contract event 0xd59c63bea5896e4c45a71fef794b137cd11f9cdbfebb378b1f7d003284af96a1.
-//
-// Solidity: event UpdateGroupToPick(uint256 oldNum, uint256 newNum)
-func (_Dosproxy *DosproxyFilterer) WatchUpdateGroupToPick(opts *bind.WatchOpts, sink chan<- *DosproxyUpdateGroupToPick) (event.Subscription, error) {
-
-	logs, sub, err := _Dosproxy.contract.WatchLogs(opts, "UpdateGroupToPick")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(DosproxyUpdateGroupToPick)
-				if err := _Dosproxy.contract.UnpackLog(event, "UpdateGroupToPick", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// DosproxyUpdateGroupingThresholdIterator is returned from FilterUpdateGroupingThreshold and is used to iterate over the raw logs and unpacked data for UpdateGroupingThreshold events raised by the Dosproxy contract.
-type DosproxyUpdateGroupingThresholdIterator struct {
-	Event *DosproxyUpdateGroupingThreshold // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *DosproxyUpdateGroupingThresholdIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(DosproxyUpdateGroupingThreshold)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(DosproxyUpdateGroupingThreshold)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *DosproxyUpdateGroupingThresholdIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *DosproxyUpdateGroupingThresholdIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// DosproxyUpdateGroupingThreshold represents a UpdateGroupingThreshold event raised by the Dosproxy contract.
-type DosproxyUpdateGroupingThreshold struct {
-	OldThreshold *big.Int
-	NewThreshold *big.Int
-	Raw          types.Log // Blockchain specific contextual infos
-}
-
-// FilterUpdateGroupingThreshold is a free log retrieval operation binding the contract event 0x104da80461821f1b0f5920c2db3100c9415fe82f1a5781a374e477d9849a7d5b.
-//
-// Solidity: event UpdateGroupingThreshold(uint256 oldThreshold, uint256 newThreshold)
-func (_Dosproxy *DosproxyFilterer) FilterUpdateGroupingThreshold(opts *bind.FilterOpts) (*DosproxyUpdateGroupingThresholdIterator, error) {
-
-	logs, sub, err := _Dosproxy.contract.FilterLogs(opts, "UpdateGroupingThreshold")
-	if err != nil {
-		return nil, err
-	}
-	return &DosproxyUpdateGroupingThresholdIterator{contract: _Dosproxy.contract, event: "UpdateGroupingThreshold", logs: logs, sub: sub}, nil
-}
-
-// WatchUpdateGroupingThreshold is a free log subscription operation binding the contract event 0x104da80461821f1b0f5920c2db3100c9415fe82f1a5781a374e477d9849a7d5b.
-//
-// Solidity: event UpdateGroupingThreshold(uint256 oldThreshold, uint256 newThreshold)
-func (_Dosproxy *DosproxyFilterer) WatchUpdateGroupingThreshold(opts *bind.WatchOpts, sink chan<- *DosproxyUpdateGroupingThreshold) (event.Subscription, error) {
-
-	logs, sub, err := _Dosproxy.contract.WatchLogs(opts, "UpdateGroupingThreshold")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(DosproxyUpdateGroupingThreshold)
-				if err := _Dosproxy.contract.UnpackLog(event, "UpdateGroupingThreshold", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
 // DosproxyUpdatePendingGroupMaxLifeIterator is returned from FilterUpdatePendingGroupMaxLife and is used to iterate over the raw logs and unpacked data for UpdatePendingGroupMaxLife events raised by the Dosproxy contract.
 type DosproxyUpdatePendingGroupMaxLifeIterator struct {
 	Event *DosproxyUpdatePendingGroupMaxLife // Event containing the contract specifics and raw log
@@ -5141,6 +5279,254 @@ func (_Dosproxy *DosproxyFilterer) WatchUpdatePendingGroupMaxLife(opts *bind.Wat
 				// New log arrived, parse the event and forward to the user
 				event := new(DosproxyUpdatePendingGroupMaxLife)
 				if err := _Dosproxy.contract.UnpackLog(event, "UpdatePendingGroupMaxLife", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// DosproxyUpdateProxyFundIterator is returned from FilterUpdateProxyFund and is used to iterate over the raw logs and unpacked data for UpdateProxyFund events raised by the Dosproxy contract.
+type DosproxyUpdateProxyFundIterator struct {
+	Event *DosproxyUpdateProxyFund // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *DosproxyUpdateProxyFundIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(DosproxyUpdateProxyFund)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(DosproxyUpdateProxyFund)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *DosproxyUpdateProxyFundIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *DosproxyUpdateProxyFundIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// DosproxyUpdateProxyFund represents a UpdateProxyFund event raised by the Dosproxy contract.
+type DosproxyUpdateProxyFund struct {
+	OldFundAddr  common.Address
+	NewFundAddr  common.Address
+	OldTokenAddr common.Address
+	NewTokenAddr common.Address
+	Raw          types.Log // Blockchain specific contextual infos
+}
+
+// FilterUpdateProxyFund is a free log retrieval operation binding the contract event 0x2ae8e7023c1978c8540df9af00881f2f942d6e7233463a3f0def2b6e57e6dd60.
+//
+// Solidity: event UpdateProxyFund(address oldFundAddr, address newFundAddr, address oldTokenAddr, address newTokenAddr)
+func (_Dosproxy *DosproxyFilterer) FilterUpdateProxyFund(opts *bind.FilterOpts) (*DosproxyUpdateProxyFundIterator, error) {
+
+	logs, sub, err := _Dosproxy.contract.FilterLogs(opts, "UpdateProxyFund")
+	if err != nil {
+		return nil, err
+	}
+	return &DosproxyUpdateProxyFundIterator{contract: _Dosproxy.contract, event: "UpdateProxyFund", logs: logs, sub: sub}, nil
+}
+
+// WatchUpdateProxyFund is a free log subscription operation binding the contract event 0x2ae8e7023c1978c8540df9af00881f2f942d6e7233463a3f0def2b6e57e6dd60.
+//
+// Solidity: event UpdateProxyFund(address oldFundAddr, address newFundAddr, address oldTokenAddr, address newTokenAddr)
+func (_Dosproxy *DosproxyFilterer) WatchUpdateProxyFund(opts *bind.WatchOpts, sink chan<- *DosproxyUpdateProxyFund) (event.Subscription, error) {
+
+	logs, sub, err := _Dosproxy.contract.WatchLogs(opts, "UpdateProxyFund")
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(DosproxyUpdateProxyFund)
+				if err := _Dosproxy.contract.UnpackLog(event, "UpdateProxyFund", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// DosproxyUpdateSystemRandomHardLimitIterator is returned from FilterUpdateSystemRandomHardLimit and is used to iterate over the raw logs and unpacked data for UpdateSystemRandomHardLimit events raised by the Dosproxy contract.
+type DosproxyUpdateSystemRandomHardLimitIterator struct {
+	Event *DosproxyUpdateSystemRandomHardLimit // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *DosproxyUpdateSystemRandomHardLimitIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(DosproxyUpdateSystemRandomHardLimit)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(DosproxyUpdateSystemRandomHardLimit)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *DosproxyUpdateSystemRandomHardLimitIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *DosproxyUpdateSystemRandomHardLimitIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// DosproxyUpdateSystemRandomHardLimit represents a UpdateSystemRandomHardLimit event raised by the Dosproxy contract.
+type DosproxyUpdateSystemRandomHardLimit struct {
+	OldLimit *big.Int
+	NewLimit *big.Int
+	Raw      types.Log // Blockchain specific contextual infos
+}
+
+// FilterUpdateSystemRandomHardLimit is a free log retrieval operation binding the contract event 0xdb95a2fbbee34de5822459ce9edd234f70f321a1cc2395b2dc902b69e1f8093b.
+//
+// Solidity: event UpdateSystemRandomHardLimit(uint256 oldLimit, uint256 newLimit)
+func (_Dosproxy *DosproxyFilterer) FilterUpdateSystemRandomHardLimit(opts *bind.FilterOpts) (*DosproxyUpdateSystemRandomHardLimitIterator, error) {
+
+	logs, sub, err := _Dosproxy.contract.FilterLogs(opts, "UpdateSystemRandomHardLimit")
+	if err != nil {
+		return nil, err
+	}
+	return &DosproxyUpdateSystemRandomHardLimitIterator{contract: _Dosproxy.contract, event: "UpdateSystemRandomHardLimit", logs: logs, sub: sub}, nil
+}
+
+// WatchUpdateSystemRandomHardLimit is a free log subscription operation binding the contract event 0xdb95a2fbbee34de5822459ce9edd234f70f321a1cc2395b2dc902b69e1f8093b.
+//
+// Solidity: event UpdateSystemRandomHardLimit(uint256 oldLimit, uint256 newLimit)
+func (_Dosproxy *DosproxyFilterer) WatchUpdateSystemRandomHardLimit(opts *bind.WatchOpts, sink chan<- *DosproxyUpdateSystemRandomHardLimit) (event.Subscription, error) {
+
+	logs, sub, err := _Dosproxy.contract.WatchLogs(opts, "UpdateSystemRandomHardLimit")
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(DosproxyUpdateSystemRandomHardLimit)
+				if err := _Dosproxy.contract.UnpackLog(event, "UpdateSystemRandomHardLimit", log); err != nil {
 					return err
 				}
 				event.Raw = log

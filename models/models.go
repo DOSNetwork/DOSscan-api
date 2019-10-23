@@ -15,6 +15,7 @@ const (
 	TypeUrlRequest
 	TypeRandomRequest
 	TypeLatestEvents
+	TypeUnregisterPendingNode
 	TypeNewPendingNode
 	TypeGrouping
 	TypePublicKeySuggested
@@ -27,7 +28,7 @@ const (
 
 	TypeGuardianReward
 	TypeCallbackTriggeredFor
-	TypeError
+	TypeMessage
 )
 
 var supportedEvents []string
@@ -36,6 +37,7 @@ var typeToStruct []interface{}
 
 func init() {
 	supportedEvents = append(supportedEvents, "LogRegisteredNewPendingNode")
+	supportedEvents = append(supportedEvents, "LogUnRegisteredNewPendingNode")
 	supportedEvents = append(supportedEvents, "LogGrouping")
 	supportedEvents = append(supportedEvents, "LogPublicKeySuggested")
 	supportedEvents = append(supportedEvents, "LogPublicKeyAccepted")
@@ -46,7 +48,7 @@ func init() {
 	supportedEvents = append(supportedEvents, "LogValidationResult")
 	supportedEvents = append(supportedEvents, "LogCallbackTriggeredFor")
 	supportedEvents = append(supportedEvents, "GuardianReward")
-	supportedEvents = append(supportedEvents, "LogError")
+	supportedEvents = append(supportedEvents, "LogMessage")
 
 	stringToType = make(map[string]int)
 	stringToType["node"] = TypeNode
@@ -54,6 +56,7 @@ func init() {
 	stringToType["urlrequest"] = TypeUrlRequest
 	stringToType["randomreques"] = TypeRandomRequest
 	stringToType["logregisterednewpendingnode"] = TypeNewPendingNode
+	stringToType["logunregisterednewpendingnode"] = TypeUnregisterPendingNode
 	stringToType["loggrouping"] = TypeGrouping
 	stringToType["logpublickeysuggested"] = TypePublicKeySuggested
 	stringToType["logpublickeyaccepted"] = TypePublicKeyAccepted
@@ -64,25 +67,26 @@ func init() {
 	stringToType["logvalidationresult"] = TypeValidationResult
 	stringToType["logcallbacktriggeredfor"] = TypeCallbackTriggeredFor
 	stringToType["guardianreward"] = TypeGuardianReward
-	stringToType["logerror"] = TypeError
+	stringToType["logmessage"] = TypeMessage
 
 	typeToStruct = []interface{}{
-		TypeNewPendingNode:       &LogRegisteredNewPendingNode{},
-		TypeGrouping:             &LogGrouping{},
-		TypePublicKeySuggested:   &LogPublicKeySuggested{},
-		TypePublicKeyAccepted:    &LogPublicKeyAccepted{},
-		TypeGroupDissolve:        &LogGroupDissolve{},
-		TypeUpdateRandom:         &LogUpdateRandom{},
-		TypeRequestUserRandom:    &LogRequestUserRandom{},
-		TypeUrl:                  &LogUrl{},
-		TypeValidationResult:     &LogValidationResult{},
-		TypeCallbackTriggeredFor: &LogCallbackTriggeredFor{},
-		TypeGuardianReward:       &GuardianReward{},
-		TypeError:                &LogError{},
-		TypeNode:                 &Node{},
-		TypeGroup:                &Group{},
-		TypeUrlRequest:           &UrlRequest{},
-		TypeRandomRequest:        &UserRandomRequest{},
+		TypeNewPendingNode:        &LogRegisteredNewPendingNode{},
+		TypeUnregisterPendingNode: &LogUnRegisteredNewPendingNode{},
+		TypeGrouping:              &LogGrouping{},
+		TypePublicKeySuggested:    &LogPublicKeySuggested{},
+		TypePublicKeyAccepted:     &LogPublicKeyAccepted{},
+		TypeGroupDissolve:         &LogGroupDissolve{},
+		TypeUpdateRandom:          &LogUpdateRandom{},
+		TypeRequestUserRandom:     &LogRequestUserRandom{},
+		TypeUrl:                   &LogUrl{},
+		TypeValidationResult:      &LogValidationResult{},
+		TypeCallbackTriggeredFor:  &LogCallbackTriggeredFor{},
+		TypeGuardianReward:        &GuardianReward{},
+		TypeMessage:               &LogMessage{},
+		TypeNode:                  &Node{},
+		TypeGroup:                 &Group{},
+		TypeUrlRequest:            &UrlRequest{},
+		TypeRandomRequest:         &UserRandomRequest{},
 	}
 }
 
@@ -103,27 +107,28 @@ func TypeToStruct(t int) interface{} {
 
 type Transaction struct {
 	gorm.Model
-	Hash                         string                        `gorm:"primary_key;unique;not null"`
-	GasPrice                     uint64                        `json:"gasPrice"`
-	Value                        uint64                        `json:"value"`
-	GasLimit                     uint64                        `json:"gasLimit"`
-	Nonce                        uint64                        `json:"nonce"`
-	Sender                       string                        `json:"sender"`
-	To                           string                        `json:"to"`
-	BlockNumber                  uint64                        `gorm:"primary_key" json:"blockNumber"`
-	Data                         []byte                        `gorm:"type:bytea" json:"data"`
-	Method                       string                        `gorm:"index" json:"method"`
-	LogRegisteredNewPendingNodes []LogRegisteredNewPendingNode `gorm:"auto_preload"`
-	LogGroupings                 []LogGrouping                 `gorm:"auto_preload"`
-	LogPublicKeySuggesteds       []LogPublicKeySuggested       `gorm:"auto_preload"`
-	LogPublicKeyAccepteds        []LogPublicKeyAccepted        `gorm:"auto_preload"`
-	LogUpdateRandoms             []LogUpdateRandom             `gorm:"auto_preload"`
-	LogUrls                      []LogUrl                      `gorm:"auto_preload"`
-	LogRequestUserRandoms        []LogRequestUserRandom        `gorm:"auto_preload"`
-	LogValidationResults         []LogValidationResult         `gorm:"auto_preload"`
-	LogCallbackTriggeredFors     []LogCallbackTriggeredFor     `gorm:"auto_preload"`
-	GuardianRewards              []GuardianReward              `gorm:"auto_preload"`
-	LogErrors                    []LogError                    `gorm:"auto_preload"`
+	Hash                           string                          `gorm:"primary_key;unique;not null"`
+	GasPrice                       uint64                          `json:"gasPrice"`
+	Value                          uint64                          `json:"value"`
+	GasLimit                       uint64                          `json:"gasLimit"`
+	Nonce                          uint64                          `json:"nonce"`
+	Sender                         string                          `json:"sender"`
+	To                             string                          `json:"to"`
+	BlockNumber                    uint64                          `gorm:"primary_key" json:"blockNumber"`
+	Data                           []byte                          `gorm:"type:bytea" json:"data"`
+	Method                         string                          `gorm:"index" json:"method"`
+	LogRegisteredNewPendingNodes   []LogRegisteredNewPendingNode   `gorm:"auto_preload"`
+	LogUnRegisteredNewPendingNodes []LogUnRegisteredNewPendingNode `gorm:"auto_preload"`
+	LogGroupings                   []LogGrouping                   `gorm:"auto_preload"`
+	LogPublicKeySuggesteds         []LogPublicKeySuggested         `gorm:"auto_preload"`
+	LogPublicKeyAccepteds          []LogPublicKeyAccepted          `gorm:"auto_preload"`
+	LogUpdateRandoms               []LogUpdateRandom               `gorm:"auto_preload"`
+	LogUrls                        []LogUrl                        `gorm:"auto_preload"`
+	LogRequestUserRandoms          []LogRequestUserRandom          `gorm:"auto_preload"`
+	LogValidationResults           []LogValidationResult           `gorm:"auto_preload"`
+	LogCallbackTriggeredFors       []LogCallbackTriggeredFor       `gorm:"auto_preload"`
+	GuardianRewards                []GuardianReward                `gorm:"auto_preload"`
+	LogMessages                    []LogMessage                    `gorm:"auto_preload"`
 
 	LogNonSupportedTypes           []LogNonSupportedType           `gorm:"auto_preload"`
 	LogNonContractCalls            []LogNonContractCall            `gorm:"auto_preload"`
@@ -162,6 +167,13 @@ type LogRegisteredNewPendingNode struct {
 	gorm.Model
 	Event
 	Node string `json:"node"`
+}
+
+type LogUnRegisteredNewPendingNode struct {
+	gorm.Model
+	Event
+	Node           string `json:"node"`
+	UnregisterFrom uint8  `json:"unregisterFrom"`
 }
 
 type LogGrouping struct {
@@ -226,10 +238,10 @@ type LogPendingGroupRemoved struct {
 	GroupId string `json:"groupId"`
 }
 
-type LogError struct {
+type LogMessage struct {
 	gorm.Model
 	Event
-	Err string `json:"err"`
+	Info string `json:"info"`
 }
 
 type UpdateGroupToPick struct {

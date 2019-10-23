@@ -11,6 +11,8 @@ import (
 	"strings"
 
 	_models "github.com/DOSNetwork/DOSscan-api/models"
+	"github.com/DOSNetwork/DOSscan-api/models/dosbridge"
+	"github.com/DOSNetwork/DOSscan-api/models/dosproxy"
 	_repository "github.com/DOSNetwork/DOSscan-api/repository"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
@@ -22,8 +24,8 @@ import (
 
 type gethRepo struct {
 	client   *ethclient.Client
-	proxy    *_models.DosproxySession
-	bridge   *_models.DosbridgeSession
+	proxy    *dosproxy.DosproxySession
+	bridge   *dosbridge.DosbridgeSession
 	proxyAbi abi.ABI
 }
 
@@ -33,23 +35,23 @@ const (
 
 func NewGethRepo(client *ethclient.Client) (_repository.Onchain, error) {
 	ctx := context.Background()
-	d, err := _models.NewDosbridge(common.HexToAddress(bridgeAddress), client)
+	d, err := dosbridge.NewDosbridge(common.HexToAddress(bridgeAddress), client)
 	if err != nil {
 		fmt.Println("NewDosbridge err ", err)
 		return nil, err
 	}
 
-	bridge := &_models.DosbridgeSession{Contract: d, CallOpts: bind.CallOpts{Context: ctx}}
+	bridge := &dosbridge.DosbridgeSession{Contract: d, CallOpts: bind.CallOpts{Context: ctx}}
 	proxyAddr, err := bridge.GetProxyAddress()
 	if err != nil {
 		return nil, err
 	}
 
-	p, err := _models.NewDosproxy(proxyAddr, client)
+	p, err := dosproxy.NewDosproxy(proxyAddr, client)
 	if err != nil {
 		return nil, err
 	}
-	proxy := &_models.DosproxySession{Contract: p, CallOpts: bind.CallOpts{Context: ctx}}
+	proxy := &dosproxy.DosproxySession{Contract: p, CallOpts: bind.CallOpts{Context: ctx}}
 
 	jsonFile, err := os.Open("./abi/DOSProxy.abi")
 	// if we os.Open returns an error then handle it
