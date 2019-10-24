@@ -61,6 +61,20 @@ func (s *SearchHandler) SupportedEvents(c *gin.Context) {
 	c.String(http.StatusOK, string(jsonData))
 }
 
+func (s *SearchHandler) UpdateLatestEvent() {
+
+	ctx := context.Background()
+	query := ""
+	pageSize := 20
+	pageIndex := 0
+	if total, results, resultType, err := s.search.Search(ctx, query, pageSize, pageIndex); err == nil {
+		resp, _ := setResponse(0, "success", resultType, total, results)
+		key := "200"
+		fmt.Println("Set latest event")
+		s.cache.Set(ctx, key, resp)
+	}
+}
+
 func (s *SearchHandler) Search(c *gin.Context) {
 	var err error
 	var resp string
@@ -74,12 +88,16 @@ func (s *SearchHandler) Search(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	fmt.Println("Search ", query, " ", pageSize, " ", pageIndex)
+
 	key := query + c.Query("pageSize") + c.Query("pageIndex")
+	fmt.Println("key-", key)
+	if query == "" {
+		fmt.Println("latestevent")
+	}
 	ctx := context.Background()
 
 	if resp, err := s.cache.Get(ctx, key); err == nil {
-		fmt.Println("Get result from server")
+		fmt.Println("Get result from cache")
 		fmt.Println(resp)
 		c.String(http.StatusOK, resp)
 		return

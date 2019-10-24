@@ -96,7 +96,13 @@ func main() {
 			WriteTimeout:   10 * time.Second,
 			MaxHeaderBytes: 1 << 20,
 		}
-
+		ticker := time.NewTicker(15 * time.Second)
+		defer ticker.Stop()
+		go func() {
+			for _ = range ticker.C {
+				searchHandler.UpdateLatestEvent()
+			}
+		}()
 		go server.ListenAndServe()
 		gracefulExitWeb(server)
 	} else {

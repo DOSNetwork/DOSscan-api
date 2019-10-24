@@ -82,11 +82,10 @@ var saveTable = []func(ctx context.Context, db *gorm.DB, eventc chan []interface
 					}
 					if err := db.Where("transaction_hash = ? AND log_index = ?", tx.Hash, log.Event.LogIndex).First(log).Error; gorm.IsRecordNotFoundError(err) {
 						db.Create(log)
-						res := db.Model(tx).Association("LogUnRegisteredNewPendingNode").Append(log)
+						res := db.Model(tx).Association("LogUnRegisteredNewPendingNodes").Append(log)
 						if res.Error != nil {
 							fmt.Println("res ", res.Error)
 						}
-						buildNode(db, log.Node)
 					}
 				}
 			}
