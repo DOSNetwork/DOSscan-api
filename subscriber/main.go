@@ -2,15 +2,15 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 
+	_config "github.com/DOSNetwork/DOSscan-api/config"
 	_models "github.com/DOSNetwork/DOSscan-api/models"
 	_gorm "github.com/DOSNetwork/DOSscan-api/repository/gorm"
 	_onchain "github.com/DOSNetwork/DOSscan-api/repository/onchain"
@@ -18,50 +18,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/jinzhu/gorm"
-	errors "golang.org/x/xerrors"
 )
-
-// Config is the configuration for creating a DOS client instance.
-type Config struct {
-	DB_IP         string
-	DB_PORT       string
-	DB_USER       string
-	DB_PASSWORD   string
-	DB_NAME       string
-	ChainNodePool []string
-}
-
-// LoadConfig loads configuration file from path.
-func LoadConfig(path string) (c *Config, err error) {
-	var jsonFile *os.File
-	var byteValue []byte
-
-	fmt.Println("Path ", path)
-	// Open our jsonFile
-	jsonFile, err = os.Open(path)
-	// if we os.Open returns an error then handle it
-	if err != nil {
-		errors.Errorf(": %w", err)
-		return
-	}
-	fmt.Println("Successfully Opened json")
-	// defer the closing of our jsonFile so that we can parse it later on
-	defer jsonFile.Close()
-
-	// read our opened xmlFile as a byte array.
-	byteValue, err = ioutil.ReadAll(jsonFile)
-	if err != nil {
-		errors.Errorf(": %w", err)
-		return
-	}
-	c = &Config{}
-	err = json.Unmarshal(byteValue, c)
-	if err != nil {
-		errors.Errorf(": %w", err)
-		return
-	}
-	return
-}
 
 func main() {
 	configPath := ""
@@ -71,7 +28,7 @@ func main() {
 	if configPath == "" {
 		configPath = "./config.json"
 	}
-	config, err := LoadConfig(configPath)
+	config, err := _config.LoadConfig(configPath)
 	if err != nil {
 		fmt.Println(err)
 		log.Fatal(err)
@@ -99,6 +56,13 @@ func main() {
 	//4)Start periodic task
 	ticker := time.NewTicker(15 * time.Second)
 	defer ticker.Stop()
+
+	startBlk, err := strconv.ParseUint(config.START_BLOCK, 10, 64)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("START_BLOCK ", startBlk)
+
 RECONN:
 	var transformService *_service.Transformer
 	for _, geth := range config.ChainNodePool {
@@ -110,7 +74,7 @@ RECONN:
 			client.Close()
 			continue
 		}
-		onchainRepo, err := _onchain.NewGethRepo(client)
+		onchainRepo, err := _onchain.NewGethRepo(client, config.BRIDGE_ADDR)
 		if err != nil {
 			fmt.Printf("NewGethRepo %v\n", err)
 			client.Close()
@@ -120,7 +84,7 @@ RECONN:
 		modelsType := []int{_models.TypePublicKeyAccepted, _models.TypeGroupDissolve,
 			_models.TypeUpdateRandom, _models.TypeUrl, _models.TypeRequestUserRandom,
 			_models.TypeGuardianReward, _models.TypeCallbackTriggeredFor, _models.TypeMessage}
-		transformService = _service.NewTransformer(onchainRepo, dbRepo, 4468400, modelsType)
+		transformService = _service.NewTransformer(onchainRepo, dbRepo, startBlk, modelsType)
 		if transformService != nil {
 			break
 		}

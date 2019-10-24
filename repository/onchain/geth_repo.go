@@ -29,11 +29,7 @@ type gethRepo struct {
 	proxyAbi abi.ABI
 }
 
-const (
-	bridgeAddress = "0xf0CEFfc4209e38EA3Cd1926DDc2bC641cbFFd1cF"
-)
-
-func NewGethRepo(client *ethclient.Client) (_repository.Onchain, error) {
+func NewGethRepo(client *ethclient.Client, bridgeAddress string) (_repository.Onchain, error) {
 	ctx := context.Background()
 	d, err := dosbridge.NewDosbridge(common.HexToAddress(bridgeAddress), client)
 	if err != nil {

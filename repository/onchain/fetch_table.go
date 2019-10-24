@@ -842,7 +842,7 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 					}
 					mLog := &_models.LogMessage{
 						Event: _models.Event{
-							EventLog:        "LogError",
+							EventLog:        "LogMessage",
 							Method:          tx.Method,
 							Topics:          topics,
 							BlockNumber:     log.Raw.BlockNumber,

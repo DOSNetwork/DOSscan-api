@@ -91,6 +91,10 @@ func (t *Transformer) FetchHistoricalLogs(ctx context.Context) (err error) {
 	if err != nil {
 		return
 	}
+	err = t.FetchHistoricalLog(ctx, _models.TypeUnregisterPendingNode, toBlock)
+	if err != nil {
+		return
+	}
 	err = t.FetchHistoricalLog(ctx, _models.TypeGrouping, toBlock)
 	if err != nil {
 		return

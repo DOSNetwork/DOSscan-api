@@ -11,6 +11,8 @@ import (
 	"syscall"
 	"time"
 
+	_config "github.com/DOSNetwork/DOSscan-api/config"
+	_repository "github.com/DOSNetwork/DOSscan-api/repository"
 	_cache "github.com/DOSNetwork/DOSscan-api/repository/cache"
 	_gorm "github.com/DOSNetwork/DOSscan-api/repository/gorm"
 	_onchain "github.com/DOSNetwork/DOSscan-api/repository/onchain"
@@ -23,18 +25,19 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-const (
-	DB_IP       = "localhost"
-	DB_PORT     = "5432"
-	DB_USER     = "postgres"
-	DB_PASSWORD = "postgres"
-	DB_NAME     = "postgres"
-	ETH_URL     = "wss://rinkeby.infura.io/ws/v3/3a3e5d776961418e93a8b33fef2f6642"
-)
-
 func main() {
-	//TODO : Add configuration
-
+	configPath := ""
+	if len(os.Args) >= 2 {
+		configPath = os.Args[1]
+	}
+	if configPath == "" {
+		configPath = "./config.json"
+	}
+	config, err := _config.LoadConfig(configPath)
+	if err != nil {
+		fmt.Println(err)
+		log.Fatal(err)
+	}
 	//1)Init repositorys abd service
 	c, err := redis.Dial("tcp", "localhost:6379")
 	if err != nil {
@@ -46,47 +49,59 @@ func main() {
 
 	var db *gorm.DB
 	postgres_url := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
-		DB_USER, DB_PASSWORD, DB_IP, DB_PORT, DB_NAME)
+		config.DB_USER, config.DB_PASSWORD, config.DB_IP, config.DB_PORT, config.DB_NAME)
 	if db, err = gorm.Open("postgres", postgres_url); err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 	dbRepo := _gorm.NewGormRepo(db)
 
-	var client *ethclient.Client
-	client, err = ethclient.Dial(ETH_URL)
-	if err != nil {
-		log.Fatal(err)
+	var onchainRepo _repository.Onchain
+	for _, geth := range config.ChainNodePool {
+		fmt.Println("Dial to ", geth)
+		var client *ethclient.Client
+		client, err = ethclient.Dial(geth)
+		if err != nil {
+			fmt.Printf("Dial %v\n", err)
+			client.Close()
+			continue
+		}
+		onchainRepo, err = _onchain.NewGethRepo(client, config.BRIDGE_ADDR)
+		if err != nil {
+			fmt.Printf("NewGethRepo %v\n", err)
+			client.Close()
+			continue
+		}
+		break
 	}
-	defer client.Close()
-	onchainRepo, err := _onchain.NewGethRepo(client)
-	if err != nil {
-		log.Fatal(err)
+	if onchainRepo != nil {
+		search := _service.NewSearch(onchainRepo, dbRepo)
+
+		gin.SetMode(gin.ReleaseMode)
+		r := gin.Default()
+		r.ForwardedByClientIP = true
+		r.Use(middleware.CORS())
+
+		// Setup route group for the API
+		searchHandler := _handler.NesSearchHandler(search, cacheRepo)
+		api := r.Group("/api")
+		v1 := api.Group("/explorer")
+		v1.GET("/search", searchHandler.Search)
+		v1.GET("/eventNames", searchHandler.SupportedEvents)
+
+		server := &http.Server{
+			Addr:           ":8080",
+			Handler:        r,
+			ReadTimeout:    10 * time.Second,
+			WriteTimeout:   10 * time.Second,
+			MaxHeaderBytes: 1 << 20,
+		}
+
+		go server.ListenAndServe()
+		gracefulExitWeb(server)
+	} else {
+		fmt.Println("No onchainRepo")
 	}
-	search := _service.NewSearch(onchainRepo, dbRepo)
-
-	gin.SetMode(gin.ReleaseMode)
-	r := gin.Default()
-	r.ForwardedByClientIP = true
-	r.Use(middleware.CORS())
-
-	// Setup route group for the API
-	searchHandler := _handler.NesSearchHandler(search, cacheRepo)
-	api := r.Group("/api")
-	v1 := api.Group("/explorer")
-	v1.GET("/search", searchHandler.Search)
-	v1.GET("/eventNames", searchHandler.SupportedEvents)
-
-	server := &http.Server{
-		Addr:           ":8080",
-		Handler:        r,
-		ReadTimeout:    10 * time.Second,
-		WriteTimeout:   10 * time.Second,
-		MaxHeaderBytes: 1 << 20,
-	}
-
-	go server.ListenAndServe()
-	gracefulExitWeb(server)
 }
 
 func gracefulExitWeb(server *http.Server) {
