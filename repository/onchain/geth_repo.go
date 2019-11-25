@@ -27,6 +27,7 @@ type gethRepo struct {
 	proxy    *dosproxy.DosproxySession
 	bridge   *dosbridge.DosbridgeSession
 	proxyAbi abi.ABI
+	initBlk  uint64
 }
 
 func NewGethRepo(client *ethclient.Client, bridgeAddress string) (_repository.Onchain, error) {
@@ -48,7 +49,10 @@ func NewGethRepo(client *ethclient.Client, bridgeAddress string) (_repository.On
 		return nil, err
 	}
 	proxy := &dosproxy.DosproxySession{Contract: p, CallOpts: bind.CallOpts{Context: ctx}}
-
+	initBlk, err := proxy.InitBlkN()
+	if err != nil {
+		return nil, err
+	}
 	jsonFile, err := os.Open("./abi/DOSProxy.abi")
 	// if we os.Open returns an error then handle it
 	if err != nil {
@@ -65,7 +69,12 @@ func NewGethRepo(client *ethclient.Client, bridgeAddress string) (_repository.On
 		proxy:    proxy,
 		bridge:   bridge,
 		proxyAbi: proxyAbi,
+		initBlk:  initBlk.Uint64(),
 	}, nil
+}
+
+func (g *gethRepo) GetInitBlk() (blknum uint64) {
+	return g.initBlk
 }
 
 func (g *gethRepo) CurrentBlockNum(ctx context.Context) (blknum uint64, err error) {

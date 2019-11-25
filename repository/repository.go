@@ -7,6 +7,7 @@ import (
 )
 
 type Onchain interface {
+	GetInitBlk() uint64
 	CurrentBlockNum(ctx context.Context) (blknum uint64, err error)
 	Balance(ctx context.Context, hexAddr string) (string, error)
 	FetchLogs(ctx context.Context, logType int, fromBlock, toBlock uint64, blockLimit uint64) (err error, eventc chan []interface{}, errc chan error)

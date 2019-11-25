@@ -5,7 +5,6 @@
     "DB_PASSWORD":"postgres",
     "DB_NAME":"dev",
     "BRIDGE_ADDR":"0x10D12b5b5B6f2495cA5a848B46750A977E876F2f",
-    "START_BLOCK":"5285603",
     "ChainNodePool": [
         "https://rinkeby.infura.io/v3/917eab7f24e645509c93f104186522e5",
         "https://rinkeby.infura.io/v3/8e609c76fce442f8a1735fbea9999747",

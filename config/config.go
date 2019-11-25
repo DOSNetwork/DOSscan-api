@@ -16,7 +16,6 @@ type Config struct {
 	DB_PASSWORD   string
 	DB_NAME       string
 	BRIDGE_ADDR   string
-	START_BLOCK   string
 	ChainNodePool []string
 }
 

@@ -38,11 +38,11 @@ func lastBlcokNum(ctx context.Context, dbRepo repository.DB, modelsTypes []int) 
 	return
 }
 
-func NewTransformer(onchainRepo repository.Onchain, dbRepo repository.DB, updatedBlknum uint64, modelsTypes []int) *Transformer {
+func NewTransformer(onchainRepo repository.Onchain, dbRepo repository.DB, modelsTypes []int) *Transformer {
 	t := &Transformer{
 		onchainRepo:   onchainRepo,
 		dbRepo:        dbRepo,
-		updatedBlknum: updatedBlknum,
+		updatedBlknum: onchainRepo.GetInitBlk(),
 		modelsTypes:   modelsTypes,
 	}
 

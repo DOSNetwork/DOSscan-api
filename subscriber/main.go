@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"os/signal"
-	"strconv"
 	"syscall"
 	"time"
 
@@ -57,12 +56,6 @@ func main() {
 	ticker := time.NewTicker(15 * time.Second)
 	defer ticker.Stop()
 
-	startBlk, err := strconv.ParseUint(config.START_BLOCK, 10, 64)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("START_BLOCK ", startBlk)
-
 RECONN:
 	var transformService *_service.Transformer
 	for _, geth := range config.ChainNodePool {
@@ -84,7 +77,7 @@ RECONN:
 		modelsType := []int{_models.TypePublicKeyAccepted, _models.TypeGroupDissolve,
 			_models.TypeUpdateRandom, _models.TypeUrl, _models.TypeRequestUserRandom,
 			_models.TypeGuardianReward, _models.TypeCallbackTriggeredFor, _models.TypeMessage}
-		transformService = _service.NewTransformer(onchainRepo, dbRepo, startBlk, modelsType)
+		transformService = _service.NewTransformer(onchainRepo, dbRepo, modelsType)
 		if transformService != nil {
 			break
 		}

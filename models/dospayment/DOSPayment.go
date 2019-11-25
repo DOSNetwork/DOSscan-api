@@ -28,7 +28,7 @@ var (
 )
 
 // DospaymentABI is the input ABI used to generate the binding from.
-const DospaymentABI = "[{\"constant\":true,\"inputs\":[],\"name\":\"_defaultGuardianFee\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"nodeAddr\",\"type\":\"address\"},{\"name\":\"idx\",\"type\":\"uint256\"}],\"name\":\"nodeTokenAddres\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"addr\",\"type\":\"address\"}],\"name\":\"setNetworkToken\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"requestID\",\"type\":\"uint256\"}],\"name\":\"refundServiceFee\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"address\"}],\"name\":\"_paymentMethods\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"guardianAddr\",\"type\":\"address\"}],\"name\":\"claimGuardianReward\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"tokenAddr\",\"type\":\"address\"}],\"name\":\"isSupportedToken\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"requestID\",\"type\":\"uint256\"}],\"name\":\"paymentInfo\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"},{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"minStake\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"tokenAddr\",\"type\":\"address\"},{\"name\":\"serviceType\",\"type\":\"uint256\"},{\"name\":\"fee\",\"type\":\"uint256\"}],\"name\":\"setServiceFee\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"withdraw\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"nodeAddr\",\"type\":\"address\"}],\"name\":\"nodeTokenAddresLength\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"quo\",\"type\":\"uint256\"}],\"name\":\"setDropBurnMaxQuota\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"fundsAddr\",\"type\":\"address\"},{\"name\":\"tokenAddr\",\"type\":\"address\"}],\"name\":\"setGuardianFunds\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"_guardianFundsTokenAddr\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"_defaultTokenAddr\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"_defaultSubmitterRate\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"networkToken\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"consumer\",\"type\":\"address\"},{\"name\":\"requestID\",\"type\":\"uint256\"},{\"name\":\"serviceType\",\"type\":\"uint256\"}],\"name\":\"chargeServiceFee\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"isOwner\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"tokenAddr\",\"type\":\"uint256\"}],\"name\":\"withdrawAll\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"_payments\",\"outputs\":[{\"name\":\"consumer\",\"type\":\"address\"},{\"name\":\"tokenAddr\",\"type\":\"address\"},{\"name\":\"serviceType\",\"type\":\"uint256\"},{\"name\":\"amount\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"_defaultWorkerRate\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"dropburnToken\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"consumer\",\"type\":\"address\"},{\"name\":\"tokenAddr\",\"type\":\"address\"}],\"name\":\"setPaymentMethod\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"address\"}],\"name\":\"_feeList\",\"outputs\":[{\"name\":\"submitterRate\",\"type\":\"uint256\"},{\"name\":\"workerRate\",\"type\":\"uint256\"},{\"name\":\"denominator\",\"type\":\"uint256\"},{\"name\":\"guardianFee\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"node\",\"type\":\"address\"}],\"name\":\"fromValidStakingNode\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"_defaultUserQueryFee\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"_defaultSystemRandomFee\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"tokenAddr\",\"type\":\"address\"},{\"name\":\"submitterRate\",\"type\":\"uint256\"},{\"name\":\"workerRate\",\"type\":\"uint256\"},{\"name\":\"denominator\",\"type\":\"uint256\"}],\"name\":\"setFeeDividend\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"_guardianFundsAddr\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"_defaultDenominator\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"dropburnMaxQuota\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"addr\",\"type\":\"address\"}],\"name\":\"setDropBurnToken\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"tokenAddr\",\"type\":\"address\"},{\"name\":\"fee\",\"type\":\"uint256\"}],\"name\":\"setGuardianFee\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"nodeAddr\",\"type\":\"address\"},{\"name\":\"idx\",\"type\":\"uint256\"}],\"name\":\"nodeTokenAmount\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"_defaultUserRandomFee\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"requestID\",\"type\":\"uint256\"},{\"name\":\"submitter\",\"type\":\"address\"},{\"name\":\"workers\",\"type\":\"address[]\"}],\"name\":\"claimServiceFee\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"oldAddress\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"newAddress\",\"type\":\"address\"}],\"name\":\"UpdateNetworkTokenAddress\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"oldAddress\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"newAddress\",\"type\":\"address\"}],\"name\":\"UpdateDropBurnTokenAddress\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"oldQuota\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"newQuota\",\"type\":\"uint256\"}],\"name\":\"UpdateDropBurnMaxQuota\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"consumer\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"tokenAddr\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"requestID\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"serviceType\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"fee\",\"type\":\"uint256\"}],\"name\":\"LogChargeServiceFee\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"consumer\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"tokenAddr\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"requestID\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"serviceType\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"fee\",\"type\":\"uint256\"}],\"name\":\"LogRefundServiceFee\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"nodeAddr\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"tokenAddr\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"requestID\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"serviceType\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"feeForSubmitter\",\"type\":\"uint256\"}],\"name\":\"LogClaimServiceFee\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"nodeAddr\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"tokenAddr\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"feeForSubmitter\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"sender\",\"type\":\"address\"}],\"name\":\"LogClaimGuardianFee\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"previousOwner\",\"type\":\"address\"}],\"name\":\"OwnershipRenounced\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"}]"
+const DospaymentABI = "[{\"constant\":true,\"inputs\":[],\"name\":\"_defaultGuardianFee\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"nodeAddr\",\"type\":\"address\"},{\"name\":\"idx\",\"type\":\"uint256\"}],\"name\":\"nodeTokenAddres\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"_bridgeAddr\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"requestID\",\"type\":\"uint256\"}],\"name\":\"refundServiceFee\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"address\"}],\"name\":\"_paymentMethods\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"guardianAddr\",\"type\":\"address\"}],\"name\":\"claimGuardianReward\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"tokenAddr\",\"type\":\"address\"}],\"name\":\"isSupportedToken\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"requestID\",\"type\":\"uint256\"}],\"name\":\"paymentInfo\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"},{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"tokenAddr\",\"type\":\"address\"},{\"name\":\"serviceType\",\"type\":\"uint256\"},{\"name\":\"fee\",\"type\":\"uint256\"}],\"name\":\"setServiceFee\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"withdraw\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"nodeAddr\",\"type\":\"address\"}],\"name\":\"nodeTokenAddresLength\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"fundsAddr\",\"type\":\"address\"},{\"name\":\"tokenAddr\",\"type\":\"address\"}],\"name\":\"setGuardianFunds\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"_guardianFundsTokenAddr\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"_defaultTokenAddr\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"_defaultSubmitterRate\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"consumer\",\"type\":\"address\"},{\"name\":\"requestID\",\"type\":\"uint256\"},{\"name\":\"serviceType\",\"type\":\"uint256\"}],\"name\":\"chargeServiceFee\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"isOwner\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"tokenAddr\",\"type\":\"uint256\"}],\"name\":\"withdrawAll\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"_payments\",\"outputs\":[{\"name\":\"consumer\",\"type\":\"address\"},{\"name\":\"tokenAddr\",\"type\":\"address\"},{\"name\":\"serviceType\",\"type\":\"uint256\"},{\"name\":\"amount\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"_defaultWorkerRate\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"consumer\",\"type\":\"address\"},{\"name\":\"tokenAddr\",\"type\":\"address\"}],\"name\":\"setPaymentMethod\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"address\"}],\"name\":\"_feeList\",\"outputs\":[{\"name\":\"submitterRate\",\"type\":\"uint256\"},{\"name\":\"workerRate\",\"type\":\"uint256\"},{\"name\":\"denominator\",\"type\":\"uint256\"},{\"name\":\"guardianFee\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"_defaultUserQueryFee\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"_defaultSystemRandomFee\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"tokenAddr\",\"type\":\"address\"},{\"name\":\"submitterRate\",\"type\":\"uint256\"},{\"name\":\"workerRate\",\"type\":\"uint256\"},{\"name\":\"denominator\",\"type\":\"uint256\"}],\"name\":\"setFeeDividend\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"_guardianFundsAddr\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"_defaultDenominator\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"tokenAddr\",\"type\":\"address\"},{\"name\":\"fee\",\"type\":\"uint256\"}],\"name\":\"setGuardianFee\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"_addressBridge\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"nodeAddr\",\"type\":\"address\"},{\"name\":\"idx\",\"type\":\"uint256\"}],\"name\":\"nodeTokenAmount\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"_defaultUserRandomFee\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"requestID\",\"type\":\"uint256\"},{\"name\":\"submitter\",\"type\":\"address\"},{\"name\":\"workers\",\"type\":\"address[]\"}],\"name\":\"claimServiceFee\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"name\":\"bridgeAddr\",\"type\":\"address\"},{\"name\":\"guardianFundsAddr\",\"type\":\"address\"},{\"name\":\"tokenAddr\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"oldAddress\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"newAddress\",\"type\":\"address\"}],\"name\":\"UpdateNetworkTokenAddress\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"oldAddress\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"newAddress\",\"type\":\"address\"}],\"name\":\"UpdateDropBurnTokenAddress\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"consumer\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"tokenAddr\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"requestID\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"serviceType\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"fee\",\"type\":\"uint256\"}],\"name\":\"LogChargeServiceFee\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"consumer\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"tokenAddr\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"requestID\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"serviceType\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"fee\",\"type\":\"uint256\"}],\"name\":\"LogRefundServiceFee\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"nodeAddr\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"tokenAddr\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"requestID\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"serviceType\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"feeForSubmitter\",\"type\":\"uint256\"}],\"name\":\"LogClaimServiceFee\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"nodeAddr\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"tokenAddr\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"feeForSubmitter\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"sender\",\"type\":\"address\"}],\"name\":\"LogClaimGuardianFee\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"previousOwner\",\"type\":\"address\"}],\"name\":\"OwnershipRenounced\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"}]"
 
 // Dospayment is an auto generated Go binding around an Ethereum contract.
 type Dospayment struct {
@@ -170,6 +170,58 @@ func (_Dospayment *DospaymentTransactorRaw) Transfer(opts *bind.TransactOpts) (*
 // Transact invokes the (paid) contract method with params as input values.
 func (_Dospayment *DospaymentTransactorRaw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
 	return _Dospayment.Contract.contract.Transact(opts, method, params...)
+}
+
+// AddressBridge is a free data retrieval call binding the contract method 0xf0612ffe.
+//
+// Solidity: function _addressBridge() constant returns(address)
+func (_Dospayment *DospaymentCaller) AddressBridge(opts *bind.CallOpts) (common.Address, error) {
+	var (
+		ret0 = new(common.Address)
+	)
+	out := ret0
+	err := _Dospayment.contract.Call(opts, out, "_addressBridge")
+	return *ret0, err
+}
+
+// AddressBridge is a free data retrieval call binding the contract method 0xf0612ffe.
+//
+// Solidity: function _addressBridge() constant returns(address)
+func (_Dospayment *DospaymentSession) AddressBridge() (common.Address, error) {
+	return _Dospayment.Contract.AddressBridge(&_Dospayment.CallOpts)
+}
+
+// AddressBridge is a free data retrieval call binding the contract method 0xf0612ffe.
+//
+// Solidity: function _addressBridge() constant returns(address)
+func (_Dospayment *DospaymentCallerSession) AddressBridge() (common.Address, error) {
+	return _Dospayment.Contract.AddressBridge(&_Dospayment.CallOpts)
+}
+
+// BridgeAddr is a free data retrieval call binding the contract method 0x1aab7941.
+//
+// Solidity: function _bridgeAddr() constant returns(address)
+func (_Dospayment *DospaymentCaller) BridgeAddr(opts *bind.CallOpts) (common.Address, error) {
+	var (
+		ret0 = new(common.Address)
+	)
+	out := ret0
+	err := _Dospayment.contract.Call(opts, out, "_bridgeAddr")
+	return *ret0, err
+}
+
+// BridgeAddr is a free data retrieval call binding the contract method 0x1aab7941.
+//
+// Solidity: function _bridgeAddr() constant returns(address)
+func (_Dospayment *DospaymentSession) BridgeAddr() (common.Address, error) {
+	return _Dospayment.Contract.BridgeAddr(&_Dospayment.CallOpts)
+}
+
+// BridgeAddr is a free data retrieval call binding the contract method 0x1aab7941.
+//
+// Solidity: function _bridgeAddr() constant returns(address)
+func (_Dospayment *DospaymentCallerSession) BridgeAddr() (common.Address, error) {
+	return _Dospayment.Contract.BridgeAddr(&_Dospayment.CallOpts)
 }
 
 // DefaultDenominator is a free data retrieval call binding the contract method 0xe6544904.
@@ -546,84 +598,6 @@ func (_Dospayment *DospaymentCallerSession) Payments(arg0 *big.Int) (struct {
 	return _Dospayment.Contract.Payments(&_Dospayment.CallOpts, arg0)
 }
 
-// DropburnMaxQuota is a free data retrieval call binding the contract method 0xe8c3470c.
-//
-// Solidity: function dropburnMaxQuota() constant returns(uint256)
-func (_Dospayment *DospaymentCaller) DropburnMaxQuota(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Dospayment.contract.Call(opts, out, "dropburnMaxQuota")
-	return *ret0, err
-}
-
-// DropburnMaxQuota is a free data retrieval call binding the contract method 0xe8c3470c.
-//
-// Solidity: function dropburnMaxQuota() constant returns(uint256)
-func (_Dospayment *DospaymentSession) DropburnMaxQuota() (*big.Int, error) {
-	return _Dospayment.Contract.DropburnMaxQuota(&_Dospayment.CallOpts)
-}
-
-// DropburnMaxQuota is a free data retrieval call binding the contract method 0xe8c3470c.
-//
-// Solidity: function dropburnMaxQuota() constant returns(uint256)
-func (_Dospayment *DospaymentCallerSession) DropburnMaxQuota() (*big.Int, error) {
-	return _Dospayment.Contract.DropburnMaxQuota(&_Dospayment.CallOpts)
-}
-
-// DropburnToken is a free data retrieval call binding the contract method 0xb26584b8.
-//
-// Solidity: function dropburnToken() constant returns(address)
-func (_Dospayment *DospaymentCaller) DropburnToken(opts *bind.CallOpts) (common.Address, error) {
-	var (
-		ret0 = new(common.Address)
-	)
-	out := ret0
-	err := _Dospayment.contract.Call(opts, out, "dropburnToken")
-	return *ret0, err
-}
-
-// DropburnToken is a free data retrieval call binding the contract method 0xb26584b8.
-//
-// Solidity: function dropburnToken() constant returns(address)
-func (_Dospayment *DospaymentSession) DropburnToken() (common.Address, error) {
-	return _Dospayment.Contract.DropburnToken(&_Dospayment.CallOpts)
-}
-
-// DropburnToken is a free data retrieval call binding the contract method 0xb26584b8.
-//
-// Solidity: function dropburnToken() constant returns(address)
-func (_Dospayment *DospaymentCallerSession) DropburnToken() (common.Address, error) {
-	return _Dospayment.Contract.DropburnToken(&_Dospayment.CallOpts)
-}
-
-// FromValidStakingNode is a free data retrieval call binding the contract method 0xc7e6a9bc.
-//
-// Solidity: function fromValidStakingNode(address node) constant returns(bool)
-func (_Dospayment *DospaymentCaller) FromValidStakingNode(opts *bind.CallOpts, node common.Address) (bool, error) {
-	var (
-		ret0 = new(bool)
-	)
-	out := ret0
-	err := _Dospayment.contract.Call(opts, out, "fromValidStakingNode", node)
-	return *ret0, err
-}
-
-// FromValidStakingNode is a free data retrieval call binding the contract method 0xc7e6a9bc.
-//
-// Solidity: function fromValidStakingNode(address node) constant returns(bool)
-func (_Dospayment *DospaymentSession) FromValidStakingNode(node common.Address) (bool, error) {
-	return _Dospayment.Contract.FromValidStakingNode(&_Dospayment.CallOpts, node)
-}
-
-// FromValidStakingNode is a free data retrieval call binding the contract method 0xc7e6a9bc.
-//
-// Solidity: function fromValidStakingNode(address node) constant returns(bool)
-func (_Dospayment *DospaymentCallerSession) FromValidStakingNode(node common.Address) (bool, error) {
-	return _Dospayment.Contract.FromValidStakingNode(&_Dospayment.CallOpts, node)
-}
-
 // IsOwner is a free data retrieval call binding the contract method 0x8f32d59b.
 //
 // Solidity: function isOwner() constant returns(bool)
@@ -674,58 +648,6 @@ func (_Dospayment *DospaymentSession) IsSupportedToken(tokenAddr common.Address)
 // Solidity: function isSupportedToken(address tokenAddr) constant returns(bool)
 func (_Dospayment *DospaymentCallerSession) IsSupportedToken(tokenAddr common.Address) (bool, error) {
 	return _Dospayment.Contract.IsSupportedToken(&_Dospayment.CallOpts, tokenAddr)
-}
-
-// MinStake is a free data retrieval call binding the contract method 0x375b3c0a.
-//
-// Solidity: function minStake() constant returns(uint256)
-func (_Dospayment *DospaymentCaller) MinStake(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Dospayment.contract.Call(opts, out, "minStake")
-	return *ret0, err
-}
-
-// MinStake is a free data retrieval call binding the contract method 0x375b3c0a.
-//
-// Solidity: function minStake() constant returns(uint256)
-func (_Dospayment *DospaymentSession) MinStake() (*big.Int, error) {
-	return _Dospayment.Contract.MinStake(&_Dospayment.CallOpts)
-}
-
-// MinStake is a free data retrieval call binding the contract method 0x375b3c0a.
-//
-// Solidity: function minStake() constant returns(uint256)
-func (_Dospayment *DospaymentCallerSession) MinStake() (*big.Int, error) {
-	return _Dospayment.Contract.MinStake(&_Dospayment.CallOpts)
-}
-
-// NetworkToken is a free data retrieval call binding the contract method 0x6ca95a4e.
-//
-// Solidity: function networkToken() constant returns(address)
-func (_Dospayment *DospaymentCaller) NetworkToken(opts *bind.CallOpts) (common.Address, error) {
-	var (
-		ret0 = new(common.Address)
-	)
-	out := ret0
-	err := _Dospayment.contract.Call(opts, out, "networkToken")
-	return *ret0, err
-}
-
-// NetworkToken is a free data retrieval call binding the contract method 0x6ca95a4e.
-//
-// Solidity: function networkToken() constant returns(address)
-func (_Dospayment *DospaymentSession) NetworkToken() (common.Address, error) {
-	return _Dospayment.Contract.NetworkToken(&_Dospayment.CallOpts)
-}
-
-// NetworkToken is a free data retrieval call binding the contract method 0x6ca95a4e.
-//
-// Solidity: function networkToken() constant returns(address)
-func (_Dospayment *DospaymentCallerSession) NetworkToken() (common.Address, error) {
-	return _Dospayment.Contract.NetworkToken(&_Dospayment.CallOpts)
 }
 
 // NodeTokenAddres is a free data retrieval call binding the contract method 0x139bcedb.
@@ -967,48 +889,6 @@ func (_Dospayment *DospaymentTransactorSession) RenounceOwnership() (*types.Tran
 	return _Dospayment.Contract.RenounceOwnership(&_Dospayment.TransactOpts)
 }
 
-// SetDropBurnMaxQuota is a paid mutator transaction binding the contract method 0x3f3381e1.
-//
-// Solidity: function setDropBurnMaxQuota(uint256 quo) returns()
-func (_Dospayment *DospaymentTransactor) SetDropBurnMaxQuota(opts *bind.TransactOpts, quo *big.Int) (*types.Transaction, error) {
-	return _Dospayment.contract.Transact(opts, "setDropBurnMaxQuota", quo)
-}
-
-// SetDropBurnMaxQuota is a paid mutator transaction binding the contract method 0x3f3381e1.
-//
-// Solidity: function setDropBurnMaxQuota(uint256 quo) returns()
-func (_Dospayment *DospaymentSession) SetDropBurnMaxQuota(quo *big.Int) (*types.Transaction, error) {
-	return _Dospayment.Contract.SetDropBurnMaxQuota(&_Dospayment.TransactOpts, quo)
-}
-
-// SetDropBurnMaxQuota is a paid mutator transaction binding the contract method 0x3f3381e1.
-//
-// Solidity: function setDropBurnMaxQuota(uint256 quo) returns()
-func (_Dospayment *DospaymentTransactorSession) SetDropBurnMaxQuota(quo *big.Int) (*types.Transaction, error) {
-	return _Dospayment.Contract.SetDropBurnMaxQuota(&_Dospayment.TransactOpts, quo)
-}
-
-// SetDropBurnToken is a paid mutator transaction binding the contract method 0xeac051f9.
-//
-// Solidity: function setDropBurnToken(address addr) returns()
-func (_Dospayment *DospaymentTransactor) SetDropBurnToken(opts *bind.TransactOpts, addr common.Address) (*types.Transaction, error) {
-	return _Dospayment.contract.Transact(opts, "setDropBurnToken", addr)
-}
-
-// SetDropBurnToken is a paid mutator transaction binding the contract method 0xeac051f9.
-//
-// Solidity: function setDropBurnToken(address addr) returns()
-func (_Dospayment *DospaymentSession) SetDropBurnToken(addr common.Address) (*types.Transaction, error) {
-	return _Dospayment.Contract.SetDropBurnToken(&_Dospayment.TransactOpts, addr)
-}
-
-// SetDropBurnToken is a paid mutator transaction binding the contract method 0xeac051f9.
-//
-// Solidity: function setDropBurnToken(address addr) returns()
-func (_Dospayment *DospaymentTransactorSession) SetDropBurnToken(addr common.Address) (*types.Transaction, error) {
-	return _Dospayment.Contract.SetDropBurnToken(&_Dospayment.TransactOpts, addr)
-}
-
 // SetFeeDividend is a paid mutator transaction binding the contract method 0xde439e9a.
 //
 // Solidity: function setFeeDividend(address tokenAddr, uint256 submitterRate, uint256 workerRate, uint256 denominator) returns()
@@ -1070,27 +950,6 @@ func (_Dospayment *DospaymentSession) SetGuardianFunds(fundsAddr common.Address,
 // Solidity: function setGuardianFunds(address fundsAddr, address tokenAddr) returns()
 func (_Dospayment *DospaymentTransactorSession) SetGuardianFunds(fundsAddr common.Address, tokenAddr common.Address) (*types.Transaction, error) {
 	return _Dospayment.Contract.SetGuardianFunds(&_Dospayment.TransactOpts, fundsAddr, tokenAddr)
-}
-
-// SetNetworkToken is a paid mutator transaction binding the contract method 0x17107c49.
-//
-// Solidity: function setNetworkToken(address addr) returns()
-func (_Dospayment *DospaymentTransactor) SetNetworkToken(opts *bind.TransactOpts, addr common.Address) (*types.Transaction, error) {
-	return _Dospayment.contract.Transact(opts, "setNetworkToken", addr)
-}
-
-// SetNetworkToken is a paid mutator transaction binding the contract method 0x17107c49.
-//
-// Solidity: function setNetworkToken(address addr) returns()
-func (_Dospayment *DospaymentSession) SetNetworkToken(addr common.Address) (*types.Transaction, error) {
-	return _Dospayment.Contract.SetNetworkToken(&_Dospayment.TransactOpts, addr)
-}
-
-// SetNetworkToken is a paid mutator transaction binding the contract method 0x17107c49.
-//
-// Solidity: function setNetworkToken(address addr) returns()
-func (_Dospayment *DospaymentTransactorSession) SetNetworkToken(addr common.Address) (*types.Transaction, error) {
-	return _Dospayment.Contract.SetNetworkToken(&_Dospayment.TransactOpts, addr)
 }
 
 // SetPaymentMethod is a paid mutator transaction binding the contract method 0xb73a3f8f.
@@ -1954,129 +1813,6 @@ func (_Dospayment *DospaymentFilterer) WatchOwnershipTransferred(opts *bind.Watc
 				// New log arrived, parse the event and forward to the user
 				event := new(DospaymentOwnershipTransferred)
 				if err := _Dospayment.contract.UnpackLog(event, "OwnershipTransferred", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// DospaymentUpdateDropBurnMaxQuotaIterator is returned from FilterUpdateDropBurnMaxQuota and is used to iterate over the raw logs and unpacked data for UpdateDropBurnMaxQuota events raised by the Dospayment contract.
-type DospaymentUpdateDropBurnMaxQuotaIterator struct {
-	Event *DospaymentUpdateDropBurnMaxQuota // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *DospaymentUpdateDropBurnMaxQuotaIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(DospaymentUpdateDropBurnMaxQuota)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(DospaymentUpdateDropBurnMaxQuota)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *DospaymentUpdateDropBurnMaxQuotaIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *DospaymentUpdateDropBurnMaxQuotaIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// DospaymentUpdateDropBurnMaxQuota represents a UpdateDropBurnMaxQuota event raised by the Dospayment contract.
-type DospaymentUpdateDropBurnMaxQuota struct {
-	OldQuota *big.Int
-	NewQuota *big.Int
-	Raw      types.Log // Blockchain specific contextual infos
-}
-
-// FilterUpdateDropBurnMaxQuota is a free log retrieval operation binding the contract event 0x0aee95cca46da64ee373e28dee5994361b4002c54035d92932c9825b76382e99.
-//
-// Solidity: event UpdateDropBurnMaxQuota(uint256 oldQuota, uint256 newQuota)
-func (_Dospayment *DospaymentFilterer) FilterUpdateDropBurnMaxQuota(opts *bind.FilterOpts) (*DospaymentUpdateDropBurnMaxQuotaIterator, error) {
-
-	logs, sub, err := _Dospayment.contract.FilterLogs(opts, "UpdateDropBurnMaxQuota")
-	if err != nil {
-		return nil, err
-	}
-	return &DospaymentUpdateDropBurnMaxQuotaIterator{contract: _Dospayment.contract, event: "UpdateDropBurnMaxQuota", logs: logs, sub: sub}, nil
-}
-
-// WatchUpdateDropBurnMaxQuota is a free log subscription operation binding the contract event 0x0aee95cca46da64ee373e28dee5994361b4002c54035d92932c9825b76382e99.
-//
-// Solidity: event UpdateDropBurnMaxQuota(uint256 oldQuota, uint256 newQuota)
-func (_Dospayment *DospaymentFilterer) WatchUpdateDropBurnMaxQuota(opts *bind.WatchOpts, sink chan<- *DospaymentUpdateDropBurnMaxQuota) (event.Subscription, error) {
-
-	logs, sub, err := _Dospayment.contract.WatchLogs(opts, "UpdateDropBurnMaxQuota")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(DospaymentUpdateDropBurnMaxQuota)
-				if err := _Dospayment.contract.UnpackLog(event, "UpdateDropBurnMaxQuota", log); err != nil {
 					return err
 				}
 				event.Raw = log
