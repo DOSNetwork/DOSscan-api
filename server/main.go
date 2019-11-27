@@ -88,7 +88,8 @@ func main() {
 		v1 := api.Group("/explorer")
 		v1.GET("/search", searchHandler.Search)
 		v1.GET("/eventNames", searchHandler.SupportedEvents)
-
+		bootStrapHandler := _handler.NesBootStrapHandler(config.BootStrapIPs)
+		api.GET("/bootStrap", bootStrapHandler.BootStrap)
 		server := &http.Server{
 			Addr:           ":8080",
 			Handler:        r,
