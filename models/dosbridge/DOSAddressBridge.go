@@ -28,7 +28,7 @@ var (
 )
 
 // DosbridgeABI is the input ABI used to generate the binding from.
-const DosbridgeABI = "[{\"constant\":true,\"inputs\":[],\"name\":\"getStakingAddress\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getCommitRevealAddress\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getProxyAddress\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newAddr\",\"type\":\"address\"}],\"name\":\"setProxyAddress\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newAddr\",\"type\":\"address\"}],\"name\":\"setPaymentAddress\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newAddr\",\"type\":\"address\"}],\"name\":\"setCommitRevealAddress\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"isOwner\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getPaymentAddress\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newAddr\",\"type\":\"address\"}],\"name\":\"setRegistryAddress\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getRegistryAddress\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newAddr\",\"type\":\"address\"}],\"name\":\"setStakingAddress\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"previousProxy\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"newProxy\",\"type\":\"address\"}],\"name\":\"ProxyAddressUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"previousAddr\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"newAddr\",\"type\":\"address\"}],\"name\":\"CommitRevealAddressUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"previousPayment\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"newPayment\",\"type\":\"address\"}],\"name\":\"PaymentAddressUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"previousRegistry\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"newRegistry\",\"type\":\"address\"}],\"name\":\"RegistryAddressUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"previousStaking\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"newStaking\",\"type\":\"address\"}],\"name\":\"StakingAddressUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"previousOwner\",\"type\":\"address\"}],\"name\":\"OwnershipRenounced\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"}]"
+const DosbridgeABI = "[{\"constant\":true,\"inputs\":[],\"name\":\"getStakingAddress\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getCommitRevealAddress\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getProxyAddress\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"url\",\"type\":\"string\"}],\"name\":\"setBootStrapUrl\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newAddr\",\"type\":\"address\"}],\"name\":\"setProxyAddress\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newAddr\",\"type\":\"address\"}],\"name\":\"setPaymentAddress\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newAddr\",\"type\":\"address\"}],\"name\":\"setCommitRevealAddress\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"isOwner\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getPaymentAddress\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newAddr\",\"type\":\"address\"}],\"name\":\"setRegistryAddress\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getBootStrapUrl\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getRegistryAddress\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newAddr\",\"type\":\"address\"}],\"name\":\"setStakingAddress\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"previousProxy\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"newProxy\",\"type\":\"address\"}],\"name\":\"ProxyAddressUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"previousAddr\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"newAddr\",\"type\":\"address\"}],\"name\":\"CommitRevealAddressUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"previousPayment\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"newPayment\",\"type\":\"address\"}],\"name\":\"PaymentAddressUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"previousRegistry\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"newRegistry\",\"type\":\"address\"}],\"name\":\"RegistryAddressUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"previousStaking\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"newStaking\",\"type\":\"address\"}],\"name\":\"StakingAddressUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"previousURL\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"newURL\",\"type\":\"string\"}],\"name\":\"BootStrapUrlUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"previousOwner\",\"type\":\"address\"}],\"name\":\"OwnershipRenounced\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"}]"
 
 // Dosbridge is an auto generated Go binding around an Ethereum contract.
 type Dosbridge struct {
@@ -170,6 +170,32 @@ func (_Dosbridge *DosbridgeTransactorRaw) Transfer(opts *bind.TransactOpts) (*ty
 // Transact invokes the (paid) contract method with params as input values.
 func (_Dosbridge *DosbridgeTransactorRaw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
 	return _Dosbridge.Contract.contract.Transact(opts, method, params...)
+}
+
+// GetBootStrapUrl is a free data retrieval call binding the contract method 0xb7e982be.
+//
+// Solidity: function getBootStrapUrl() constant returns(string)
+func (_Dosbridge *DosbridgeCaller) GetBootStrapUrl(opts *bind.CallOpts) (string, error) {
+	var (
+		ret0 = new(string)
+	)
+	out := ret0
+	err := _Dosbridge.contract.Call(opts, out, "getBootStrapUrl")
+	return *ret0, err
+}
+
+// GetBootStrapUrl is a free data retrieval call binding the contract method 0xb7e982be.
+//
+// Solidity: function getBootStrapUrl() constant returns(string)
+func (_Dosbridge *DosbridgeSession) GetBootStrapUrl() (string, error) {
+	return _Dosbridge.Contract.GetBootStrapUrl(&_Dosbridge.CallOpts)
+}
+
+// GetBootStrapUrl is a free data retrieval call binding the contract method 0xb7e982be.
+//
+// Solidity: function getBootStrapUrl() constant returns(string)
+func (_Dosbridge *DosbridgeCallerSession) GetBootStrapUrl() (string, error) {
+	return _Dosbridge.Contract.GetBootStrapUrl(&_Dosbridge.CallOpts)
 }
 
 // GetCommitRevealAddress is a free data retrieval call binding the contract method 0x1ae0433c.
@@ -375,6 +401,27 @@ func (_Dosbridge *DosbridgeTransactorSession) RenounceOwnership() (*types.Transa
 	return _Dosbridge.Contract.RenounceOwnership(&_Dosbridge.TransactOpts)
 }
 
+// SetBootStrapUrl is a paid mutator transaction binding the contract method 0x4400bc07.
+//
+// Solidity: function setBootStrapUrl(string url) returns()
+func (_Dosbridge *DosbridgeTransactor) SetBootStrapUrl(opts *bind.TransactOpts, url string) (*types.Transaction, error) {
+	return _Dosbridge.contract.Transact(opts, "setBootStrapUrl", url)
+}
+
+// SetBootStrapUrl is a paid mutator transaction binding the contract method 0x4400bc07.
+//
+// Solidity: function setBootStrapUrl(string url) returns()
+func (_Dosbridge *DosbridgeSession) SetBootStrapUrl(url string) (*types.Transaction, error) {
+	return _Dosbridge.Contract.SetBootStrapUrl(&_Dosbridge.TransactOpts, url)
+}
+
+// SetBootStrapUrl is a paid mutator transaction binding the contract method 0x4400bc07.
+//
+// Solidity: function setBootStrapUrl(string url) returns()
+func (_Dosbridge *DosbridgeTransactorSession) SetBootStrapUrl(url string) (*types.Transaction, error) {
+	return _Dosbridge.Contract.SetBootStrapUrl(&_Dosbridge.TransactOpts, url)
+}
+
 // SetCommitRevealAddress is a paid mutator transaction binding the contract method 0x7b08cd03.
 //
 // Solidity: function setCommitRevealAddress(address newAddr) returns()
@@ -499,6 +546,129 @@ func (_Dosbridge *DosbridgeSession) TransferOwnership(newOwner common.Address) (
 // Solidity: function transferOwnership(address newOwner) returns()
 func (_Dosbridge *DosbridgeTransactorSession) TransferOwnership(newOwner common.Address) (*types.Transaction, error) {
 	return _Dosbridge.Contract.TransferOwnership(&_Dosbridge.TransactOpts, newOwner)
+}
+
+// DosbridgeBootStrapUrlUpdatedIterator is returned from FilterBootStrapUrlUpdated and is used to iterate over the raw logs and unpacked data for BootStrapUrlUpdated events raised by the Dosbridge contract.
+type DosbridgeBootStrapUrlUpdatedIterator struct {
+	Event *DosbridgeBootStrapUrlUpdated // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *DosbridgeBootStrapUrlUpdatedIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(DosbridgeBootStrapUrlUpdated)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(DosbridgeBootStrapUrlUpdated)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *DosbridgeBootStrapUrlUpdatedIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *DosbridgeBootStrapUrlUpdatedIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// DosbridgeBootStrapUrlUpdated represents a BootStrapUrlUpdated event raised by the Dosbridge contract.
+type DosbridgeBootStrapUrlUpdated struct {
+	PreviousURL string
+	NewURL      string
+	Raw         types.Log // Blockchain specific contextual infos
+}
+
+// FilterBootStrapUrlUpdated is a free log retrieval operation binding the contract event 0xc2194dd450e596fc07061b41e1cb9e4d38bd372ed38c6f909979d464f71cde7c.
+//
+// Solidity: event BootStrapUrlUpdated(string previousURL, string newURL)
+func (_Dosbridge *DosbridgeFilterer) FilterBootStrapUrlUpdated(opts *bind.FilterOpts) (*DosbridgeBootStrapUrlUpdatedIterator, error) {
+
+	logs, sub, err := _Dosbridge.contract.FilterLogs(opts, "BootStrapUrlUpdated")
+	if err != nil {
+		return nil, err
+	}
+	return &DosbridgeBootStrapUrlUpdatedIterator{contract: _Dosbridge.contract, event: "BootStrapUrlUpdated", logs: logs, sub: sub}, nil
+}
+
+// WatchBootStrapUrlUpdated is a free log subscription operation binding the contract event 0xc2194dd450e596fc07061b41e1cb9e4d38bd372ed38c6f909979d464f71cde7c.
+//
+// Solidity: event BootStrapUrlUpdated(string previousURL, string newURL)
+func (_Dosbridge *DosbridgeFilterer) WatchBootStrapUrlUpdated(opts *bind.WatchOpts, sink chan<- *DosbridgeBootStrapUrlUpdated) (event.Subscription, error) {
+
+	logs, sub, err := _Dosbridge.contract.WatchLogs(opts, "BootStrapUrlUpdated")
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(DosbridgeBootStrapUrlUpdated)
+				if err := _Dosbridge.contract.UnpackLog(event, "BootStrapUrlUpdated", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
 }
 
 // DosbridgeCommitRevealAddressUpdatedIterator is returned from FilterCommitRevealAddressUpdated and is used to iterate over the raw logs and unpacked data for CommitRevealAddressUpdated events raised by the Dosbridge contract.
