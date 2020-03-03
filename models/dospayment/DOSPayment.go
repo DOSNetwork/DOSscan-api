@@ -15,18 +15,6 @@ import (
 	"github.com/ethereum/go-ethereum/event"
 )
 
-// Reference imports to suppress errors if they are not otherwise used.
-var (
-	_ = big.NewInt
-	_ = strings.NewReader
-	_ = ethereum.NotFound
-	_ = abi.U256
-	_ = bind.Bind
-	_ = common.Big1
-	_ = types.BloomLookup
-	_ = event.NewSubscription
-)
-
 // DospaymentABI is the input ABI used to generate the binding from.
 const DospaymentABI = "[{\"constant\":true,\"inputs\":[],\"name\":\"_defaultGuardianFee\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"nodeAddr\",\"type\":\"address\"},{\"name\":\"idx\",\"type\":\"uint256\"}],\"name\":\"nodeTokenAddres\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"_bridgeAddr\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"requestID\",\"type\":\"uint256\"}],\"name\":\"refundServiceFee\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"address\"}],\"name\":\"_paymentMethods\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"guardianAddr\",\"type\":\"address\"}],\"name\":\"claimGuardianReward\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"tokenAddr\",\"type\":\"address\"}],\"name\":\"isSupportedToken\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"requestID\",\"type\":\"uint256\"}],\"name\":\"paymentInfo\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"},{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"tokenAddr\",\"type\":\"address\"},{\"name\":\"serviceType\",\"type\":\"uint256\"},{\"name\":\"fee\",\"type\":\"uint256\"}],\"name\":\"setServiceFee\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"withdraw\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"nodeAddr\",\"type\":\"address\"}],\"name\":\"nodeTokenAddresLength\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"fundsAddr\",\"type\":\"address\"},{\"name\":\"tokenAddr\",\"type\":\"address\"}],\"name\":\"setGuardianFunds\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"_guardianFundsTokenAddr\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"_defaultTokenAddr\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"_defaultSubmitterRate\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"consumer\",\"type\":\"address\"},{\"name\":\"requestID\",\"type\":\"uint256\"},{\"name\":\"serviceType\",\"type\":\"uint256\"}],\"name\":\"chargeServiceFee\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"isOwner\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"tokenAddr\",\"type\":\"uint256\"}],\"name\":\"withdrawAll\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"_payments\",\"outputs\":[{\"name\":\"consumer\",\"type\":\"address\"},{\"name\":\"tokenAddr\",\"type\":\"address\"},{\"name\":\"serviceType\",\"type\":\"uint256\"},{\"name\":\"amount\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"_defaultWorkerRate\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"consumer\",\"type\":\"address\"},{\"name\":\"tokenAddr\",\"type\":\"address\"}],\"name\":\"setPaymentMethod\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"address\"}],\"name\":\"_feeList\",\"outputs\":[{\"name\":\"submitterRate\",\"type\":\"uint256\"},{\"name\":\"workerRate\",\"type\":\"uint256\"},{\"name\":\"denominator\",\"type\":\"uint256\"},{\"name\":\"guardianFee\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"_defaultUserQueryFee\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"_defaultSystemRandomFee\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"tokenAddr\",\"type\":\"address\"},{\"name\":\"submitterRate\",\"type\":\"uint256\"},{\"name\":\"workerRate\",\"type\":\"uint256\"},{\"name\":\"denominator\",\"type\":\"uint256\"}],\"name\":\"setFeeDividend\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"_guardianFundsAddr\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"_defaultDenominator\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"tokenAddr\",\"type\":\"address\"},{\"name\":\"fee\",\"type\":\"uint256\"}],\"name\":\"setGuardianFee\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"_addressBridge\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"nodeAddr\",\"type\":\"address\"},{\"name\":\"idx\",\"type\":\"uint256\"}],\"name\":\"nodeTokenAmount\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"_defaultUserRandomFee\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"requestID\",\"type\":\"uint256\"},{\"name\":\"submitter\",\"type\":\"address\"},{\"name\":\"workers\",\"type\":\"address[]\"}],\"name\":\"claimServiceFee\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"name\":\"bridgeAddr\",\"type\":\"address\"},{\"name\":\"guardianFundsAddr\",\"type\":\"address\"},{\"name\":\"tokenAddr\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"oldAddress\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"newAddress\",\"type\":\"address\"}],\"name\":\"UpdateNetworkTokenAddress\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"oldAddress\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"newAddress\",\"type\":\"address\"}],\"name\":\"UpdateDropBurnTokenAddress\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"consumer\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"tokenAddr\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"requestID\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"serviceType\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"fee\",\"type\":\"uint256\"}],\"name\":\"LogChargeServiceFee\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"consumer\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"tokenAddr\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"requestID\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"serviceType\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"fee\",\"type\":\"uint256\"}],\"name\":\"LogRefundServiceFee\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"nodeAddr\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"tokenAddr\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"requestID\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"serviceType\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"feeForSubmitter\",\"type\":\"uint256\"}],\"name\":\"LogClaimServiceFee\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"nodeAddr\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"tokenAddr\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"feeForSubmitter\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"sender\",\"type\":\"address\"}],\"name\":\"LogClaimGuardianFee\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"previousOwner\",\"type\":\"address\"}],\"name\":\"OwnershipRenounced\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"}]"
 
@@ -434,7 +422,7 @@ func (_Dospayment *DospaymentCallerSession) DefaultWorkerRate() (*big.Int, error
 
 // FeeList is a free data retrieval call binding the contract method 0xc5e7ffef.
 //
-// Solidity: function _feeList(address ) constant returns(uint256 submitterRate, uint256 workerRate, uint256 denominator, uint256 guardianFee)
+// Solidity: function _feeList( address) constant returns(submitterRate uint256, workerRate uint256, denominator uint256, guardianFee uint256)
 func (_Dospayment *DospaymentCaller) FeeList(opts *bind.CallOpts, arg0 common.Address) (struct {
 	SubmitterRate *big.Int
 	WorkerRate    *big.Int
@@ -454,7 +442,7 @@ func (_Dospayment *DospaymentCaller) FeeList(opts *bind.CallOpts, arg0 common.Ad
 
 // FeeList is a free data retrieval call binding the contract method 0xc5e7ffef.
 //
-// Solidity: function _feeList(address ) constant returns(uint256 submitterRate, uint256 workerRate, uint256 denominator, uint256 guardianFee)
+// Solidity: function _feeList( address) constant returns(submitterRate uint256, workerRate uint256, denominator uint256, guardianFee uint256)
 func (_Dospayment *DospaymentSession) FeeList(arg0 common.Address) (struct {
 	SubmitterRate *big.Int
 	WorkerRate    *big.Int
@@ -466,7 +454,7 @@ func (_Dospayment *DospaymentSession) FeeList(arg0 common.Address) (struct {
 
 // FeeList is a free data retrieval call binding the contract method 0xc5e7ffef.
 //
-// Solidity: function _feeList(address ) constant returns(uint256 submitterRate, uint256 workerRate, uint256 denominator, uint256 guardianFee)
+// Solidity: function _feeList( address) constant returns(submitterRate uint256, workerRate uint256, denominator uint256, guardianFee uint256)
 func (_Dospayment *DospaymentCallerSession) FeeList(arg0 common.Address) (struct {
 	SubmitterRate *big.Int
 	WorkerRate    *big.Int
@@ -530,7 +518,7 @@ func (_Dospayment *DospaymentCallerSession) GuardianFundsTokenAddr() (common.Add
 
 // PaymentMethods is a free data retrieval call binding the contract method 0x22e60ea5.
 //
-// Solidity: function _paymentMethods(address ) constant returns(address)
+// Solidity: function _paymentMethods( address) constant returns(address)
 func (_Dospayment *DospaymentCaller) PaymentMethods(opts *bind.CallOpts, arg0 common.Address) (common.Address, error) {
 	var (
 		ret0 = new(common.Address)
@@ -542,21 +530,21 @@ func (_Dospayment *DospaymentCaller) PaymentMethods(opts *bind.CallOpts, arg0 co
 
 // PaymentMethods is a free data retrieval call binding the contract method 0x22e60ea5.
 //
-// Solidity: function _paymentMethods(address ) constant returns(address)
+// Solidity: function _paymentMethods( address) constant returns(address)
 func (_Dospayment *DospaymentSession) PaymentMethods(arg0 common.Address) (common.Address, error) {
 	return _Dospayment.Contract.PaymentMethods(&_Dospayment.CallOpts, arg0)
 }
 
 // PaymentMethods is a free data retrieval call binding the contract method 0x22e60ea5.
 //
-// Solidity: function _paymentMethods(address ) constant returns(address)
+// Solidity: function _paymentMethods( address) constant returns(address)
 func (_Dospayment *DospaymentCallerSession) PaymentMethods(arg0 common.Address) (common.Address, error) {
 	return _Dospayment.Contract.PaymentMethods(&_Dospayment.CallOpts, arg0)
 }
 
 // Payments is a free data retrieval call binding the contract method 0x9ed713b4.
 //
-// Solidity: function _payments(uint256 ) constant returns(address consumer, address tokenAddr, uint256 serviceType, uint256 amount)
+// Solidity: function _payments( uint256) constant returns(consumer address, tokenAddr address, serviceType uint256, amount uint256)
 func (_Dospayment *DospaymentCaller) Payments(opts *bind.CallOpts, arg0 *big.Int) (struct {
 	Consumer    common.Address
 	TokenAddr   common.Address
@@ -576,7 +564,7 @@ func (_Dospayment *DospaymentCaller) Payments(opts *bind.CallOpts, arg0 *big.Int
 
 // Payments is a free data retrieval call binding the contract method 0x9ed713b4.
 //
-// Solidity: function _payments(uint256 ) constant returns(address consumer, address tokenAddr, uint256 serviceType, uint256 amount)
+// Solidity: function _payments( uint256) constant returns(consumer address, tokenAddr address, serviceType uint256, amount uint256)
 func (_Dospayment *DospaymentSession) Payments(arg0 *big.Int) (struct {
 	Consumer    common.Address
 	TokenAddr   common.Address
@@ -588,7 +576,7 @@ func (_Dospayment *DospaymentSession) Payments(arg0 *big.Int) (struct {
 
 // Payments is a free data retrieval call binding the contract method 0x9ed713b4.
 //
-// Solidity: function _payments(uint256 ) constant returns(address consumer, address tokenAddr, uint256 serviceType, uint256 amount)
+// Solidity: function _payments( uint256) constant returns(consumer address, tokenAddr address, serviceType uint256, amount uint256)
 func (_Dospayment *DospaymentCallerSession) Payments(arg0 *big.Int) (struct {
 	Consumer    common.Address
 	TokenAddr   common.Address
@@ -626,7 +614,7 @@ func (_Dospayment *DospaymentCallerSession) IsOwner() (bool, error) {
 
 // IsSupportedToken is a free data retrieval call binding the contract method 0x240028e8.
 //
-// Solidity: function isSupportedToken(address tokenAddr) constant returns(bool)
+// Solidity: function isSupportedToken(tokenAddr address) constant returns(bool)
 func (_Dospayment *DospaymentCaller) IsSupportedToken(opts *bind.CallOpts, tokenAddr common.Address) (bool, error) {
 	var (
 		ret0 = new(bool)
@@ -638,21 +626,21 @@ func (_Dospayment *DospaymentCaller) IsSupportedToken(opts *bind.CallOpts, token
 
 // IsSupportedToken is a free data retrieval call binding the contract method 0x240028e8.
 //
-// Solidity: function isSupportedToken(address tokenAddr) constant returns(bool)
+// Solidity: function isSupportedToken(tokenAddr address) constant returns(bool)
 func (_Dospayment *DospaymentSession) IsSupportedToken(tokenAddr common.Address) (bool, error) {
 	return _Dospayment.Contract.IsSupportedToken(&_Dospayment.CallOpts, tokenAddr)
 }
 
 // IsSupportedToken is a free data retrieval call binding the contract method 0x240028e8.
 //
-// Solidity: function isSupportedToken(address tokenAddr) constant returns(bool)
+// Solidity: function isSupportedToken(tokenAddr address) constant returns(bool)
 func (_Dospayment *DospaymentCallerSession) IsSupportedToken(tokenAddr common.Address) (bool, error) {
 	return _Dospayment.Contract.IsSupportedToken(&_Dospayment.CallOpts, tokenAddr)
 }
 
 // NodeTokenAddres is a free data retrieval call binding the contract method 0x139bcedb.
 //
-// Solidity: function nodeTokenAddres(address nodeAddr, uint256 idx) constant returns(address)
+// Solidity: function nodeTokenAddres(nodeAddr address, idx uint256) constant returns(address)
 func (_Dospayment *DospaymentCaller) NodeTokenAddres(opts *bind.CallOpts, nodeAddr common.Address, idx *big.Int) (common.Address, error) {
 	var (
 		ret0 = new(common.Address)
@@ -664,21 +652,21 @@ func (_Dospayment *DospaymentCaller) NodeTokenAddres(opts *bind.CallOpts, nodeAd
 
 // NodeTokenAddres is a free data retrieval call binding the contract method 0x139bcedb.
 //
-// Solidity: function nodeTokenAddres(address nodeAddr, uint256 idx) constant returns(address)
+// Solidity: function nodeTokenAddres(nodeAddr address, idx uint256) constant returns(address)
 func (_Dospayment *DospaymentSession) NodeTokenAddres(nodeAddr common.Address, idx *big.Int) (common.Address, error) {
 	return _Dospayment.Contract.NodeTokenAddres(&_Dospayment.CallOpts, nodeAddr, idx)
 }
 
 // NodeTokenAddres is a free data retrieval call binding the contract method 0x139bcedb.
 //
-// Solidity: function nodeTokenAddres(address nodeAddr, uint256 idx) constant returns(address)
+// Solidity: function nodeTokenAddres(nodeAddr address, idx uint256) constant returns(address)
 func (_Dospayment *DospaymentCallerSession) NodeTokenAddres(nodeAddr common.Address, idx *big.Int) (common.Address, error) {
 	return _Dospayment.Contract.NodeTokenAddres(&_Dospayment.CallOpts, nodeAddr, idx)
 }
 
 // NodeTokenAddresLength is a free data retrieval call binding the contract method 0x3e698ad5.
 //
-// Solidity: function nodeTokenAddresLength(address nodeAddr) constant returns(uint256)
+// Solidity: function nodeTokenAddresLength(nodeAddr address) constant returns(uint256)
 func (_Dospayment *DospaymentCaller) NodeTokenAddresLength(opts *bind.CallOpts, nodeAddr common.Address) (*big.Int, error) {
 	var (
 		ret0 = new(*big.Int)
@@ -690,21 +678,21 @@ func (_Dospayment *DospaymentCaller) NodeTokenAddresLength(opts *bind.CallOpts, 
 
 // NodeTokenAddresLength is a free data retrieval call binding the contract method 0x3e698ad5.
 //
-// Solidity: function nodeTokenAddresLength(address nodeAddr) constant returns(uint256)
+// Solidity: function nodeTokenAddresLength(nodeAddr address) constant returns(uint256)
 func (_Dospayment *DospaymentSession) NodeTokenAddresLength(nodeAddr common.Address) (*big.Int, error) {
 	return _Dospayment.Contract.NodeTokenAddresLength(&_Dospayment.CallOpts, nodeAddr)
 }
 
 // NodeTokenAddresLength is a free data retrieval call binding the contract method 0x3e698ad5.
 //
-// Solidity: function nodeTokenAddresLength(address nodeAddr) constant returns(uint256)
+// Solidity: function nodeTokenAddresLength(nodeAddr address) constant returns(uint256)
 func (_Dospayment *DospaymentCallerSession) NodeTokenAddresLength(nodeAddr common.Address) (*big.Int, error) {
 	return _Dospayment.Contract.NodeTokenAddresLength(&_Dospayment.CallOpts, nodeAddr)
 }
 
 // NodeTokenAmount is a free data retrieval call binding the contract method 0xf87059c1.
 //
-// Solidity: function nodeTokenAmount(address nodeAddr, uint256 idx) constant returns(uint256)
+// Solidity: function nodeTokenAmount(nodeAddr address, idx uint256) constant returns(uint256)
 func (_Dospayment *DospaymentCaller) NodeTokenAmount(opts *bind.CallOpts, nodeAddr common.Address, idx *big.Int) (*big.Int, error) {
 	var (
 		ret0 = new(*big.Int)
@@ -716,14 +704,14 @@ func (_Dospayment *DospaymentCaller) NodeTokenAmount(opts *bind.CallOpts, nodeAd
 
 // NodeTokenAmount is a free data retrieval call binding the contract method 0xf87059c1.
 //
-// Solidity: function nodeTokenAmount(address nodeAddr, uint256 idx) constant returns(uint256)
+// Solidity: function nodeTokenAmount(nodeAddr address, idx uint256) constant returns(uint256)
 func (_Dospayment *DospaymentSession) NodeTokenAmount(nodeAddr common.Address, idx *big.Int) (*big.Int, error) {
 	return _Dospayment.Contract.NodeTokenAmount(&_Dospayment.CallOpts, nodeAddr, idx)
 }
 
 // NodeTokenAmount is a free data retrieval call binding the contract method 0xf87059c1.
 //
-// Solidity: function nodeTokenAmount(address nodeAddr, uint256 idx) constant returns(uint256)
+// Solidity: function nodeTokenAmount(nodeAddr address, idx uint256) constant returns(uint256)
 func (_Dospayment *DospaymentCallerSession) NodeTokenAmount(nodeAddr common.Address, idx *big.Int) (*big.Int, error) {
 	return _Dospayment.Contract.NodeTokenAmount(&_Dospayment.CallOpts, nodeAddr, idx)
 }
@@ -756,7 +744,7 @@ func (_Dospayment *DospaymentCallerSession) Owner() (common.Address, error) {
 
 // PaymentInfo is a free data retrieval call binding the contract method 0x3157f16d.
 //
-// Solidity: function paymentInfo(uint256 requestID) constant returns(address, uint256)
+// Solidity: function paymentInfo(requestID uint256) constant returns(address, uint256)
 func (_Dospayment *DospaymentCaller) PaymentInfo(opts *bind.CallOpts, requestID *big.Int) (common.Address, *big.Int, error) {
 	var (
 		ret0 = new(common.Address)
@@ -772,98 +760,98 @@ func (_Dospayment *DospaymentCaller) PaymentInfo(opts *bind.CallOpts, requestID 
 
 // PaymentInfo is a free data retrieval call binding the contract method 0x3157f16d.
 //
-// Solidity: function paymentInfo(uint256 requestID) constant returns(address, uint256)
+// Solidity: function paymentInfo(requestID uint256) constant returns(address, uint256)
 func (_Dospayment *DospaymentSession) PaymentInfo(requestID *big.Int) (common.Address, *big.Int, error) {
 	return _Dospayment.Contract.PaymentInfo(&_Dospayment.CallOpts, requestID)
 }
 
 // PaymentInfo is a free data retrieval call binding the contract method 0x3157f16d.
 //
-// Solidity: function paymentInfo(uint256 requestID) constant returns(address, uint256)
+// Solidity: function paymentInfo(requestID uint256) constant returns(address, uint256)
 func (_Dospayment *DospaymentCallerSession) PaymentInfo(requestID *big.Int) (common.Address, *big.Int, error) {
 	return _Dospayment.Contract.PaymentInfo(&_Dospayment.CallOpts, requestID)
 }
 
 // ChargeServiceFee is a paid mutator transaction binding the contract method 0x7aa9181b.
 //
-// Solidity: function chargeServiceFee(address consumer, uint256 requestID, uint256 serviceType) returns()
+// Solidity: function chargeServiceFee(consumer address, requestID uint256, serviceType uint256) returns()
 func (_Dospayment *DospaymentTransactor) ChargeServiceFee(opts *bind.TransactOpts, consumer common.Address, requestID *big.Int, serviceType *big.Int) (*types.Transaction, error) {
 	return _Dospayment.contract.Transact(opts, "chargeServiceFee", consumer, requestID, serviceType)
 }
 
 // ChargeServiceFee is a paid mutator transaction binding the contract method 0x7aa9181b.
 //
-// Solidity: function chargeServiceFee(address consumer, uint256 requestID, uint256 serviceType) returns()
+// Solidity: function chargeServiceFee(consumer address, requestID uint256, serviceType uint256) returns()
 func (_Dospayment *DospaymentSession) ChargeServiceFee(consumer common.Address, requestID *big.Int, serviceType *big.Int) (*types.Transaction, error) {
 	return _Dospayment.Contract.ChargeServiceFee(&_Dospayment.TransactOpts, consumer, requestID, serviceType)
 }
 
 // ChargeServiceFee is a paid mutator transaction binding the contract method 0x7aa9181b.
 //
-// Solidity: function chargeServiceFee(address consumer, uint256 requestID, uint256 serviceType) returns()
+// Solidity: function chargeServiceFee(consumer address, requestID uint256, serviceType uint256) returns()
 func (_Dospayment *DospaymentTransactorSession) ChargeServiceFee(consumer common.Address, requestID *big.Int, serviceType *big.Int) (*types.Transaction, error) {
 	return _Dospayment.Contract.ChargeServiceFee(&_Dospayment.TransactOpts, consumer, requestID, serviceType)
 }
 
 // ClaimGuardianReward is a paid mutator transaction binding the contract method 0x23ff34cb.
 //
-// Solidity: function claimGuardianReward(address guardianAddr) returns()
+// Solidity: function claimGuardianReward(guardianAddr address) returns()
 func (_Dospayment *DospaymentTransactor) ClaimGuardianReward(opts *bind.TransactOpts, guardianAddr common.Address) (*types.Transaction, error) {
 	return _Dospayment.contract.Transact(opts, "claimGuardianReward", guardianAddr)
 }
 
 // ClaimGuardianReward is a paid mutator transaction binding the contract method 0x23ff34cb.
 //
-// Solidity: function claimGuardianReward(address guardianAddr) returns()
+// Solidity: function claimGuardianReward(guardianAddr address) returns()
 func (_Dospayment *DospaymentSession) ClaimGuardianReward(guardianAddr common.Address) (*types.Transaction, error) {
 	return _Dospayment.Contract.ClaimGuardianReward(&_Dospayment.TransactOpts, guardianAddr)
 }
 
 // ClaimGuardianReward is a paid mutator transaction binding the contract method 0x23ff34cb.
 //
-// Solidity: function claimGuardianReward(address guardianAddr) returns()
+// Solidity: function claimGuardianReward(guardianAddr address) returns()
 func (_Dospayment *DospaymentTransactorSession) ClaimGuardianReward(guardianAddr common.Address) (*types.Transaction, error) {
 	return _Dospayment.Contract.ClaimGuardianReward(&_Dospayment.TransactOpts, guardianAddr)
 }
 
 // ClaimServiceFee is a paid mutator transaction binding the contract method 0xfedb8b6a.
 //
-// Solidity: function claimServiceFee(uint256 requestID, address submitter, address[] workers) returns()
+// Solidity: function claimServiceFee(requestID uint256, submitter address, workers address[]) returns()
 func (_Dospayment *DospaymentTransactor) ClaimServiceFee(opts *bind.TransactOpts, requestID *big.Int, submitter common.Address, workers []common.Address) (*types.Transaction, error) {
 	return _Dospayment.contract.Transact(opts, "claimServiceFee", requestID, submitter, workers)
 }
 
 // ClaimServiceFee is a paid mutator transaction binding the contract method 0xfedb8b6a.
 //
-// Solidity: function claimServiceFee(uint256 requestID, address submitter, address[] workers) returns()
+// Solidity: function claimServiceFee(requestID uint256, submitter address, workers address[]) returns()
 func (_Dospayment *DospaymentSession) ClaimServiceFee(requestID *big.Int, submitter common.Address, workers []common.Address) (*types.Transaction, error) {
 	return _Dospayment.Contract.ClaimServiceFee(&_Dospayment.TransactOpts, requestID, submitter, workers)
 }
 
 // ClaimServiceFee is a paid mutator transaction binding the contract method 0xfedb8b6a.
 //
-// Solidity: function claimServiceFee(uint256 requestID, address submitter, address[] workers) returns()
+// Solidity: function claimServiceFee(requestID uint256, submitter address, workers address[]) returns()
 func (_Dospayment *DospaymentTransactorSession) ClaimServiceFee(requestID *big.Int, submitter common.Address, workers []common.Address) (*types.Transaction, error) {
 	return _Dospayment.Contract.ClaimServiceFee(&_Dospayment.TransactOpts, requestID, submitter, workers)
 }
 
 // RefundServiceFee is a paid mutator transaction binding the contract method 0x1efa5a98.
 //
-// Solidity: function refundServiceFee(uint256 requestID) returns()
+// Solidity: function refundServiceFee(requestID uint256) returns()
 func (_Dospayment *DospaymentTransactor) RefundServiceFee(opts *bind.TransactOpts, requestID *big.Int) (*types.Transaction, error) {
 	return _Dospayment.contract.Transact(opts, "refundServiceFee", requestID)
 }
 
 // RefundServiceFee is a paid mutator transaction binding the contract method 0x1efa5a98.
 //
-// Solidity: function refundServiceFee(uint256 requestID) returns()
+// Solidity: function refundServiceFee(requestID uint256) returns()
 func (_Dospayment *DospaymentSession) RefundServiceFee(requestID *big.Int) (*types.Transaction, error) {
 	return _Dospayment.Contract.RefundServiceFee(&_Dospayment.TransactOpts, requestID)
 }
 
 // RefundServiceFee is a paid mutator transaction binding the contract method 0x1efa5a98.
 //
-// Solidity: function refundServiceFee(uint256 requestID) returns()
+// Solidity: function refundServiceFee(requestID uint256) returns()
 func (_Dospayment *DospaymentTransactorSession) RefundServiceFee(requestID *big.Int) (*types.Transaction, error) {
 	return _Dospayment.Contract.RefundServiceFee(&_Dospayment.TransactOpts, requestID)
 }
@@ -891,126 +879,126 @@ func (_Dospayment *DospaymentTransactorSession) RenounceOwnership() (*types.Tran
 
 // SetFeeDividend is a paid mutator transaction binding the contract method 0xde439e9a.
 //
-// Solidity: function setFeeDividend(address tokenAddr, uint256 submitterRate, uint256 workerRate, uint256 denominator) returns()
+// Solidity: function setFeeDividend(tokenAddr address, submitterRate uint256, workerRate uint256, denominator uint256) returns()
 func (_Dospayment *DospaymentTransactor) SetFeeDividend(opts *bind.TransactOpts, tokenAddr common.Address, submitterRate *big.Int, workerRate *big.Int, denominator *big.Int) (*types.Transaction, error) {
 	return _Dospayment.contract.Transact(opts, "setFeeDividend", tokenAddr, submitterRate, workerRate, denominator)
 }
 
 // SetFeeDividend is a paid mutator transaction binding the contract method 0xde439e9a.
 //
-// Solidity: function setFeeDividend(address tokenAddr, uint256 submitterRate, uint256 workerRate, uint256 denominator) returns()
+// Solidity: function setFeeDividend(tokenAddr address, submitterRate uint256, workerRate uint256, denominator uint256) returns()
 func (_Dospayment *DospaymentSession) SetFeeDividend(tokenAddr common.Address, submitterRate *big.Int, workerRate *big.Int, denominator *big.Int) (*types.Transaction, error) {
 	return _Dospayment.Contract.SetFeeDividend(&_Dospayment.TransactOpts, tokenAddr, submitterRate, workerRate, denominator)
 }
 
 // SetFeeDividend is a paid mutator transaction binding the contract method 0xde439e9a.
 //
-// Solidity: function setFeeDividend(address tokenAddr, uint256 submitterRate, uint256 workerRate, uint256 denominator) returns()
+// Solidity: function setFeeDividend(tokenAddr address, submitterRate uint256, workerRate uint256, denominator uint256) returns()
 func (_Dospayment *DospaymentTransactorSession) SetFeeDividend(tokenAddr common.Address, submitterRate *big.Int, workerRate *big.Int, denominator *big.Int) (*types.Transaction, error) {
 	return _Dospayment.Contract.SetFeeDividend(&_Dospayment.TransactOpts, tokenAddr, submitterRate, workerRate, denominator)
 }
 
 // SetGuardianFee is a paid mutator transaction binding the contract method 0xeebede83.
 //
-// Solidity: function setGuardianFee(address tokenAddr, uint256 fee) returns()
+// Solidity: function setGuardianFee(tokenAddr address, fee uint256) returns()
 func (_Dospayment *DospaymentTransactor) SetGuardianFee(opts *bind.TransactOpts, tokenAddr common.Address, fee *big.Int) (*types.Transaction, error) {
 	return _Dospayment.contract.Transact(opts, "setGuardianFee", tokenAddr, fee)
 }
 
 // SetGuardianFee is a paid mutator transaction binding the contract method 0xeebede83.
 //
-// Solidity: function setGuardianFee(address tokenAddr, uint256 fee) returns()
+// Solidity: function setGuardianFee(tokenAddr address, fee uint256) returns()
 func (_Dospayment *DospaymentSession) SetGuardianFee(tokenAddr common.Address, fee *big.Int) (*types.Transaction, error) {
 	return _Dospayment.Contract.SetGuardianFee(&_Dospayment.TransactOpts, tokenAddr, fee)
 }
 
 // SetGuardianFee is a paid mutator transaction binding the contract method 0xeebede83.
 //
-// Solidity: function setGuardianFee(address tokenAddr, uint256 fee) returns()
+// Solidity: function setGuardianFee(tokenAddr address, fee uint256) returns()
 func (_Dospayment *DospaymentTransactorSession) SetGuardianFee(tokenAddr common.Address, fee *big.Int) (*types.Transaction, error) {
 	return _Dospayment.Contract.SetGuardianFee(&_Dospayment.TransactOpts, tokenAddr, fee)
 }
 
 // SetGuardianFunds is a paid mutator transaction binding the contract method 0x5a1fa503.
 //
-// Solidity: function setGuardianFunds(address fundsAddr, address tokenAddr) returns()
+// Solidity: function setGuardianFunds(fundsAddr address, tokenAddr address) returns()
 func (_Dospayment *DospaymentTransactor) SetGuardianFunds(opts *bind.TransactOpts, fundsAddr common.Address, tokenAddr common.Address) (*types.Transaction, error) {
 	return _Dospayment.contract.Transact(opts, "setGuardianFunds", fundsAddr, tokenAddr)
 }
 
 // SetGuardianFunds is a paid mutator transaction binding the contract method 0x5a1fa503.
 //
-// Solidity: function setGuardianFunds(address fundsAddr, address tokenAddr) returns()
+// Solidity: function setGuardianFunds(fundsAddr address, tokenAddr address) returns()
 func (_Dospayment *DospaymentSession) SetGuardianFunds(fundsAddr common.Address, tokenAddr common.Address) (*types.Transaction, error) {
 	return _Dospayment.Contract.SetGuardianFunds(&_Dospayment.TransactOpts, fundsAddr, tokenAddr)
 }
 
 // SetGuardianFunds is a paid mutator transaction binding the contract method 0x5a1fa503.
 //
-// Solidity: function setGuardianFunds(address fundsAddr, address tokenAddr) returns()
+// Solidity: function setGuardianFunds(fundsAddr address, tokenAddr address) returns()
 func (_Dospayment *DospaymentTransactorSession) SetGuardianFunds(fundsAddr common.Address, tokenAddr common.Address) (*types.Transaction, error) {
 	return _Dospayment.Contract.SetGuardianFunds(&_Dospayment.TransactOpts, fundsAddr, tokenAddr)
 }
 
 // SetPaymentMethod is a paid mutator transaction binding the contract method 0xb73a3f8f.
 //
-// Solidity: function setPaymentMethod(address consumer, address tokenAddr) returns()
+// Solidity: function setPaymentMethod(consumer address, tokenAddr address) returns()
 func (_Dospayment *DospaymentTransactor) SetPaymentMethod(opts *bind.TransactOpts, consumer common.Address, tokenAddr common.Address) (*types.Transaction, error) {
 	return _Dospayment.contract.Transact(opts, "setPaymentMethod", consumer, tokenAddr)
 }
 
 // SetPaymentMethod is a paid mutator transaction binding the contract method 0xb73a3f8f.
 //
-// Solidity: function setPaymentMethod(address consumer, address tokenAddr) returns()
+// Solidity: function setPaymentMethod(consumer address, tokenAddr address) returns()
 func (_Dospayment *DospaymentSession) SetPaymentMethod(consumer common.Address, tokenAddr common.Address) (*types.Transaction, error) {
 	return _Dospayment.Contract.SetPaymentMethod(&_Dospayment.TransactOpts, consumer, tokenAddr)
 }
 
 // SetPaymentMethod is a paid mutator transaction binding the contract method 0xb73a3f8f.
 //
-// Solidity: function setPaymentMethod(address consumer, address tokenAddr) returns()
+// Solidity: function setPaymentMethod(consumer address, tokenAddr address) returns()
 func (_Dospayment *DospaymentTransactorSession) SetPaymentMethod(consumer common.Address, tokenAddr common.Address) (*types.Transaction, error) {
 	return _Dospayment.Contract.SetPaymentMethod(&_Dospayment.TransactOpts, consumer, tokenAddr)
 }
 
 // SetServiceFee is a paid mutator transaction binding the contract method 0x3939c401.
 //
-// Solidity: function setServiceFee(address tokenAddr, uint256 serviceType, uint256 fee) returns()
+// Solidity: function setServiceFee(tokenAddr address, serviceType uint256, fee uint256) returns()
 func (_Dospayment *DospaymentTransactor) SetServiceFee(opts *bind.TransactOpts, tokenAddr common.Address, serviceType *big.Int, fee *big.Int) (*types.Transaction, error) {
 	return _Dospayment.contract.Transact(opts, "setServiceFee", tokenAddr, serviceType, fee)
 }
 
 // SetServiceFee is a paid mutator transaction binding the contract method 0x3939c401.
 //
-// Solidity: function setServiceFee(address tokenAddr, uint256 serviceType, uint256 fee) returns()
+// Solidity: function setServiceFee(tokenAddr address, serviceType uint256, fee uint256) returns()
 func (_Dospayment *DospaymentSession) SetServiceFee(tokenAddr common.Address, serviceType *big.Int, fee *big.Int) (*types.Transaction, error) {
 	return _Dospayment.Contract.SetServiceFee(&_Dospayment.TransactOpts, tokenAddr, serviceType, fee)
 }
 
 // SetServiceFee is a paid mutator transaction binding the contract method 0x3939c401.
 //
-// Solidity: function setServiceFee(address tokenAddr, uint256 serviceType, uint256 fee) returns()
+// Solidity: function setServiceFee(tokenAddr address, serviceType uint256, fee uint256) returns()
 func (_Dospayment *DospaymentTransactorSession) SetServiceFee(tokenAddr common.Address, serviceType *big.Int, fee *big.Int) (*types.Transaction, error) {
 	return _Dospayment.Contract.SetServiceFee(&_Dospayment.TransactOpts, tokenAddr, serviceType, fee)
 }
 
 // TransferOwnership is a paid mutator transaction binding the contract method 0xf2fde38b.
 //
-// Solidity: function transferOwnership(address newOwner) returns()
+// Solidity: function transferOwnership(newOwner address) returns()
 func (_Dospayment *DospaymentTransactor) TransferOwnership(opts *bind.TransactOpts, newOwner common.Address) (*types.Transaction, error) {
 	return _Dospayment.contract.Transact(opts, "transferOwnership", newOwner)
 }
 
 // TransferOwnership is a paid mutator transaction binding the contract method 0xf2fde38b.
 //
-// Solidity: function transferOwnership(address newOwner) returns()
+// Solidity: function transferOwnership(newOwner address) returns()
 func (_Dospayment *DospaymentSession) TransferOwnership(newOwner common.Address) (*types.Transaction, error) {
 	return _Dospayment.Contract.TransferOwnership(&_Dospayment.TransactOpts, newOwner)
 }
 
 // TransferOwnership is a paid mutator transaction binding the contract method 0xf2fde38b.
 //
-// Solidity: function transferOwnership(address newOwner) returns()
+// Solidity: function transferOwnership(newOwner address) returns()
 func (_Dospayment *DospaymentTransactorSession) TransferOwnership(newOwner common.Address) (*types.Transaction, error) {
 	return _Dospayment.Contract.TransferOwnership(&_Dospayment.TransactOpts, newOwner)
 }
@@ -1038,21 +1026,21 @@ func (_Dospayment *DospaymentTransactorSession) Withdraw() (*types.Transaction, 
 
 // WithdrawAll is a paid mutator transaction binding the contract method 0x958e2d31.
 //
-// Solidity: function withdrawAll(uint256 tokenAddr) returns()
+// Solidity: function withdrawAll(tokenAddr uint256) returns()
 func (_Dospayment *DospaymentTransactor) WithdrawAll(opts *bind.TransactOpts, tokenAddr *big.Int) (*types.Transaction, error) {
 	return _Dospayment.contract.Transact(opts, "withdrawAll", tokenAddr)
 }
 
 // WithdrawAll is a paid mutator transaction binding the contract method 0x958e2d31.
 //
-// Solidity: function withdrawAll(uint256 tokenAddr) returns()
+// Solidity: function withdrawAll(tokenAddr uint256) returns()
 func (_Dospayment *DospaymentSession) WithdrawAll(tokenAddr *big.Int) (*types.Transaction, error) {
 	return _Dospayment.Contract.WithdrawAll(&_Dospayment.TransactOpts, tokenAddr)
 }
 
 // WithdrawAll is a paid mutator transaction binding the contract method 0x958e2d31.
 //
-// Solidity: function withdrawAll(uint256 tokenAddr) returns()
+// Solidity: function withdrawAll(tokenAddr uint256) returns()
 func (_Dospayment *DospaymentTransactorSession) WithdrawAll(tokenAddr *big.Int) (*types.Transaction, error) {
 	return _Dospayment.Contract.WithdrawAll(&_Dospayment.TransactOpts, tokenAddr)
 }
@@ -1136,7 +1124,7 @@ type DospaymentLogChargeServiceFee struct {
 
 // FilterLogChargeServiceFee is a free log retrieval operation binding the contract event 0xa94e9ce5d0a7b76275efad947367b7999d9900f23bec1377d98f522ecad1b7ba.
 //
-// Solidity: event LogChargeServiceFee(address consumer, address tokenAddr, uint256 requestID, uint256 serviceType, uint256 fee)
+// Solidity: e LogChargeServiceFee(consumer address, tokenAddr address, requestID uint256, serviceType uint256, fee uint256)
 func (_Dospayment *DospaymentFilterer) FilterLogChargeServiceFee(opts *bind.FilterOpts) (*DospaymentLogChargeServiceFeeIterator, error) {
 
 	logs, sub, err := _Dospayment.contract.FilterLogs(opts, "LogChargeServiceFee")
@@ -1148,7 +1136,7 @@ func (_Dospayment *DospaymentFilterer) FilterLogChargeServiceFee(opts *bind.Filt
 
 // WatchLogChargeServiceFee is a free log subscription operation binding the contract event 0xa94e9ce5d0a7b76275efad947367b7999d9900f23bec1377d98f522ecad1b7ba.
 //
-// Solidity: event LogChargeServiceFee(address consumer, address tokenAddr, uint256 requestID, uint256 serviceType, uint256 fee)
+// Solidity: e LogChargeServiceFee(consumer address, tokenAddr address, requestID uint256, serviceType uint256, fee uint256)
 func (_Dospayment *DospaymentFilterer) WatchLogChargeServiceFee(opts *bind.WatchOpts, sink chan<- *DospaymentLogChargeServiceFee) (event.Subscription, error) {
 
 	logs, sub, err := _Dospayment.contract.WatchLogs(opts, "LogChargeServiceFee")
@@ -1261,7 +1249,7 @@ type DospaymentLogClaimGuardianFee struct {
 
 // FilterLogClaimGuardianFee is a free log retrieval operation binding the contract event 0x47ad88344c408450ef0ccab93ed97dd83af7a27dedfaa205c0725cfc4ca819cd.
 //
-// Solidity: event LogClaimGuardianFee(address nodeAddr, address tokenAddr, uint256 feeForSubmitter, address sender)
+// Solidity: e LogClaimGuardianFee(nodeAddr address, tokenAddr address, feeForSubmitter uint256, sender address)
 func (_Dospayment *DospaymentFilterer) FilterLogClaimGuardianFee(opts *bind.FilterOpts) (*DospaymentLogClaimGuardianFeeIterator, error) {
 
 	logs, sub, err := _Dospayment.contract.FilterLogs(opts, "LogClaimGuardianFee")
@@ -1273,7 +1261,7 @@ func (_Dospayment *DospaymentFilterer) FilterLogClaimGuardianFee(opts *bind.Filt
 
 // WatchLogClaimGuardianFee is a free log subscription operation binding the contract event 0x47ad88344c408450ef0ccab93ed97dd83af7a27dedfaa205c0725cfc4ca819cd.
 //
-// Solidity: event LogClaimGuardianFee(address nodeAddr, address tokenAddr, uint256 feeForSubmitter, address sender)
+// Solidity: e LogClaimGuardianFee(nodeAddr address, tokenAddr address, feeForSubmitter uint256, sender address)
 func (_Dospayment *DospaymentFilterer) WatchLogClaimGuardianFee(opts *bind.WatchOpts, sink chan<- *DospaymentLogClaimGuardianFee) (event.Subscription, error) {
 
 	logs, sub, err := _Dospayment.contract.WatchLogs(opts, "LogClaimGuardianFee")
@@ -1387,7 +1375,7 @@ type DospaymentLogClaimServiceFee struct {
 
 // FilterLogClaimServiceFee is a free log retrieval operation binding the contract event 0xab9fe896064c2c9dfd31acebc7d522b311e5f2e7d1b4965ac0cfd5a4abec813a.
 //
-// Solidity: event LogClaimServiceFee(address nodeAddr, address tokenAddr, uint256 requestID, uint256 serviceType, uint256 feeForSubmitter)
+// Solidity: e LogClaimServiceFee(nodeAddr address, tokenAddr address, requestID uint256, serviceType uint256, feeForSubmitter uint256)
 func (_Dospayment *DospaymentFilterer) FilterLogClaimServiceFee(opts *bind.FilterOpts) (*DospaymentLogClaimServiceFeeIterator, error) {
 
 	logs, sub, err := _Dospayment.contract.FilterLogs(opts, "LogClaimServiceFee")
@@ -1399,7 +1387,7 @@ func (_Dospayment *DospaymentFilterer) FilterLogClaimServiceFee(opts *bind.Filte
 
 // WatchLogClaimServiceFee is a free log subscription operation binding the contract event 0xab9fe896064c2c9dfd31acebc7d522b311e5f2e7d1b4965ac0cfd5a4abec813a.
 //
-// Solidity: event LogClaimServiceFee(address nodeAddr, address tokenAddr, uint256 requestID, uint256 serviceType, uint256 feeForSubmitter)
+// Solidity: e LogClaimServiceFee(nodeAddr address, tokenAddr address, requestID uint256, serviceType uint256, feeForSubmitter uint256)
 func (_Dospayment *DospaymentFilterer) WatchLogClaimServiceFee(opts *bind.WatchOpts, sink chan<- *DospaymentLogClaimServiceFee) (event.Subscription, error) {
 
 	logs, sub, err := _Dospayment.contract.WatchLogs(opts, "LogClaimServiceFee")
@@ -1513,7 +1501,7 @@ type DospaymentLogRefundServiceFee struct {
 
 // FilterLogRefundServiceFee is a free log retrieval operation binding the contract event 0xde0a5183bfc8c743f7b95ecaaf7815e8f82d8ae05ca1ade1eac1ff9d961a2eaa.
 //
-// Solidity: event LogRefundServiceFee(address consumer, address tokenAddr, uint256 requestID, uint256 serviceType, uint256 fee)
+// Solidity: e LogRefundServiceFee(consumer address, tokenAddr address, requestID uint256, serviceType uint256, fee uint256)
 func (_Dospayment *DospaymentFilterer) FilterLogRefundServiceFee(opts *bind.FilterOpts) (*DospaymentLogRefundServiceFeeIterator, error) {
 
 	logs, sub, err := _Dospayment.contract.FilterLogs(opts, "LogRefundServiceFee")
@@ -1525,7 +1513,7 @@ func (_Dospayment *DospaymentFilterer) FilterLogRefundServiceFee(opts *bind.Filt
 
 // WatchLogRefundServiceFee is a free log subscription operation binding the contract event 0xde0a5183bfc8c743f7b95ecaaf7815e8f82d8ae05ca1ade1eac1ff9d961a2eaa.
 //
-// Solidity: event LogRefundServiceFee(address consumer, address tokenAddr, uint256 requestID, uint256 serviceType, uint256 fee)
+// Solidity: e LogRefundServiceFee(consumer address, tokenAddr address, requestID uint256, serviceType uint256, fee uint256)
 func (_Dospayment *DospaymentFilterer) WatchLogRefundServiceFee(opts *bind.WatchOpts, sink chan<- *DospaymentLogRefundServiceFee) (event.Subscription, error) {
 
 	logs, sub, err := _Dospayment.contract.WatchLogs(opts, "LogRefundServiceFee")
@@ -1635,7 +1623,7 @@ type DospaymentOwnershipRenounced struct {
 
 // FilterOwnershipRenounced is a free log retrieval operation binding the contract event 0xf8df31144d9c2f0f6b59d69b8b98abd5459d07f2742c4df920b25aae33c64820.
 //
-// Solidity: event OwnershipRenounced(address indexed previousOwner)
+// Solidity: e OwnershipRenounced(previousOwner indexed address)
 func (_Dospayment *DospaymentFilterer) FilterOwnershipRenounced(opts *bind.FilterOpts, previousOwner []common.Address) (*DospaymentOwnershipRenouncedIterator, error) {
 
 	var previousOwnerRule []interface{}
@@ -1652,7 +1640,7 @@ func (_Dospayment *DospaymentFilterer) FilterOwnershipRenounced(opts *bind.Filte
 
 // WatchOwnershipRenounced is a free log subscription operation binding the contract event 0xf8df31144d9c2f0f6b59d69b8b98abd5459d07f2742c4df920b25aae33c64820.
 //
-// Solidity: event OwnershipRenounced(address indexed previousOwner)
+// Solidity: e OwnershipRenounced(previousOwner indexed address)
 func (_Dospayment *DospaymentFilterer) WatchOwnershipRenounced(opts *bind.WatchOpts, sink chan<- *DospaymentOwnershipRenounced, previousOwner []common.Address) (event.Subscription, error) {
 
 	var previousOwnerRule []interface{}
@@ -1768,7 +1756,7 @@ type DospaymentOwnershipTransferred struct {
 
 // FilterOwnershipTransferred is a free log retrieval operation binding the contract event 0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0.
 //
-// Solidity: event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)
+// Solidity: e OwnershipTransferred(previousOwner indexed address, newOwner indexed address)
 func (_Dospayment *DospaymentFilterer) FilterOwnershipTransferred(opts *bind.FilterOpts, previousOwner []common.Address, newOwner []common.Address) (*DospaymentOwnershipTransferredIterator, error) {
 
 	var previousOwnerRule []interface{}
@@ -1789,7 +1777,7 @@ func (_Dospayment *DospaymentFilterer) FilterOwnershipTransferred(opts *bind.Fil
 
 // WatchOwnershipTransferred is a free log subscription operation binding the contract event 0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0.
 //
-// Solidity: event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)
+// Solidity: e OwnershipTransferred(previousOwner indexed address, newOwner indexed address)
 func (_Dospayment *DospaymentFilterer) WatchOwnershipTransferred(opts *bind.WatchOpts, sink chan<- *DospaymentOwnershipTransferred, previousOwner []common.Address, newOwner []common.Address) (event.Subscription, error) {
 
 	var previousOwnerRule []interface{}
@@ -1909,7 +1897,7 @@ type DospaymentUpdateDropBurnTokenAddress struct {
 
 // FilterUpdateDropBurnTokenAddress is a free log retrieval operation binding the contract event 0xfc8013dfb0c8d38f3bcab9239bd5712457c48919b272cdb109488549199a0173.
 //
-// Solidity: event UpdateDropBurnTokenAddress(address oldAddress, address newAddress)
+// Solidity: e UpdateDropBurnTokenAddress(oldAddress address, newAddress address)
 func (_Dospayment *DospaymentFilterer) FilterUpdateDropBurnTokenAddress(opts *bind.FilterOpts) (*DospaymentUpdateDropBurnTokenAddressIterator, error) {
 
 	logs, sub, err := _Dospayment.contract.FilterLogs(opts, "UpdateDropBurnTokenAddress")
@@ -1921,7 +1909,7 @@ func (_Dospayment *DospaymentFilterer) FilterUpdateDropBurnTokenAddress(opts *bi
 
 // WatchUpdateDropBurnTokenAddress is a free log subscription operation binding the contract event 0xfc8013dfb0c8d38f3bcab9239bd5712457c48919b272cdb109488549199a0173.
 //
-// Solidity: event UpdateDropBurnTokenAddress(address oldAddress, address newAddress)
+// Solidity: e UpdateDropBurnTokenAddress(oldAddress address, newAddress address)
 func (_Dospayment *DospaymentFilterer) WatchUpdateDropBurnTokenAddress(opts *bind.WatchOpts, sink chan<- *DospaymentUpdateDropBurnTokenAddress) (event.Subscription, error) {
 
 	logs, sub, err := _Dospayment.contract.WatchLogs(opts, "UpdateDropBurnTokenAddress")
@@ -2032,7 +2020,7 @@ type DospaymentUpdateNetworkTokenAddress struct {
 
 // FilterUpdateNetworkTokenAddress is a free log retrieval operation binding the contract event 0x4d27a2adceae86b92fb74fb7e8f96dc902d917e243fbff389b5a793c9040dafe.
 //
-// Solidity: event UpdateNetworkTokenAddress(address oldAddress, address newAddress)
+// Solidity: e UpdateNetworkTokenAddress(oldAddress address, newAddress address)
 func (_Dospayment *DospaymentFilterer) FilterUpdateNetworkTokenAddress(opts *bind.FilterOpts) (*DospaymentUpdateNetworkTokenAddressIterator, error) {
 
 	logs, sub, err := _Dospayment.contract.FilterLogs(opts, "UpdateNetworkTokenAddress")
@@ -2044,7 +2032,7 @@ func (_Dospayment *DospaymentFilterer) FilterUpdateNetworkTokenAddress(opts *bin
 
 // WatchUpdateNetworkTokenAddress is a free log subscription operation binding the contract event 0x4d27a2adceae86b92fb74fb7e8f96dc902d917e243fbff389b5a793c9040dafe.
 //
-// Solidity: event UpdateNetworkTokenAddress(address oldAddress, address newAddress)
+// Solidity: e UpdateNetworkTokenAddress(oldAddress address, newAddress address)
 func (_Dospayment *DospaymentFilterer) WatchUpdateNetworkTokenAddress(opts *bind.WatchOpts, sink chan<- *DospaymentUpdateNetworkTokenAddress) (event.Subscription, error) {
 
 	logs, sub, err := _Dospayment.contract.WatchLogs(opts, "UpdateNetworkTokenAddress")
