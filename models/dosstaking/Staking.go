@@ -16,7 +16,7 @@ import (
 )
 
 // DosstakingABI is the input ABI used to generate the binding from.
-const DosstakingABI = "[{\"constant\":false,\"inputs\":[{\"name\":\"_tokenAmount\",\"type\":\"uint256\"},{\"name\":\"_nodeAddr\",\"type\":\"address\"}],\"name\":\"delegate\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"DOSTOKEN\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getNodeAddrs\",\"outputs\":[{\"name\":\"\",\"type\":\"address[]\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"address\"}],\"name\":\"nodes\",\"outputs\":[{\"name\":\"ownerAddr\",\"type\":\"address\"},{\"name\":\"rewardCut\",\"type\":\"uint256\"},{\"name\":\"stakedDB\",\"type\":\"uint256\"},{\"name\":\"selfStakedAmount\",\"type\":\"uint256\"},{\"name\":\"totalOtherDelegatedAmount\",\"type\":\"uint256\"},{\"name\":\"accumulatedReward\",\"type\":\"uint256\"},{\"name\":\"accumulatedRewardRate\",\"type\":\"uint256\"},{\"name\":\"pendingWithdrawToken\",\"type\":\"uint256\"},{\"name\":\"pendingWithdrawDB\",\"type\":\"uint256\"},{\"name\":\"lastStartTime\",\"type\":\"uint256\"},{\"name\":\"running\",\"type\":\"bool\"},{\"name\":\"description\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"accumulatedRewardRate\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ONEYEAR\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_nodeAddr\",\"type\":\"address\"}],\"name\":\"delegatorClaimReward\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_nodeAddr\",\"type\":\"address\"},{\"name\":\"_newTokenAmount\",\"type\":\"uint256\"},{\"name\":\"_newDropburnAmount\",\"type\":\"uint256\"},{\"name\":\"_newCut\",\"type\":\"uint256\"}],\"name\":\"updateNodeStaking\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getCurrentAPR\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"totalStakedTokens\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_quota\",\"type\":\"uint256\"}],\"name\":\"setDropBurnMaxQuota\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_nodeAddr\",\"type\":\"address\"}],\"name\":\"nodeStart\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_nodeAddr\",\"type\":\"address\"}],\"name\":\"nodeWithdraw\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_tokenAmount\",\"type\":\"uint256\"},{\"name\":\"_dropburnAmount\",\"type\":\"uint256\"},{\"name\":\"_nodeAddr\",\"type\":\"address\"}],\"name\":\"nodeUnbond\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"nodeAddr\",\"type\":\"address\"}],\"name\":\"getNodeRewardTokens\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_owner\",\"type\":\"address\"},{\"name\":\"_nodeAddr\",\"type\":\"address\"}],\"name\":\"delegatorWithdrawAble\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"rewardRateDelta\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"nodeAddr\",\"type\":\"address\"}],\"name\":\"getNodeUptime\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_owner\",\"type\":\"address\"},{\"name\":\"_nodeAddr\",\"type\":\"address\"}],\"name\":\"nodeWithdrawAble\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"},{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_nodeAddr\",\"type\":\"address\"},{\"name\":\"_tokenAmount\",\"type\":\"uint256\"},{\"name\":\"_dropburnAmount\",\"type\":\"uint256\"},{\"name\":\"_rewardCut\",\"type\":\"uint256\"},{\"name\":\"_desc\",\"type\":\"string\"}],\"name\":\"newNode\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_minStake\",\"type\":\"uint256\"}],\"name\":\"setMinStakePerNode\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"isOwner\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"bridgeAddr\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"DBDECIMAL\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"circulatingSupply\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"initBlkN\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_tokenAmount\",\"type\":\"uint256\"},{\"name\":\"_nodeAddr\",\"type\":\"address\"}],\"name\":\"delegatorUnbond\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"address\"},{\"name\":\"\",\"type\":\"address\"}],\"name\":\"delegators\",\"outputs\":[{\"name\":\"delegatedNode\",\"type\":\"address\"},{\"name\":\"delegatedAmount\",\"type\":\"uint256\"},{\"name\":\"accumulatedReward\",\"type\":\"uint256\"},{\"name\":\"accumulatedRewardRate\",\"type\":\"uint256\"},{\"name\":\"pendingWithdraw\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_nodeAddr\",\"type\":\"address\"}],\"name\":\"nodeUnregister\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"updateGlobalRewardRate\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"nodeAddr\",\"type\":\"address\"}],\"name\":\"isValidStakingNode\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_duration\",\"type\":\"uint256\"}],\"name\":\"setUnbondDuration\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_newSupply\",\"type\":\"uint256\"}],\"name\":\"setCirculatingSupply\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_nodeAddr\",\"type\":\"address\"}],\"name\":\"nodeClaimReward\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"nodeAddrs\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"address\"},{\"name\":\"\",\"type\":\"address\"}],\"name\":\"nodeRunners\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"lastRateUpdatedTime\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_nodeAddr\",\"type\":\"address\"}],\"name\":\"delegatorWithdraw\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"unbondDuration\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"DOSDECIMAL\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_nodeAddr\",\"type\":\"address\"}],\"name\":\"nodeStop\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"stakingRewardsVault\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_delegator\",\"type\":\"address\"},{\"name\":\"_nodeAddr\",\"type\":\"address\"}],\"name\":\"getDelegatorRewardTokens\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"DBTOKEN\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"minStakePerNode\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"dropburnMaxQuota\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"name\":\"_dostoken\",\"type\":\"address\"},{\"name\":\"_dbtoken\",\"type\":\"address\"},{\"name\":\"_vault\",\"type\":\"address\"},{\"name\":\"_bridgeAddr\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"oldQuota\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"newQuota\",\"type\":\"uint256\"}],\"name\":\"UpdateDropBurnMaxQuota\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"oldDuration\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"newDuration\",\"type\":\"uint256\"}],\"name\":\"UpdateUnbondDuration\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"oldCirculatingSupply\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"newCirculatingSupply\",\"type\":\"uint256\"}],\"name\":\"UpdateCirculatingSupply\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"oldMinStakePerNode\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"newMinStakePerNode\",\"type\":\"uint256\"}],\"name\":\"UpdateMinStakePerNode\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"owner\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"nodeAddress\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"selfStakedAmount\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"stakedDB\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"rewardCut\",\"type\":\"uint256\"}],\"name\":\"NewNode\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"from\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"Delegate\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"from\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"nodeRunner\",\"type\":\"bool\"},{\"indexed\":false,\"name\":\"tokenAmount\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"dbAmount\",\"type\":\"uint256\"}],\"name\":\"Withdraw\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"from\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"nodeRunner\",\"type\":\"bool\"},{\"indexed\":false,\"name\":\"tokenAmount\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"dropburnAmount\",\"type\":\"uint256\"}],\"name\":\"Unbond\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"nodeRunner\",\"type\":\"bool\"},{\"indexed\":false,\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"ClaimReward\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"previousOwner\",\"type\":\"address\"}],\"name\":\"OwnershipRenounced\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"}]"
+const DosstakingABI = "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_dostoken\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_dbtoken\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_vault\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_bridgeAddr\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"nodeRunner\",\"type\":\"bool\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"ClaimReward\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"Delegate\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"nodeAddress\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"selfStakedAmount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"stakedDB\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"rewardCut\",\"type\":\"uint256\"}],\"name\":\"NewNode\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"}],\"name\":\"OwnershipRenounced\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"nodeRunner\",\"type\":\"bool\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"tokenAmount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"dropburnAmount\",\"type\":\"uint256\"}],\"name\":\"Unbond\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"oldCirculatingSupply\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"newCirculatingSupply\",\"type\":\"uint256\"}],\"name\":\"UpdateCirculatingSupply\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"oldQuota\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"newQuota\",\"type\":\"uint256\"}],\"name\":\"UpdateDropBurnMaxQuota\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"oldMinStakePerNode\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"newMinStakePerNode\",\"type\":\"uint256\"}],\"name\":\"UpdateMinStakePerNode\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"oldDuration\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"newDuration\",\"type\":\"uint256\"}],\"name\":\"UpdateUnbondDuration\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"nodeRunner\",\"type\":\"bool\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"tokenAmount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"dbAmount\",\"type\":\"uint256\"}],\"name\":\"Withdraw\",\"type\":\"event\"},{\"constant\":true,\"inputs\":[],\"name\":\"DBDECIMAL\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"DBTOKEN\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"DOSDECIMAL\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"DOSTOKEN\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ONEYEAR\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"accumulatedRewardIndex\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"bridgeAddr\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"circulatingSupply\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_tokenAmount\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"_nodeAddr\",\"type\":\"address\"}],\"name\":\"delegate\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"_nodeAddr\",\"type\":\"address\"}],\"name\":\"delegatorClaimReward\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_tokenAmount\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"_nodeAddr\",\"type\":\"address\"}],\"name\":\"delegatorUnbond\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"_nodeAddr\",\"type\":\"address\"}],\"name\":\"delegatorWithdraw\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"address\",\"name\":\"_owner\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_nodeAddr\",\"type\":\"address\"}],\"name\":\"delegatorWithdrawable\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"delegators\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"delegatedNode\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"delegatedAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"accumulatedRewards\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"accumulatedRewardIndex\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"pendingWithdraw\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"dropburnMaxQuota\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getCurrentAPR\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"address\",\"name\":\"_delegator\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_nodeAddr\",\"type\":\"address\"}],\"name\":\"getDelegatorRewardTokensRT\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getNodeAddrs\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"address\",\"name\":\"_nodeAddr\",\"type\":\"address\"}],\"name\":\"getNodeRewardTokensRT\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"address\",\"name\":\"nodeAddr\",\"type\":\"address\"}],\"name\":\"getNodeUptime\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"initBlkN\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"isOwner\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"address\",\"name\":\"nodeAddr\",\"type\":\"address\"}],\"name\":\"isValidStakingNode\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"lastRateUpdatedTime\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"minStakePerNode\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"_nodeAddr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_tokenAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_dropburnAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardCut\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"_desc\",\"type\":\"string\"}],\"name\":\"newNode\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"nodeAddrs\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"_nodeAddr\",\"type\":\"address\"}],\"name\":\"nodeClaimReward\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"nodeRunners\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"_nodeAddr\",\"type\":\"address\"}],\"name\":\"nodeStart\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"_nodeAddr\",\"type\":\"address\"}],\"name\":\"nodeStop\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_tokenAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_dropburnAmount\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"_nodeAddr\",\"type\":\"address\"}],\"name\":\"nodeUnbond\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"_nodeAddr\",\"type\":\"address\"}],\"name\":\"nodeUnregister\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"_nodeAddr\",\"type\":\"address\"}],\"name\":\"nodeWithdraw\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"address\",\"name\":\"_owner\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_nodeAddr\",\"type\":\"address\"}],\"name\":\"nodeWithdrawable\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"nodes\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"ownerAddr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"rewardCut\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"stakedDB\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"selfStakedAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"totalOtherDelegatedAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"accumulatedRewards\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"accumulatedRewardIndex\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"pendingWithdrawToken\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"pendingWithdrawDB\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"lastStartTime\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"running\",\"type\":\"bool\"},{\"internalType\":\"string\",\"name\":\"description\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"rewardRateDelta\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_newSupply\",\"type\":\"uint256\"}],\"name\":\"setCirculatingSupply\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_quota\",\"type\":\"uint256\"}],\"name\":\"setDropBurnMaxQuota\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_minStake\",\"type\":\"uint256\"}],\"name\":\"setMinStakePerNode\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_duration\",\"type\":\"uint256\"}],\"name\":\"setUnbondDuration\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"stakingRewardsVault\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"totalStakedTokens\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"unbondDuration\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"updateGlobalRewardIndex\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"_nodeAddr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_newTokenAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_newDropburnAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_newCut\",\"type\":\"uint256\"}],\"name\":\"updateNodeStaking\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
 
 // Dosstaking is an auto generated Go binding around an Ethereum contract.
 type Dosstaking struct {
@@ -290,30 +290,30 @@ func (_Dosstaking *DosstakingCallerSession) ONEYEAR() (*big.Int, error) {
 	return _Dosstaking.Contract.ONEYEAR(&_Dosstaking.CallOpts)
 }
 
-// AccumulatedRewardRate is a free data retrieval call binding the contract method 0x193b9497.
+// AccumulatedRewardIndex is a free data retrieval call binding the contract method 0x37308854.
 //
-// Solidity: function accumulatedRewardRate() constant returns(uint256)
-func (_Dosstaking *DosstakingCaller) AccumulatedRewardRate(opts *bind.CallOpts) (*big.Int, error) {
+// Solidity: function accumulatedRewardIndex() constant returns(uint256)
+func (_Dosstaking *DosstakingCaller) AccumulatedRewardIndex(opts *bind.CallOpts) (*big.Int, error) {
 	var (
 		ret0 = new(*big.Int)
 	)
 	out := ret0
-	err := _Dosstaking.contract.Call(opts, out, "accumulatedRewardRate")
+	err := _Dosstaking.contract.Call(opts, out, "accumulatedRewardIndex")
 	return *ret0, err
 }
 
-// AccumulatedRewardRate is a free data retrieval call binding the contract method 0x193b9497.
+// AccumulatedRewardIndex is a free data retrieval call binding the contract method 0x37308854.
 //
-// Solidity: function accumulatedRewardRate() constant returns(uint256)
-func (_Dosstaking *DosstakingSession) AccumulatedRewardRate() (*big.Int, error) {
-	return _Dosstaking.Contract.AccumulatedRewardRate(&_Dosstaking.CallOpts)
+// Solidity: function accumulatedRewardIndex() constant returns(uint256)
+func (_Dosstaking *DosstakingSession) AccumulatedRewardIndex() (*big.Int, error) {
+	return _Dosstaking.Contract.AccumulatedRewardIndex(&_Dosstaking.CallOpts)
 }
 
-// AccumulatedRewardRate is a free data retrieval call binding the contract method 0x193b9497.
+// AccumulatedRewardIndex is a free data retrieval call binding the contract method 0x37308854.
 //
-// Solidity: function accumulatedRewardRate() constant returns(uint256)
-func (_Dosstaking *DosstakingCallerSession) AccumulatedRewardRate() (*big.Int, error) {
-	return _Dosstaking.Contract.AccumulatedRewardRate(&_Dosstaking.CallOpts)
+// Solidity: function accumulatedRewardIndex() constant returns(uint256)
+func (_Dosstaking *DosstakingCallerSession) AccumulatedRewardIndex() (*big.Int, error) {
+	return _Dosstaking.Contract.AccumulatedRewardIndex(&_Dosstaking.CallOpts)
 }
 
 // BridgeAddr is a free data retrieval call binding the contract method 0x91874ef7.
@@ -368,48 +368,48 @@ func (_Dosstaking *DosstakingCallerSession) CirculatingSupply() (*big.Int, error
 	return _Dosstaking.Contract.CirculatingSupply(&_Dosstaking.CallOpts)
 }
 
-// DelegatorWithdrawAble is a free data retrieval call binding the contract method 0x6b73b2b8.
+// DelegatorWithdrawable is a free data retrieval call binding the contract method 0x0bac06cb.
 //
-// Solidity: function delegatorWithdrawAble(_owner address, _nodeAddr address) constant returns(uint256)
-func (_Dosstaking *DosstakingCaller) DelegatorWithdrawAble(opts *bind.CallOpts, _owner common.Address, _nodeAddr common.Address) (*big.Int, error) {
+// Solidity: function delegatorWithdrawable(_owner address, _nodeAddr address) constant returns(uint256)
+func (_Dosstaking *DosstakingCaller) DelegatorWithdrawable(opts *bind.CallOpts, _owner common.Address, _nodeAddr common.Address) (*big.Int, error) {
 	var (
 		ret0 = new(*big.Int)
 	)
 	out := ret0
-	err := _Dosstaking.contract.Call(opts, out, "delegatorWithdrawAble", _owner, _nodeAddr)
+	err := _Dosstaking.contract.Call(opts, out, "delegatorWithdrawable", _owner, _nodeAddr)
 	return *ret0, err
 }
 
-// DelegatorWithdrawAble is a free data retrieval call binding the contract method 0x6b73b2b8.
+// DelegatorWithdrawable is a free data retrieval call binding the contract method 0x0bac06cb.
 //
-// Solidity: function delegatorWithdrawAble(_owner address, _nodeAddr address) constant returns(uint256)
-func (_Dosstaking *DosstakingSession) DelegatorWithdrawAble(_owner common.Address, _nodeAddr common.Address) (*big.Int, error) {
-	return _Dosstaking.Contract.DelegatorWithdrawAble(&_Dosstaking.CallOpts, _owner, _nodeAddr)
+// Solidity: function delegatorWithdrawable(_owner address, _nodeAddr address) constant returns(uint256)
+func (_Dosstaking *DosstakingSession) DelegatorWithdrawable(_owner common.Address, _nodeAddr common.Address) (*big.Int, error) {
+	return _Dosstaking.Contract.DelegatorWithdrawable(&_Dosstaking.CallOpts, _owner, _nodeAddr)
 }
 
-// DelegatorWithdrawAble is a free data retrieval call binding the contract method 0x6b73b2b8.
+// DelegatorWithdrawable is a free data retrieval call binding the contract method 0x0bac06cb.
 //
-// Solidity: function delegatorWithdrawAble(_owner address, _nodeAddr address) constant returns(uint256)
-func (_Dosstaking *DosstakingCallerSession) DelegatorWithdrawAble(_owner common.Address, _nodeAddr common.Address) (*big.Int, error) {
-	return _Dosstaking.Contract.DelegatorWithdrawAble(&_Dosstaking.CallOpts, _owner, _nodeAddr)
+// Solidity: function delegatorWithdrawable(_owner address, _nodeAddr address) constant returns(uint256)
+func (_Dosstaking *DosstakingCallerSession) DelegatorWithdrawable(_owner common.Address, _nodeAddr common.Address) (*big.Int, error) {
+	return _Dosstaking.Contract.DelegatorWithdrawable(&_Dosstaking.CallOpts, _owner, _nodeAddr)
 }
 
 // Delegators is a free data retrieval call binding the contract method 0xa2526bd3.
 //
-// Solidity: function delegators( address,  address) constant returns(delegatedNode address, delegatedAmount uint256, accumulatedReward uint256, accumulatedRewardRate uint256, pendingWithdraw uint256)
+// Solidity: function delegators( address,  address) constant returns(delegatedNode address, delegatedAmount uint256, accumulatedRewards uint256, accumulatedRewardIndex uint256, pendingWithdraw uint256)
 func (_Dosstaking *DosstakingCaller) Delegators(opts *bind.CallOpts, arg0 common.Address, arg1 common.Address) (struct {
-	DelegatedNode         common.Address
-	DelegatedAmount       *big.Int
-	AccumulatedReward     *big.Int
-	AccumulatedRewardRate *big.Int
-	PendingWithdraw       *big.Int
+	DelegatedNode          common.Address
+	DelegatedAmount        *big.Int
+	AccumulatedRewards     *big.Int
+	AccumulatedRewardIndex *big.Int
+	PendingWithdraw        *big.Int
 }, error) {
 	ret := new(struct {
-		DelegatedNode         common.Address
-		DelegatedAmount       *big.Int
-		AccumulatedReward     *big.Int
-		AccumulatedRewardRate *big.Int
-		PendingWithdraw       *big.Int
+		DelegatedNode          common.Address
+		DelegatedAmount        *big.Int
+		AccumulatedRewards     *big.Int
+		AccumulatedRewardIndex *big.Int
+		PendingWithdraw        *big.Int
 	})
 	out := ret
 	err := _Dosstaking.contract.Call(opts, out, "delegators", arg0, arg1)
@@ -418,26 +418,26 @@ func (_Dosstaking *DosstakingCaller) Delegators(opts *bind.CallOpts, arg0 common
 
 // Delegators is a free data retrieval call binding the contract method 0xa2526bd3.
 //
-// Solidity: function delegators( address,  address) constant returns(delegatedNode address, delegatedAmount uint256, accumulatedReward uint256, accumulatedRewardRate uint256, pendingWithdraw uint256)
+// Solidity: function delegators( address,  address) constant returns(delegatedNode address, delegatedAmount uint256, accumulatedRewards uint256, accumulatedRewardIndex uint256, pendingWithdraw uint256)
 func (_Dosstaking *DosstakingSession) Delegators(arg0 common.Address, arg1 common.Address) (struct {
-	DelegatedNode         common.Address
-	DelegatedAmount       *big.Int
-	AccumulatedReward     *big.Int
-	AccumulatedRewardRate *big.Int
-	PendingWithdraw       *big.Int
+	DelegatedNode          common.Address
+	DelegatedAmount        *big.Int
+	AccumulatedRewards     *big.Int
+	AccumulatedRewardIndex *big.Int
+	PendingWithdraw        *big.Int
 }, error) {
 	return _Dosstaking.Contract.Delegators(&_Dosstaking.CallOpts, arg0, arg1)
 }
 
 // Delegators is a free data retrieval call binding the contract method 0xa2526bd3.
 //
-// Solidity: function delegators( address,  address) constant returns(delegatedNode address, delegatedAmount uint256, accumulatedReward uint256, accumulatedRewardRate uint256, pendingWithdraw uint256)
+// Solidity: function delegators( address,  address) constant returns(delegatedNode address, delegatedAmount uint256, accumulatedRewards uint256, accumulatedRewardIndex uint256, pendingWithdraw uint256)
 func (_Dosstaking *DosstakingCallerSession) Delegators(arg0 common.Address, arg1 common.Address) (struct {
-	DelegatedNode         common.Address
-	DelegatedAmount       *big.Int
-	AccumulatedReward     *big.Int
-	AccumulatedRewardRate *big.Int
-	PendingWithdraw       *big.Int
+	DelegatedNode          common.Address
+	DelegatedAmount        *big.Int
+	AccumulatedRewards     *big.Int
+	AccumulatedRewardIndex *big.Int
+	PendingWithdraw        *big.Int
 }, error) {
 	return _Dosstaking.Contract.Delegators(&_Dosstaking.CallOpts, arg0, arg1)
 }
@@ -494,30 +494,30 @@ func (_Dosstaking *DosstakingCallerSession) GetCurrentAPR() (*big.Int, error) {
 	return _Dosstaking.Contract.GetCurrentAPR(&_Dosstaking.CallOpts)
 }
 
-// GetDelegatorRewardTokens is a free data retrieval call binding the contract method 0xd0e301f0.
+// GetDelegatorRewardTokensRT is a free data retrieval call binding the contract method 0xfb7f2488.
 //
-// Solidity: function getDelegatorRewardTokens(_delegator address, _nodeAddr address) constant returns(uint256)
-func (_Dosstaking *DosstakingCaller) GetDelegatorRewardTokens(opts *bind.CallOpts, _delegator common.Address, _nodeAddr common.Address) (*big.Int, error) {
+// Solidity: function getDelegatorRewardTokensRT(_delegator address, _nodeAddr address) constant returns(uint256)
+func (_Dosstaking *DosstakingCaller) GetDelegatorRewardTokensRT(opts *bind.CallOpts, _delegator common.Address, _nodeAddr common.Address) (*big.Int, error) {
 	var (
 		ret0 = new(*big.Int)
 	)
 	out := ret0
-	err := _Dosstaking.contract.Call(opts, out, "getDelegatorRewardTokens", _delegator, _nodeAddr)
+	err := _Dosstaking.contract.Call(opts, out, "getDelegatorRewardTokensRT", _delegator, _nodeAddr)
 	return *ret0, err
 }
 
-// GetDelegatorRewardTokens is a free data retrieval call binding the contract method 0xd0e301f0.
+// GetDelegatorRewardTokensRT is a free data retrieval call binding the contract method 0xfb7f2488.
 //
-// Solidity: function getDelegatorRewardTokens(_delegator address, _nodeAddr address) constant returns(uint256)
-func (_Dosstaking *DosstakingSession) GetDelegatorRewardTokens(_delegator common.Address, _nodeAddr common.Address) (*big.Int, error) {
-	return _Dosstaking.Contract.GetDelegatorRewardTokens(&_Dosstaking.CallOpts, _delegator, _nodeAddr)
+// Solidity: function getDelegatorRewardTokensRT(_delegator address, _nodeAddr address) constant returns(uint256)
+func (_Dosstaking *DosstakingSession) GetDelegatorRewardTokensRT(_delegator common.Address, _nodeAddr common.Address) (*big.Int, error) {
+	return _Dosstaking.Contract.GetDelegatorRewardTokensRT(&_Dosstaking.CallOpts, _delegator, _nodeAddr)
 }
 
-// GetDelegatorRewardTokens is a free data retrieval call binding the contract method 0xd0e301f0.
+// GetDelegatorRewardTokensRT is a free data retrieval call binding the contract method 0xfb7f2488.
 //
-// Solidity: function getDelegatorRewardTokens(_delegator address, _nodeAddr address) constant returns(uint256)
-func (_Dosstaking *DosstakingCallerSession) GetDelegatorRewardTokens(_delegator common.Address, _nodeAddr common.Address) (*big.Int, error) {
-	return _Dosstaking.Contract.GetDelegatorRewardTokens(&_Dosstaking.CallOpts, _delegator, _nodeAddr)
+// Solidity: function getDelegatorRewardTokensRT(_delegator address, _nodeAddr address) constant returns(uint256)
+func (_Dosstaking *DosstakingCallerSession) GetDelegatorRewardTokensRT(_delegator common.Address, _nodeAddr common.Address) (*big.Int, error) {
+	return _Dosstaking.Contract.GetDelegatorRewardTokensRT(&_Dosstaking.CallOpts, _delegator, _nodeAddr)
 }
 
 // GetNodeAddrs is a free data retrieval call binding the contract method 0x1017bf56.
@@ -546,30 +546,30 @@ func (_Dosstaking *DosstakingCallerSession) GetNodeAddrs() ([]common.Address, er
 	return _Dosstaking.Contract.GetNodeAddrs(&_Dosstaking.CallOpts)
 }
 
-// GetNodeRewardTokens is a free data retrieval call binding the contract method 0x5bfd61d4.
+// GetNodeRewardTokensRT is a free data retrieval call binding the contract method 0x4d0b5ea9.
 //
-// Solidity: function getNodeRewardTokens(nodeAddr address) constant returns(uint256)
-func (_Dosstaking *DosstakingCaller) GetNodeRewardTokens(opts *bind.CallOpts, nodeAddr common.Address) (*big.Int, error) {
+// Solidity: function getNodeRewardTokensRT(_nodeAddr address) constant returns(uint256)
+func (_Dosstaking *DosstakingCaller) GetNodeRewardTokensRT(opts *bind.CallOpts, _nodeAddr common.Address) (*big.Int, error) {
 	var (
 		ret0 = new(*big.Int)
 	)
 	out := ret0
-	err := _Dosstaking.contract.Call(opts, out, "getNodeRewardTokens", nodeAddr)
+	err := _Dosstaking.contract.Call(opts, out, "getNodeRewardTokensRT", _nodeAddr)
 	return *ret0, err
 }
 
-// GetNodeRewardTokens is a free data retrieval call binding the contract method 0x5bfd61d4.
+// GetNodeRewardTokensRT is a free data retrieval call binding the contract method 0x4d0b5ea9.
 //
-// Solidity: function getNodeRewardTokens(nodeAddr address) constant returns(uint256)
-func (_Dosstaking *DosstakingSession) GetNodeRewardTokens(nodeAddr common.Address) (*big.Int, error) {
-	return _Dosstaking.Contract.GetNodeRewardTokens(&_Dosstaking.CallOpts, nodeAddr)
+// Solidity: function getNodeRewardTokensRT(_nodeAddr address) constant returns(uint256)
+func (_Dosstaking *DosstakingSession) GetNodeRewardTokensRT(_nodeAddr common.Address) (*big.Int, error) {
+	return _Dosstaking.Contract.GetNodeRewardTokensRT(&_Dosstaking.CallOpts, _nodeAddr)
 }
 
-// GetNodeRewardTokens is a free data retrieval call binding the contract method 0x5bfd61d4.
+// GetNodeRewardTokensRT is a free data retrieval call binding the contract method 0x4d0b5ea9.
 //
-// Solidity: function getNodeRewardTokens(nodeAddr address) constant returns(uint256)
-func (_Dosstaking *DosstakingCallerSession) GetNodeRewardTokens(nodeAddr common.Address) (*big.Int, error) {
-	return _Dosstaking.Contract.GetNodeRewardTokens(&_Dosstaking.CallOpts, nodeAddr)
+// Solidity: function getNodeRewardTokensRT(_nodeAddr address) constant returns(uint256)
+func (_Dosstaking *DosstakingCallerSession) GetNodeRewardTokensRT(_nodeAddr common.Address) (*big.Int, error) {
+	return _Dosstaking.Contract.GetNodeRewardTokensRT(&_Dosstaking.CallOpts, _nodeAddr)
 }
 
 // GetNodeUptime is a free data retrieval call binding the contract method 0x7f92ca19.
@@ -780,10 +780,10 @@ func (_Dosstaking *DosstakingCallerSession) NodeRunners(arg0 common.Address, arg
 	return _Dosstaking.Contract.NodeRunners(&_Dosstaking.CallOpts, arg0, arg1)
 }
 
-// NodeWithdrawAble is a free data retrieval call binding the contract method 0x857d9e41.
+// NodeWithdrawable is a free data retrieval call binding the contract method 0x70841a0b.
 //
-// Solidity: function nodeWithdrawAble(_owner address, _nodeAddr address) constant returns(uint256, uint256)
-func (_Dosstaking *DosstakingCaller) NodeWithdrawAble(opts *bind.CallOpts, _owner common.Address, _nodeAddr common.Address) (*big.Int, *big.Int, error) {
+// Solidity: function nodeWithdrawable(_owner address, _nodeAddr address) constant returns(uint256, uint256)
+func (_Dosstaking *DosstakingCaller) NodeWithdrawable(opts *bind.CallOpts, _owner common.Address, _nodeAddr common.Address) (*big.Int, *big.Int, error) {
 	var (
 		ret0 = new(*big.Int)
 		ret1 = new(*big.Int)
@@ -792,35 +792,35 @@ func (_Dosstaking *DosstakingCaller) NodeWithdrawAble(opts *bind.CallOpts, _owne
 		ret0,
 		ret1,
 	}
-	err := _Dosstaking.contract.Call(opts, out, "nodeWithdrawAble", _owner, _nodeAddr)
+	err := _Dosstaking.contract.Call(opts, out, "nodeWithdrawable", _owner, _nodeAddr)
 	return *ret0, *ret1, err
 }
 
-// NodeWithdrawAble is a free data retrieval call binding the contract method 0x857d9e41.
+// NodeWithdrawable is a free data retrieval call binding the contract method 0x70841a0b.
 //
-// Solidity: function nodeWithdrawAble(_owner address, _nodeAddr address) constant returns(uint256, uint256)
-func (_Dosstaking *DosstakingSession) NodeWithdrawAble(_owner common.Address, _nodeAddr common.Address) (*big.Int, *big.Int, error) {
-	return _Dosstaking.Contract.NodeWithdrawAble(&_Dosstaking.CallOpts, _owner, _nodeAddr)
+// Solidity: function nodeWithdrawable(_owner address, _nodeAddr address) constant returns(uint256, uint256)
+func (_Dosstaking *DosstakingSession) NodeWithdrawable(_owner common.Address, _nodeAddr common.Address) (*big.Int, *big.Int, error) {
+	return _Dosstaking.Contract.NodeWithdrawable(&_Dosstaking.CallOpts, _owner, _nodeAddr)
 }
 
-// NodeWithdrawAble is a free data retrieval call binding the contract method 0x857d9e41.
+// NodeWithdrawable is a free data retrieval call binding the contract method 0x70841a0b.
 //
-// Solidity: function nodeWithdrawAble(_owner address, _nodeAddr address) constant returns(uint256, uint256)
-func (_Dosstaking *DosstakingCallerSession) NodeWithdrawAble(_owner common.Address, _nodeAddr common.Address) (*big.Int, *big.Int, error) {
-	return _Dosstaking.Contract.NodeWithdrawAble(&_Dosstaking.CallOpts, _owner, _nodeAddr)
+// Solidity: function nodeWithdrawable(_owner address, _nodeAddr address) constant returns(uint256, uint256)
+func (_Dosstaking *DosstakingCallerSession) NodeWithdrawable(_owner common.Address, _nodeAddr common.Address) (*big.Int, *big.Int, error) {
+	return _Dosstaking.Contract.NodeWithdrawable(&_Dosstaking.CallOpts, _owner, _nodeAddr)
 }
 
 // Nodes is a free data retrieval call binding the contract method 0x189a5a17.
 //
-// Solidity: function nodes( address) constant returns(ownerAddr address, rewardCut uint256, stakedDB uint256, selfStakedAmount uint256, totalOtherDelegatedAmount uint256, accumulatedReward uint256, accumulatedRewardRate uint256, pendingWithdrawToken uint256, pendingWithdrawDB uint256, lastStartTime uint256, running bool, description string)
+// Solidity: function nodes( address) constant returns(ownerAddr address, rewardCut uint256, stakedDB uint256, selfStakedAmount uint256, totalOtherDelegatedAmount uint256, accumulatedRewards uint256, accumulatedRewardIndex uint256, pendingWithdrawToken uint256, pendingWithdrawDB uint256, lastStartTime uint256, running bool, description string)
 func (_Dosstaking *DosstakingCaller) Nodes(opts *bind.CallOpts, arg0 common.Address) (struct {
 	OwnerAddr                 common.Address
 	RewardCut                 *big.Int
 	StakedDB                  *big.Int
 	SelfStakedAmount          *big.Int
 	TotalOtherDelegatedAmount *big.Int
-	AccumulatedReward         *big.Int
-	AccumulatedRewardRate     *big.Int
+	AccumulatedRewards        *big.Int
+	AccumulatedRewardIndex    *big.Int
 	PendingWithdrawToken      *big.Int
 	PendingWithdrawDB         *big.Int
 	LastStartTime             *big.Int
@@ -833,8 +833,8 @@ func (_Dosstaking *DosstakingCaller) Nodes(opts *bind.CallOpts, arg0 common.Addr
 		StakedDB                  *big.Int
 		SelfStakedAmount          *big.Int
 		TotalOtherDelegatedAmount *big.Int
-		AccumulatedReward         *big.Int
-		AccumulatedRewardRate     *big.Int
+		AccumulatedRewards        *big.Int
+		AccumulatedRewardIndex    *big.Int
 		PendingWithdrawToken      *big.Int
 		PendingWithdrawDB         *big.Int
 		LastStartTime             *big.Int
@@ -848,15 +848,15 @@ func (_Dosstaking *DosstakingCaller) Nodes(opts *bind.CallOpts, arg0 common.Addr
 
 // Nodes is a free data retrieval call binding the contract method 0x189a5a17.
 //
-// Solidity: function nodes( address) constant returns(ownerAddr address, rewardCut uint256, stakedDB uint256, selfStakedAmount uint256, totalOtherDelegatedAmount uint256, accumulatedReward uint256, accumulatedRewardRate uint256, pendingWithdrawToken uint256, pendingWithdrawDB uint256, lastStartTime uint256, running bool, description string)
+// Solidity: function nodes( address) constant returns(ownerAddr address, rewardCut uint256, stakedDB uint256, selfStakedAmount uint256, totalOtherDelegatedAmount uint256, accumulatedRewards uint256, accumulatedRewardIndex uint256, pendingWithdrawToken uint256, pendingWithdrawDB uint256, lastStartTime uint256, running bool, description string)
 func (_Dosstaking *DosstakingSession) Nodes(arg0 common.Address) (struct {
 	OwnerAddr                 common.Address
 	RewardCut                 *big.Int
 	StakedDB                  *big.Int
 	SelfStakedAmount          *big.Int
 	TotalOtherDelegatedAmount *big.Int
-	AccumulatedReward         *big.Int
-	AccumulatedRewardRate     *big.Int
+	AccumulatedRewards        *big.Int
+	AccumulatedRewardIndex    *big.Int
 	PendingWithdrawToken      *big.Int
 	PendingWithdrawDB         *big.Int
 	LastStartTime             *big.Int
@@ -868,15 +868,15 @@ func (_Dosstaking *DosstakingSession) Nodes(arg0 common.Address) (struct {
 
 // Nodes is a free data retrieval call binding the contract method 0x189a5a17.
 //
-// Solidity: function nodes( address) constant returns(ownerAddr address, rewardCut uint256, stakedDB uint256, selfStakedAmount uint256, totalOtherDelegatedAmount uint256, accumulatedReward uint256, accumulatedRewardRate uint256, pendingWithdrawToken uint256, pendingWithdrawDB uint256, lastStartTime uint256, running bool, description string)
+// Solidity: function nodes( address) constant returns(ownerAddr address, rewardCut uint256, stakedDB uint256, selfStakedAmount uint256, totalOtherDelegatedAmount uint256, accumulatedRewards uint256, accumulatedRewardIndex uint256, pendingWithdrawToken uint256, pendingWithdrawDB uint256, lastStartTime uint256, running bool, description string)
 func (_Dosstaking *DosstakingCallerSession) Nodes(arg0 common.Address) (struct {
 	OwnerAddr                 common.Address
 	RewardCut                 *big.Int
 	StakedDB                  *big.Int
 	SelfStakedAmount          *big.Int
 	TotalOtherDelegatedAmount *big.Int
-	AccumulatedReward         *big.Int
-	AccumulatedRewardRate     *big.Int
+	AccumulatedRewards        *big.Int
+	AccumulatedRewardIndex    *big.Int
 	PendingWithdrawToken      *big.Int
 	PendingWithdrawDB         *big.Int
 	LastStartTime             *big.Int
@@ -1373,25 +1373,25 @@ func (_Dosstaking *DosstakingTransactorSession) TransferOwnership(newOwner commo
 	return _Dosstaking.Contract.TransferOwnership(&_Dosstaking.TransactOpts, newOwner)
 }
 
-// UpdateGlobalRewardRate is a paid mutator transaction binding the contract method 0xa5e5b55e.
+// UpdateGlobalRewardIndex is a paid mutator transaction binding the contract method 0xcb47b341.
 //
-// Solidity: function updateGlobalRewardRate() returns()
-func (_Dosstaking *DosstakingTransactor) UpdateGlobalRewardRate(opts *bind.TransactOpts) (*types.Transaction, error) {
-	return _Dosstaking.contract.Transact(opts, "updateGlobalRewardRate")
+// Solidity: function updateGlobalRewardIndex() returns()
+func (_Dosstaking *DosstakingTransactor) UpdateGlobalRewardIndex(opts *bind.TransactOpts) (*types.Transaction, error) {
+	return _Dosstaking.contract.Transact(opts, "updateGlobalRewardIndex")
 }
 
-// UpdateGlobalRewardRate is a paid mutator transaction binding the contract method 0xa5e5b55e.
+// UpdateGlobalRewardIndex is a paid mutator transaction binding the contract method 0xcb47b341.
 //
-// Solidity: function updateGlobalRewardRate() returns()
-func (_Dosstaking *DosstakingSession) UpdateGlobalRewardRate() (*types.Transaction, error) {
-	return _Dosstaking.Contract.UpdateGlobalRewardRate(&_Dosstaking.TransactOpts)
+// Solidity: function updateGlobalRewardIndex() returns()
+func (_Dosstaking *DosstakingSession) UpdateGlobalRewardIndex() (*types.Transaction, error) {
+	return _Dosstaking.Contract.UpdateGlobalRewardIndex(&_Dosstaking.TransactOpts)
 }
 
-// UpdateGlobalRewardRate is a paid mutator transaction binding the contract method 0xa5e5b55e.
+// UpdateGlobalRewardIndex is a paid mutator transaction binding the contract method 0xcb47b341.
 //
-// Solidity: function updateGlobalRewardRate() returns()
-func (_Dosstaking *DosstakingTransactorSession) UpdateGlobalRewardRate() (*types.Transaction, error) {
-	return _Dosstaking.Contract.UpdateGlobalRewardRate(&_Dosstaking.TransactOpts)
+// Solidity: function updateGlobalRewardIndex() returns()
+func (_Dosstaking *DosstakingTransactorSession) UpdateGlobalRewardIndex() (*types.Transaction, error) {
+	return _Dosstaking.Contract.UpdateGlobalRewardIndex(&_Dosstaking.TransactOpts)
 }
 
 // UpdateNodeStaking is a paid mutator transaction binding the contract method 0x1ece5950.
