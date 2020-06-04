@@ -24,11 +24,11 @@ ifeq ($(GETHURL),)
 endif
 
 build:
-	go build -o subsciber subscriber/main.go
-	go build -o server server/main.go
+	go build -o subscriber/subscriber subscriber/main.go
+	go build -o server/server server/main.go
 
 clean:
+	rm subscriber/subscriber
+	rm server/server
 	dropdb dev
 	createdb dev
-	rm subsciber
-	rm server

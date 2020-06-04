@@ -694,7 +694,7 @@ var fetchTable = []func(ctx context.Context, fromBlock, toBlock uint64, blockLim
 				if nextBlk-fromBlock > blockLimit {
 					nextBlk = fromBlock + blockLimit
 				}
-				logs, err := filter.FilterGuardianReward(&bind.FilterOpts{Start: fromBlock, End: &nextBlk, Context: ctx}, nil)
+				logs, err := filter.FilterGuardianReward(&bind.FilterOpts{Start: fromBlock, End: &nextBlk, Context: ctx})
 				if err != nil {
 					err = errors.Errorf("fetchTable : %w", err)
 					reportErr(ctx, errc, err)

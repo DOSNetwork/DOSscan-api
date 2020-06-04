@@ -221,9 +221,8 @@ type LogInsufficientWorkingGroup struct {
 type LogGroupingInitiated struct {
 	gorm.Model
 	Event
-	PendingNodePool   uint64 `json:"pendingNodePool"`
-	GroupSize         uint64 `json:"groupSize"`
-	GroupingThreshold uint64 `json:"groupingThreshold"`
+	PendingNodePool uint64 `json:"pendingNodePool"`
+	GroupSize       uint64 `json:"groupSize"`
 }
 
 type LogNoPendingGroup struct {
