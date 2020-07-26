@@ -21,7 +21,7 @@ type Transformer struct {
 	modelsTypes   []int
 }
 
-func lastBlcokNum(ctx context.Context, dbRepo repository.DB, modelsTypes []int) (lastBlk uint64) {
+func lastBlockNum(ctx context.Context, dbRepo repository.DB, modelsTypes []int) (lastBlk uint64) {
 	for _, mType := range modelsTypes {
 		blkNum, err := dbRepo.LastBlockNum(ctx, mType)
 		if err != nil {
@@ -34,7 +34,7 @@ func lastBlcokNum(ctx context.Context, dbRepo repository.DB, modelsTypes []int) 
 			lastBlk = blkNum
 		}
 	}
-	fmt.Println("lastBlcokNum ", lastBlk)
+	fmt.Println("lastBlockNum ", lastBlk)
 	return
 }
 
@@ -46,8 +46,8 @@ func NewTransformer(onchainRepo repository.Onchain, dbRepo repository.DB, models
 		modelsTypes:   modelsTypes,
 	}
 
-	if lastBlk := lastBlcokNum(context.Background(), dbRepo, modelsTypes); lastBlk != 0 {
-		if t.updatedBlknum > lastBlk {
+	if lastBlk := lastBlockNum(context.Background(), dbRepo, modelsTypes); lastBlk != 0 {
+		if t.updatedBlknum < lastBlk {
 			t.updatedBlknum = lastBlk
 		}
 	}
