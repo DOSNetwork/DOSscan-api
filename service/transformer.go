@@ -79,14 +79,19 @@ func (t *Transformer) FetchHistoricalLog(ctx context.Context, modelType int, toB
 }
 func (t *Transformer) FetchHistoricalLogs(ctx context.Context) (err error) {
 	//	var errcList []<-chan error
-	toBlock, err := t.onchainRepo.CurrentBlockNum(ctx)
+	curBlock, err := t.onchainRepo.CurrentBlockNum(ctx)
 	if err != nil {
 		fmt.Println("Transformer err ", err)
 		return
 	}
-	if toBlock-t.updatedBlknum > logsLimit {
+	toBlock := curBlock
+	// If chain reorg happens then updates updatedBlknum to the current block number
+	if curBlock < t.updatedBlknum {
+		t.updatedBlknum = curBlock
+	} else if toBlock-t.updatedBlknum > logsLimit {
 		toBlock = t.updatedBlknum + logsLimit
 	}
+	fmt.Println("FetchHistoricalLogs current blknum", curBlock, "from ", t.updatedBlknum, " to ", toBlock)
 	err = t.FetchHistoricalLog(ctx, _models.TypeNewPendingNode, toBlock)
 	if err != nil {
 		return
