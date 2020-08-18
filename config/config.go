@@ -10,14 +10,15 @@ import (
 )
 
 type Config struct {
-	DB_IP         string
-	DB_PORT       string
-	DB_USER       string
-	DB_PASSWORD   string
-	DB_NAME       string
-	BRIDGE_ADDR   string
-	BootStrapIPs  []string
-	ChainNodePool []string
+	DB_IP               string
+	DB_PORT             string
+	DB_USER             string
+	DB_PASSWORD         string
+	DB_NAME             string
+	BRIDGE_ADDR         string
+	BootStrapIPs        []string
+	RinkebyBootStrapIPs []string
+	ChainNodePool       []string
 }
 
 // LoadConfig loads configuration file from path.

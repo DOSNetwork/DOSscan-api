@@ -5,9 +5,8 @@
     "DB_PASSWORD": "postgres",
     "DB_NAME": "mainnet",
     "BRIDGE_ADDR": "0x98A0E7026778840Aacd28B9c03137D32e06F5ff1",
-    "ChainNodePool": [
-        "https://mainnet.infura.io/v3/917eab7f24e645509c93f104186522e5",
-        "https://mainnet.infura.io/v3/8e609c76fce442f8a1735fbea9999747",
-        "https://mainnet.infura.io/v3/a95781685090488a83012e1c37e9728b"
-    ]
+    "BootStrapIPs" : [],
+    "BootStrapIPs" : [],
+    "RinkebyBootStrapIPs": [],
+    "ChainNodePool": []
 }
