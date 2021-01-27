@@ -1,5 +1,4 @@
-# Usage:
-# $ 
+.DEFAULT_GOAL := build
 
 CORE := ${GOPATH}/src/github.com/DOSNetwork/core
 
@@ -9,13 +8,11 @@ sync:
 	cp ${CORE}/onchain/dosstaking/*.abi abi/
 	cp ${CORE}/onchain/dosproxy/*.abi abi/
 	cp ${CORE}/onchain/commitreveal/*.abi abi/
-
-gen: sync
-	abigen --abi "abi/DOSAddressBridge.abi" --pkg dosbridge --out "models/dosbridge/DOSAddressBridge.go"
-	abigen --abi "abi/DOSPayment.abi" --pkg dospayment --out "models/dospayment/DOSPayment.go"
-	abigen --abi "abi/DOSProxy.abi" --pkg dosproxy --out "models/dosproxy/DOSProxy.go"
-	abigen --abi "abi/Staking.abi" --pkg dosstaking --out "models/dosstaking/Staking.go"
-	abigen --abi "abi/CommitReveal.abi" --pkg commitreveal --out "models/commitreveal/CommitReveal.go"
+	cp ${CORE}/onchain/dosbridge/DOSAddressBridge.go models/dosbridge/DOSAddressBridge.go
+	cp ${CORE}/onchain/dospayment/DOSPayment.go models/dospayment/DOSPayment.go
+	cp ${CORE}/onchain/dosproxy/DOSProxy.go models/dosproxy/DOSProxy.go
+	cp ${CORE}/onchain/dosstaking/Staking.go models/dosstaking/Staking.go
+	cp ${CORE}/onchain/commitreveal/CommitReveal.go models/commitreveal/CommitReveal.go
 
 check-env:
 ifeq ($(GETHURL),)
@@ -23,12 +20,10 @@ ifeq ($(GETHURL),)
 	exit 1;
 endif
 
-build:
-	go build -o subscriber/subscriber subscriber/main.go
+build: sync
 	go build -o server/server server/main.go
+	go build -o subscriber/subscriber subscriber/main.go
 
 clean:
-	rm subscriber/subscriber
-	rm server/server
-	dropdb dev
-	createdb dev
+	rm -f subscriber/subscriber
+	rm -f server/server

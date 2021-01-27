@@ -18,6 +18,8 @@ type Config struct {
 	BRIDGE_ADDR         string
 	BootStrapIPs        []string
 	RinkebyBootStrapIPs []string
+	HecoBootStrapIPs    []string
+	BSCBootStrapIPs     []string
 	ChainNodePool       []string
 }
 

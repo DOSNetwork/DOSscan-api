@@ -8,5 +8,7 @@
     "BootStrapIPs" : [],
     "BootStrapIPs" : [],
     "RinkebyBootStrapIPs": [],
+    "HecoBootStrapIPs": [],
+    "BSCBootStrapIPs": [],
     "ChainNodePool": []
 }
