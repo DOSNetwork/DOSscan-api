@@ -92,10 +92,12 @@ func main() {
 		bootStrapRinkebyHandler := _handler.NesBootStrapHandler(config.RinkebyBootStrapIPs)
 		bootStrapHecoHandler := _handler.NesBootStrapHandler(config.HecoBootStrapIPs)
 		bootStrapBSCHandler := _handler.NesBootStrapHandler(config.BSCBootStrapIPs)
+		bootStrapOkHandler := _handler.NesBootStrapHandler(config.OkBootStrapIPs)
 		api.GET("/bootStrap", bootStrapHandler.BootStrap)
 		api.GET("/bootStrapRinkeby", bootStrapRinkebyHandler.BootStrap)
 		api.GET("/bootStrapHeco", bootStrapHecoHandler.BootStrap)
 		api.GET("/bootStrapBSC", bootStrapBSCHandler.BootStrap)
+		api.GET("/bootStrapOkchain", bootStrapOkHandler.BootStrap)
 		server := &http.Server{
 			Addr:           ":8080",
 			Handler:        r,

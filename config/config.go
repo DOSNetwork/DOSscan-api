@@ -20,6 +20,7 @@ type Config struct {
 	RinkebyBootStrapIPs []string
 	HecoBootStrapIPs    []string
 	BSCBootStrapIPs     []string
+	OkBootStrapIPs      []string
 	ChainNodePool       []string
 }
 
